@@ -1651,7 +1651,10 @@ def my_bookings():
         refunded_bookings=refunded_bookings
     )
 
-@dashboard.route("/bookings/<int:request_id>/review", methods=["POST"])
+@dashboard.route(
+    "/bookings/<int:request_id>/review",
+    methods=["POST"]
+)
 @login_required
 def submit_review(request_id):
 
@@ -1674,7 +1677,10 @@ def submit_review(request_id):
         )
         return redirect(url_for("dashboard.my_bookings"))
 
-    # Prevent duplicate reviews
+    # ---------------------------------------------------------
+    # CHECK FOR EXISTING REVIEW
+    # ---------------------------------------------------------
+
     existing_review = Review.query.filter_by(
         service_request_id=service_request.id
     ).first()
@@ -1686,10 +1692,17 @@ def submit_review(request_id):
         )
         return redirect(url_for("dashboard.my_bookings"))
 
+    # ---------------------------------------------------------
+    # GET FORM DATA
+    # ---------------------------------------------------------
+
     rating = request.form.get("rating", type=int)
     comment = request.form.get("comment", "").strip()
 
-    # Validate rating
+    # ---------------------------------------------------------
+    # VALIDATE RATING
+    # ---------------------------------------------------------
+
     if rating is None or rating < 1 or rating > 5:
         flash(
             "Please select a rating between 1 and 5 stars.",
@@ -1697,7 +1710,10 @@ def submit_review(request_id):
         )
         return redirect(url_for("dashboard.my_bookings"))
 
-    # Get the professional directly from the booking
+    # ---------------------------------------------------------
+    # GET PROFESSIONAL
+    # ---------------------------------------------------------
+
     professional = service_request.professional
 
     if not professional:
@@ -1707,6 +1723,16 @@ def submit_review(request_id):
         )
         return redirect(url_for("dashboard.my_bookings"))
 
+    # ---------------------------------------------------------
+    # GET SERVICE NAME BEFORE ADDING REVIEW
+    # ---------------------------------------------------------
+
+    service_name = service_request.service.name
+
+    # ---------------------------------------------------------
+    # CREATE REVIEW
+    # ---------------------------------------------------------
+
     review = Review(
         user_id=current_user.id,
         professional_id=professional.id,
@@ -1715,15 +1741,43 @@ def submit_review(request_id):
         comment=comment if comment else None
     )
 
-    db.session.add(review)
+    try:
 
-    # Notify the professional
+        db.session.add(review)
+
+        # Save review first
+        db.session.commit()
+
+    except Exception as e:
+
+        # Roll back failed transaction
+        db.session.rollback()
+
+        # Handle duplicate review safely
+        if "reviews_service_request_id_key" in str(e):
+
+            flash(
+                "You have already reviewed this service.",
+                "error"
+            )
+
+            return redirect(
+                url_for("dashboard.my_bookings")
+            )
+
+        # Re-raise unexpected errors
+        raise
+
+    # ---------------------------------------------------------
+    # NOTIFY PROFESSIONAL
+    # ---------------------------------------------------------
+
     create_notification(
         user_id=professional.user_id,
         title="New Review",
         message=(
             f"You received a new review for "
-            f"{service_request.service.name}."
+            f"{service_name}."
         ),
         notification_type="new_review",
         booking_id=service_request.id
@@ -1736,7 +1790,10 @@ def submit_review(request_id):
         "success"
     )
 
-    return redirect(url_for("dashboard.my_bookings"))
+    return redirect(
+        url_for("dashboard.my_bookings")
+    )
+
 @dashboard.route("/bookings/<int:request_id>")
 @login_required
 def booking_details(request_id):
