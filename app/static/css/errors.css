@@ -1,0 +1,120 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #1f2937;
+    background: #ffffff;
+}
+
+.error-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 20px;
+    background: linear-gradient(135deg, #f7f9ff 0%, #ffffff 55%, #eef3ff 100%);
+}
+
+.error-card {
+    width: 100%;
+    max-width: 650px;
+    padding: 55px 45px;
+    text-align: center;
+    background: #ffffff;
+    border: 1px solid #e7ebf5;
+    border-radius: 20px;
+    box-shadow: 0 18px 50px rgba(31, 41, 55, 0.10);
+}
+
+.error-code {
+    margin-bottom: 12px;
+    color: #315efb;
+    font-size: clamp(72px, 14vw, 130px);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -5px;
+}
+
+.error-card h1 {
+    margin-bottom: 14px;
+    font-size: 30px;
+    color: #1f2937;
+}
+
+.error-card p {
+    max-width: 520px;
+    margin: 0 auto;
+    color: #667085;
+    font-size: 16px;
+    line-height: 1.7;
+}
+
+.error-actions {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.primary-btn,
+.secondary-btn {
+    min-width: 125px;
+    padding: 11px 20px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.primary-btn {
+    color: #ffffff;
+    background: #315efb;
+    border: 1px solid #315efb;
+}
+
+.primary-btn:hover {
+    background: #244bd1;
+    border-color: #244bd1;
+}
+
+.secondary-btn {
+    color: #315efb;
+    background: #ffffff;
+    border: 1px solid #cdd6f5;
+}
+
+.secondary-btn:hover {
+    background: #f3f6ff;
+}
+
+@media (max-width: 600px) {
+    .error-card {
+        padding: 42px 24px;
+    }
+
+    .error-card h1 {
+        font-size: 25px;
+    }
+
+    .error-card p {
+        font-size: 15px;
+    }
+
+    .error-actions {
+        flex-direction: column;
+    }
+
+    .primary-btn,
+    .secondary-btn {
+        width: 100%;
+        max-width: 250px;
+    }
+}
