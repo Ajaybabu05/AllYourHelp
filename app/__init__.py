@@ -1,7 +1,8 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
+from flask_wtf.csrf import generate_csrf
 
 from .config import Config
-from .extensions import db, migrate, login_manager, mail
+from .extensions import db, migrate, login_manager, mail, csrf
 
 
 def create_app():
@@ -11,11 +12,61 @@ def create_app():
     # Load configuration
     app.config.from_object(Config)
 
-    # Initialize extensions
+    # Initialize database and other extensions
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
     mail.init_app(app)
+
+    # --------------------------------------------------
+    # CSRF protection
+    #
+    # Existing AllYourHelp forms are protected using a
+    # signed CSRF token stored in a secure cookie and
+    # supplied to Flask-WTF through the request header.
+    # This lets us protect the existing forms without
+    # changing their business logic.
+    # --------------------------------------------------
+
+    @app.before_request
+    def add_csrf_header_from_cookie():
+
+        if request.method in {"POST", "PUT", "PATCH", "DELETE"}:
+
+            csrf_cookie = request.cookies.get(
+                "XSRF-TOKEN"
+            )
+
+            if csrf_cookie and not request.headers.get(
+                "X-CSRFToken"
+            ):
+
+                request.environ[
+                    "HTTP_X_CSRFTOKEN"
+                ] = csrf_cookie
+
+    csrf.init_app(app)
+
+    @app.after_request
+    def add_csrf_cookie(response):
+
+        # Generate a token for pages that create a session
+        # and expose it as a signed, HttpOnly cookie.
+        token = generate_csrf()
+
+        response.set_cookie(
+            "XSRF-TOKEN",
+            token,
+            max_age=app.config["PERMANENT_SESSION_LIFETIME"].total_seconds(),
+            secure=app.config.get(
+                "SESSION_COOKIE_SECURE",
+                False
+            ),
+            httponly=True,
+            samesite="Lax"
+        )
+
+        return response
 
     # --------------------------------------------------
     # Basic security headers
@@ -44,8 +95,6 @@ def create_app():
             "camera=(), microphone=(), geolocation=()"
         )
 
-        # HSTS should only be sent when the application is
-        # actually served over HTTPS.
         if (
             app.config.get("APP_ENV") == "production"
             and app.config.get("SESSION_COOKIE_SECURE")
@@ -67,8 +116,13 @@ def create_app():
     # Flask-Login user loader
     @login_manager.user_loader
     def load_user(user_id):
+
         try:
-            return db.session.get(User, int(user_id))
+            return db.session.get(
+                User,
+                int(user_id)
+            )
+
         except (TypeError, ValueError):
             return None
 
