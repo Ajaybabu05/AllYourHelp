@@ -1,0 +1,315 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f5f7fb;
+    color: #1f2937;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+.dashboard-header {
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 18px 0;
+}
+
+.dashboard-header-inner {
+    width: 90%;
+    max-width: 1100px;
+    margin: auto;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dashboard-logo {
+    font-size: 24px;
+    font-weight: 700;
+    color: #2563eb;
+}
+
+.dashboard-user {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.logout-button {
+    text-decoration: none;
+    color: #ffffff;
+    background: #ef4444;
+
+    padding: 9px 16px;
+    border-radius: 7px;
+
+    transition: 0.2s;
+}
+
+.logout-button:hover {
+    background: #dc2626;
+}
+
+
+/* =========================
+   CONTAINER
+========================= */
+
+.review-container {
+    width: 90%;
+    max-width: 850px;
+    margin: 50px auto;
+}
+
+
+/* =========================
+   WELCOME
+========================= */
+
+.welcome-section {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.welcome-section h1 {
+    font-size: 32px;
+    margin-bottom: 10px;
+    color: #111827;
+}
+
+.welcome-section p {
+    color: #6b7280;
+    font-size: 16px;
+}
+
+
+/* =========================
+   BOOKING CARD
+========================= */
+
+.booking-card {
+    background: #ffffff;
+
+    border-radius: 14px;
+
+    padding: 32px;
+
+    box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.card-header {
+    border-bottom: 1px solid #e5e7eb;
+
+    padding-bottom: 20px;
+    margin-bottom: 10px;
+}
+
+.card-header h2 {
+    font-size: 22px;
+    color: #111827;
+}
+
+
+/* =========================
+   DETAILS
+========================= */
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+
+    gap: 30px;
+
+    padding: 16px 0;
+
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.detail-label {
+    color: #6b7280;
+    font-weight: 600;
+}
+
+.detail-value {
+    text-align: right;
+    font-weight: 600;
+    color: #111827;
+}
+
+
+/* =========================
+   TEXT SECTIONS
+========================= */
+
+.detail-section {
+    margin-top: 25px;
+}
+
+.detail-section h3 {
+    font-size: 17px;
+    margin-bottom: 10px;
+}
+
+.detail-section p {
+    background: #f8fafc;
+
+    padding: 15px;
+
+    border-radius: 8px;
+
+    color: #4b5563;
+
+    line-height: 1.6;
+}
+
+
+/* =========================
+   PRICE
+========================= */
+
+.price-section {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    margin-top: 30px;
+
+    padding: 20px 0;
+
+    border-top: 2px solid #e5e7eb;
+}
+
+.price-section span {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.price-section strong {
+    font-size: 25px;
+    color: #2563eb;
+}
+
+
+/* =========================
+   ACTIONS
+========================= */
+
+.booking-actions {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 20px;
+
+    margin-top: 25px;
+}
+
+.back-button {
+    text-decoration: none;
+
+    color: #374151;
+
+    border: 1px solid #d1d5db;
+
+    padding: 12px 20px;
+
+    border-radius: 8px;
+
+    background: #ffffff;
+
+    font-weight: 600;
+
+    transition: 0.2s;
+}
+
+.back-button:hover {
+    background: #f3f4f6;
+}
+
+.continue-button {
+    border: none;
+
+    background: #2563eb;
+
+    color: #ffffff;
+
+    padding: 13px 24px;
+
+    border-radius: 8px;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+.continue-button:hover {
+    background: #1d4ed8;
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 650px) {
+
+    .dashboard-header-inner {
+        width: 94%;
+    }
+
+    .dashboard-logo {
+        font-size: 20px;
+    }
+
+    .dashboard-user {
+        gap: 10px;
+    }
+
+    .review-container {
+        width: 94%;
+        margin: 30px auto;
+    }
+
+    .booking-card {
+        padding: 22px;
+    }
+
+    .detail-row {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .detail-value {
+        text-align: left;
+    }
+
+    .booking-actions {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    .back-button,
+    .continue-button {
+        width: 100%;
+        text-align: center;
+    }
+}

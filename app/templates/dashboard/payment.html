@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Payment - AllYourHelp</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f7fb;
+            color: #222;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 60px auto;
+            padding: 20px;
+        }
+
+        .payment-card {
+            background: white;
+            border-radius: 16px;
+            padding: 35px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            margin-top: 0;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .details {
+            background: #f8f9fc;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .detail {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .detail:last-child {
+            border-bottom: none;
+        }
+
+        .label {
+            color: #666;
+        }
+
+        .value {
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .amount-box {
+            background: #f8f9fc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .amount {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .amount-label {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .amount-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2563eb;
+        }
+
+        .payment-method {
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            padding: 18px;
+            background: #fafafa;
+        }
+
+        .payment-method strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .payment-method span {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            border: none;
+            text-decoration: none;
+            padding: 14px 24px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .secondary {
+            background: #e5e7eb;
+            color: #333;
+        }
+
+        .primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .primary:hover {
+            background: #1d4ed8;
+        }
+
+        .secondary:hover {
+            background: #d1d5db;
+        }
+
+        @media (max-width: 600px) {
+
+            .payment-card {
+                padding: 25px 20px;
+            }
+
+            .detail {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .value {
+                text-align: left;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="payment-card">
+
+        <h1>
+            Complete Your Payment
+        </h1>
+
+        <p class="subtitle">
+            Review your booking details before proceeding with payment.
+        </p>
+
+
+        <!-- Booking Information -->
+
+        <div class="section">
+
+            <div class="section-title">
+                Booking Details
+            </div>
+
+            <div class="details">
+
+                <div class="detail">
+
+                    <span class="label">
+                        Service
+                    </span>
+
+                    <span class="value">
+                        {{ service.name }}
+                    </span>
+
+                </div>
+
+
+                <div class="detail">
+
+                    <span class="label">
+                        Professional
+                    </span>
+
+                    <span class="value">
+                        {{ professional.user.name }}
+                    </span>
+
+                </div>
+
+
+                <div class="detail">
+
+                    <span class="label">
+                        Date
+                    </span>
+
+                    <span class="value">
+                        {{ slot.slot_date }}
+                    </span>
+
+                </div>
+
+
+                <div class="detail">
+
+                    <span class="label">
+                        Time
+                    </span>
+
+                    <span class="value">
+
+                        {{ slot.start_time.strftime('%I:%M %p') }}
+
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Payment Amount -->
+
+        <div class="section">
+
+            <div class="section-title">
+                Payment Summary
+            </div>
+
+            <div class="amount-box">
+
+                <div class="amount">
+
+                    <span class="amount-label">
+                        Total Amount
+                    </span>
+
+                    <span class="amount-value">
+
+                        ₹{{ "%.2f"|format(service.price or 0) }}
+
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Payment Method -->
+
+        <div class="section">
+
+            <div class="section-title">
+                Payment Method
+            </div>
+
+            <div class="payment-method">
+
+                <strong>
+                    Online Payment
+                </strong>
+
+                <span>
+                    Secure payment through AllYourHelp
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- Actions -->
+
+        <div class="actions">
+
+            <a
+                href="{{ url_for(
+                    'services.request_service',
+                    professional_id=professional.id
+                ) }}"
+                class="btn secondary"
+            >
+                Back to Booking
+            </a>
+
+
+            <form
+                method="POST"
+                action="{{ url_for(
+                    'dashboard.process_payment'
+                ) }}"
+            >
+
+                <button
+                    type="submit"
+                    class="btn primary"
+                >
+                    Pay ₹{{ "%.2f"|format(service.price or 0) }}
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

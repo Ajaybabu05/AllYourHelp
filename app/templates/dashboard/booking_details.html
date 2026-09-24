@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Booking Details - AllYourHelp</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f7fb;
+            color: #222;
+        }
+
+        .page {
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+
+        .back {
+            display: inline-block;
+            margin-bottom: 20px;
+            text-decoration: none;
+            color: #2563eb;
+            font-weight: bold;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 35px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            margin: 0 0 8px;
+            font-size: 30px;
+        }
+
+        .booking-id {
+            color: #777;
+            margin: 0;
+        }
+
+        .status {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: capitalize;
+            background: #fff7ed;
+            color: #c2410c;
+        }
+
+        .details {
+            background: #f8f9fc;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .detail {
+            display: flex;
+            justify-content: space-between;
+            gap: 30px;
+            padding: 15px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .detail:last-child {
+            border-bottom: none;
+        }
+
+        .label {
+            font-weight: bold;
+            color: #555;
+        }
+
+        .value {
+            text-align: right;
+            color: #222;
+        }
+
+        .description {
+            margin-top: 30px;
+        }
+
+        .description h3 {
+            margin-bottom: 10px;
+        }
+
+        .description-box {
+            background: #f8f9fc;
+            border-radius: 10px;
+            padding: 18px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            display: inline-block;
+            text-decoration: none;
+            padding: 13px 22px;
+            border-radius: 8px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .secondary {
+            background: #e5e7eb;
+            color: #333;
+        }
+
+        .payment-pending {
+            color: #d97706;
+            font-weight: bold;
+        }
+
+        .payment-paid {
+            color: #16a34a;
+            font-weight: bold;
+        }
+
+        @media (max-width: 650px) {
+
+            .header {
+                flex-direction: column;
+            }
+
+            .detail {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .value {
+                text-align: left;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                text-align: center;
+            }
+
+        }
+                .cancel-btn {
+            background: #dc2626;
+            color: white;
+        }
+
+        .cancel-btn:hover {
+            background: #b91c1c;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="page">
+
+    <a
+        href="{{ url_for('dashboard.my_bookings') }}"
+        class="back"
+    >
+        ← Back to My Bookings
+    </a>
+
+
+    <div class="card">
+
+        <div class="header">
+
+            <div>
+
+                <h1>
+                    Booking Details
+                </h1>
+
+                <p class="booking-id">
+                    Booking #{{ service_request.id }}
+                </p>
+
+            </div>
+
+
+            <div class="status">
+
+                {{ service_request.status|capitalize }}
+
+            </div>
+
+        </div>
+
+
+        <!-- BOOKING INFORMATION -->
+
+        <div class="details">
+
+            <div class="detail">
+
+                <span class="label">
+                    Service
+                </span>
+
+                <span class="value">
+                    {{ service_request.service.name }}
+                </span>
+
+            </div>
+
+
+            <div class="detail">
+
+                <span class="label">
+                    Professional
+                </span>
+
+                <span class="value">
+                    {{ service_request.professional.user.name }}
+                </span>
+
+            </div>
+
+
+            <div class="detail">
+
+                <span class="label">
+                    Date
+                </span>
+
+                <span class="value">
+                    {{ service_request.preferred_date }}
+                </span>
+
+            </div>
+
+
+            {% if service_request.preferred_time %}
+
+            <div class="detail">
+
+                <span class="label">
+                    Time
+                </span>
+
+                <span class="value">
+
+                    {{ service_request.preferred_time.strftime('%I:%M %p') }}
+
+                </span>
+
+            </div>
+
+            {% endif %}
+
+
+            {% if service_request.location %}
+
+            <div class="detail">
+
+                <span class="label">
+                    Location
+                </span>
+
+                <span class="value">
+                    {{ service_request.location }}
+                </span>
+
+            </div>
+
+            {% endif %}
+
+
+            <div class="detail">
+
+                <span class="label">
+                    Price
+                </span>
+
+                <span class="value">
+
+                    ₹{{ "%.2f"|format(service_request.service.price or 0) }}
+
+                </span>
+
+            </div>
+
+
+            <div class="detail">
+
+                <span class="label">
+                    Payment Status
+                </span>
+
+                <span class="value">
+
+                    {% if service_request.payment_status == "paid" %}
+
+                        <span class="payment-paid">
+                            Paid
+                        </span>
+
+                    {% else %}
+
+                        <span class="payment-pending">
+                            {{ (service_request.payment_status or "pending")|capitalize }}
+                        </span>
+
+                    {% endif %}
+
+                </span>
+
+            </div>
+
+
+            <div class="detail">
+
+                <span class="label">
+                    Booking Created
+                </span>
+
+                <span class="value">
+
+                    {{ service_request.created_at.strftime('%d %b %Y, %I:%M %p') }}
+
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- REQUIREMENT -->
+
+        <div class="description">
+
+            <h3>
+                Your Requirement
+            </h3>
+
+            <div class="description-box">
+
+                {{ service_request.description }}
+
+            </div>
+
+        </div>
+
+
+        {% if service_request.additional_details %}
+
+        <div class="description">
+
+            <h3>
+                Additional Details
+            </h3>
+
+            <div class="description-box">
+
+                {{ service_request.additional_details }}
+
+            </div>
+
+        </div>
+
+                    {% endif %}
+
+
+                    <!-- ACTIONS -->
+
+                    <div class="actions">
+
+                <a
+                    href="{{ url_for('dashboard.my_bookings') }}"
+                    class="btn secondary"
+                >
+                    Back to My Bookings
+                </a>
+                    {% if service_request.payment_status != "paid"
+                    and service_request.status != "cancelled" %}
+
+                {% endif %}
+
+
+                {% if service_request.status in ['pending', 'confirmed'] %}
+
+                <form
+                    method="POST"
+                    action="{{ url_for(
+                        'dashboard.cancel_booking',
+                        request_id=service_request.id
+                    ) }}"
+                    style="display: inline;"
+                >
+
+                    <button
+                        type="submit"
+                        class="btn cancel-btn"
+                        onclick="return confirm(
+                            'Are you sure you want to cancel this booking?'
+                        );"
+                    >
+                        Cancel Booking
+                    </button>
+
+                </form>
+
+                {% endif %}
+
+            </div>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

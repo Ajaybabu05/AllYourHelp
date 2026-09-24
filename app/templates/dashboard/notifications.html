@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Notifications - AllYourHelp</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f5f7fb;
+            color: #1f2937;
+            min-height: 100vh;
+        }
+
+        /* HEADER */
+
+        .header {
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+
+            padding: 18px 40px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2563eb;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-name {
+            font-size: 14px;
+            color: #4b5563;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+
+            border-radius: 50%;
+            overflow: hidden;
+
+            background: #2563eb;
+            color: white;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-weight: 600;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* CONTAINER */
+
+        .container {
+            max-width: 800px;
+            margin: 45px auto;
+            padding: 0 20px;
+        }
+
+        .back-link {
+            display: inline-block;
+
+            color: #2563eb;
+            text-decoration: none;
+
+            font-size: 14px;
+            font-weight: 500;
+
+            margin-bottom: 20px;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .page-title {
+            font-size: 30px;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+
+        .page-description {
+            color: #6b7280;
+            font-size: 15px;
+            margin-bottom: 25px;
+        }
+
+        /* NOTIFICATION CARD */
+
+        .notifications-card {
+            background: white;
+
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+
+            overflow: hidden;
+
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+        }
+
+        .notification {
+            display: flex;
+            gap: 16px;
+
+            padding: 20px;
+
+            border-bottom: 1px solid #e5e7eb;
+
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .notification:last-child {
+            border-bottom: none;
+        }
+
+        .notification:hover {
+            background: #f9fafb;
+        }
+
+        .notification.unread {
+            background: #eff6ff;
+        }
+
+        .notification-icon {
+            width: 42px;
+            height: 42px;
+
+            flex-shrink: 0;
+
+            border-radius: 50%;
+
+            background: #dbeafe;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 19px;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-size: 15px;
+            font-weight: 600;
+
+            color: #111827;
+
+            margin-bottom: 5px;
+        }
+
+        .notification-message {
+            font-size: 14px;
+            color: #6b7280;
+
+            line-height: 1.5;
+
+            margin-bottom: 7px;
+        }
+
+        .notification-time {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        .unread-dot {
+            width: 9px;
+            height: 9px;
+
+            flex-shrink: 0;
+
+            border-radius: 50%;
+
+            background: #2563eb;
+
+            margin-top: 7px;
+        }
+
+        /* EMPTY STATE */
+
+        .empty-state {
+            padding: 65px 25px;
+
+            text-align: center;
+        }
+
+        .empty-icon {
+            font-size: 45px;
+            margin-bottom: 15px;
+        }
+
+        .empty-state h2 {
+            font-size: 20px;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 600px) {
+
+            .header {
+                padding: 15px 20px;
+            }
+
+            .logo {
+                font-size: 21px;
+            }
+
+            .user-name {
+                display: none;
+            }
+
+            .container {
+                margin: 30px auto;
+            }
+
+            .page-title {
+                font-size: 25px;
+            }
+
+            .notification {
+                padding: 16px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <header class="header">
+
+        <div class="logo">
+            AllYourHelp
+        </div>
+
+        <div class="header-right">
+
+            <span class="user-name">
+                {{ user.name }}
+            </span>
+
+            <div class="user-avatar">
+
+                {% if user.profile_image %}
+
+                    <img
+                        src="{{ url_for(
+                            'static',
+                            filename=user.profile_image
+                        ) }}"
+                        alt="{{ user.name }}"
+                    >
+
+                {% else %}
+
+                    {{ user.name[0]|upper }}
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <main class="container">
+
+        <a
+            href="{{ url_for('dashboard.user_dashboard') }}"
+            class="back-link"
+        >
+            ← Back to Dashboard
+        </a>
+
+        <h1 class="page-title">
+            Notifications
+        </h1>
+
+        <p class="page-description">
+            Stay updated about your bookings and services.
+        </p>
+
+
+        <div class="notifications-card">
+
+            {% if notifications %}
+
+                {% for notification in notifications %}
+
+                    <a
+                        href="{{
+                            url_for(
+                                'dashboard.notification_click',
+                                notification_id=notification.id
+                            )
+                        }}"
+                        class="notification
+                        {% if not notification.is_read %}
+                            unread
+                        {% endif %}"
+                    >
+
+                        <div class="notification-icon">
+
+                            {% if notification.notification_type == "booking_confirmation" %}
+                                📅
+                            {% elif notification.notification_type == "booking_update" %}
+                                🔄
+                            {% elif notification.notification_type == "professional_response" %}
+                                👤
+                            {% elif notification.notification_type == "completion" %}
+                                ✅
+                            {% else %}
+                                🔔
+                            {% endif %}
+
+                        </div>
+
+                        <div class="notification-content">
+
+                            <div class="notification-title">
+                                {{ notification.title }}
+                            </div>
+
+                            <div class="notification-message">
+                                {{ notification.message }}
+                            </div>
+
+                            <div class="notification-time">
+                                {{ notification.created_at.strftime(
+                                    "%d %b %Y, %I:%M %p"
+                                ) }}
+                            </div>
+
+                        </div>
+
+                        {% if not notification.is_read %}
+
+                            <span class="unread-dot"></span>
+
+                        {% endif %}
+
+                    </a>
+
+                {% endfor %}
+
+            {% else %}
+
+                <div class="empty-state">
+
+                    <div class="empty-icon">
+                        🔔
+                    </div>
+
+                    <h2>
+                        No notifications
+                    </h2>
+
+                    <p>
+                        You're all caught up. New updates will
+                        appear here.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </main>
+
+</body>
+
+</html>

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Booking Confirmed - AllYourHelp</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f7fb;
+            color: #222;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 80px auto;
+            padding: 20px;
+        }
+
+        .success-card {
+            background: white;
+            border-radius: 16px;
+            padding: 45px;
+            text-align: center;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        .success-icon {
+            width: 75px;
+            height: 75px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            background: #e8f8ee;
+            color: #22a05a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            font-weight: bold;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+            color: #222;
+        }
+
+        .message {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .booking-details {
+            text-align: left;
+            background: #f8f9fc;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .detail {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .detail:last-child {
+            border-bottom: none;
+        }
+
+        .label {
+            font-weight: bold;
+            color: #555;
+        }
+
+        .value {
+            color: #222;
+            text-align: right;
+        }
+
+        .status {
+            color: #d97706;
+            font-weight: bold;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .btn {
+            text-decoration: none;
+            padding: 13px 24px;
+            border-radius: 8px;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .secondary {
+            background: #e5e7eb;
+            color: #333;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="success-card">
+
+        <div class="success-icon">
+            ✓
+        </div>
+
+        <h1>Booking Confirmed!</h1>
+
+        <p class="message">
+            Your service booking has been successfully confirmed.
+        </p>
+
+        <div class="booking-details">
+
+            <div class="detail">
+                <span class="label">Booking ID</span>
+                <span class="value">
+                    #{{ service_request.id }}
+                </span>
+            </div>
+
+            <div class="detail">
+                <span class="label">Service</span>
+                <span class="value">
+                    {{ service_request.service.name }}
+                </span>
+            </div>
+
+            <div class="detail">
+                <span class="label">Professional</span>
+                <span class="value">
+                    {{ service_request.professional.user.name }}
+                </span>
+            </div>
+
+            <div class="detail">
+                <span class="label">Date</span>
+                <span class="value">
+                    {{ service_request.preferred_date }}
+                </span>
+            </div>
+
+            {% if service_request.preferred_time %}
+            <div class="detail">
+                <span class="label">Time</span>
+                <span class="value">
+                    {{ service_request.preferred_time.strftime('%I:%M %p') }}
+                </span>
+            </div>
+            {% endif %}
+
+            <div class="detail">
+                <span class="label">Booking Status</span>
+                <span class="value status">
+                    {{ service_request.status|capitalize }}
+                </span>
+            </div>
+
+        </div>
+
+        <div class="buttons">
+
+            <a
+                href="{{ url_for('dashboard.user_dashboard') }}"
+                class="btn primary"
+            >
+                Go to Dashboard
+            </a>
+
+            <a
+                href="{{ url_for('services.category_services', slug=service_request.service.category.slug) }}"
+                class="btn secondary"
+            >
+                Browse More Services
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

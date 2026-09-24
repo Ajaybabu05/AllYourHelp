@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Service Request Details - AllYourHelp</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f5f7fb;
+            color: #1f2937;
+        }
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        .header {
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 20px 40px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2563eb;
+        }
+
+        .admin-label {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        /* =========================
+           MAIN CONTAINER
+        ========================= */
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* =========================
+           BACK LINK
+        ========================= */
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 25px;
+
+            text-decoration: none;
+
+            color: #2563eb;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        /* =========================
+           PAGE HEADER
+        ========================= */
+
+        .page-header {
+            margin-bottom: 25px;
+        }
+
+        .page-header h1 {
+            font-size: 32px;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+
+        .page-header p {
+            color: #6b7280;
+            font-size: 15px;
+        }
+
+        /* =========================
+           DETAILS CARD
+        ========================= */
+
+        .details-card {
+            background: #ffffff;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+
+            padding: 30px;
+
+            box-shadow:
+                0 4px 12px rgba(0, 0, 0, 0.04);
+
+            margin-bottom: 25px;
+        }
+
+        .card-title {
+            font-size: 20px;
+            color: #111827;
+
+            margin-bottom: 25px;
+
+            padding-bottom: 15px;
+
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        /* =========================
+           DETAIL ROWS
+        ========================= */
+
+        .detail-row {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+
+            gap: 20px;
+
+            padding: 16px 0;
+
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #6b7280;
+        }
+
+        .detail-value {
+            font-size: 15px;
+            color: #111827;
+        }
+
+        /* =========================
+           PROFESSIONAL
+        ========================= */
+
+        .professional-name {
+            font-weight: 600;
+            color: #111827;
+            font-size: 16px;
+        }
+
+        .professional-email {
+            margin-top: 5px;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        /* =========================
+           SERVICE
+        ========================= */
+
+        .service-name {
+            font-weight: 600;
+            color: #2563eb;
+            font-size: 16px;
+        }
+
+        .category-name {
+            margin-top: 5px;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        /* =========================
+           STATUS
+        ========================= */
+
+        .status {
+            display: inline-block;
+
+            padding: 6px 12px;
+
+            border-radius: 20px;
+
+            font-size: 13px;
+            font-weight: 600;
+
+            text-transform: capitalize;
+        }
+
+        .status.pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status.approved {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status.rejected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status.removed {
+            background: #f3f4f6;
+            color: #4b5563;
+        }
+
+        /* =========================
+           REQUEST ID
+        ========================= */
+
+        .request-id {
+            font-weight: 600;
+            color: #374151;
+        }
+
+        /* =========================
+           ACTION CARD
+        ========================= */
+
+        .actions-card {
+            background: #ffffff;
+
+            border-radius: 12px;
+
+            border: 1px solid #e5e7eb;
+
+            padding: 25px 30px;
+
+            box-shadow:
+                0 4px 12px rgba(0, 0, 0, 0.04);
+        }
+
+        .actions-title {
+            font-size: 18px;
+            color: #111827;
+
+            margin-bottom: 18px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* =========================
+           BUTTONS
+        ========================= */
+
+        .btn {
+            border: none;
+
+            border-radius: 7px;
+
+            padding: 11px 18px;
+
+            font-size: 14px;
+
+            font-weight: 600;
+
+            cursor: pointer;
+
+            text-decoration: none;
+
+            display: inline-block;
+        }
+
+        .approve-btn {
+            background: #16a34a;
+            color: white;
+        }
+
+        .approve-btn:hover {
+            background: #15803d;
+        }
+
+        .reject-btn {
+            background: #dc2626;
+            color: white;
+        }
+
+        .reject-btn:hover {
+            background: #b91c1c;
+        }
+
+        .back-btn {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .back-btn:hover {
+            background: #e5e7eb;
+        }
+
+        /* =========================
+           FLASH MESSAGES
+        ========================= */
+
+        .flash-container {
+            margin-bottom: 20px;
+        }
+
+        .flash {
+            padding: 14px 18px;
+
+            border-radius: 8px;
+
+            margin-bottom: 10px;
+
+            font-size: 14px;
+        }
+
+        .flash.success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .flash.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        /* =========================
+           MOBILE
+        ========================= */
+
+        @media (max-width: 768px) {
+
+            .header {
+                padding: 18px 20px;
+            }
+
+            .container {
+                margin: 25px auto;
+            }
+
+            .page-header h1 {
+                font-size: 26px;
+            }
+
+            .details-card {
+                padding: 20px;
+            }
+
+            .detail-row {
+                grid-template-columns: 1fr;
+                gap: 6px;
+            }
+
+            .actions-card {
+                padding: 20px;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                text-align: center;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =========================
+         HEADER
+    ========================= -->
+
+    <header class="header">
+
+        <div class="logo">
+            AllYourHelp
+        </div>
+
+        <div class="admin-label">
+            Admin Panel
+        </div>
+
+    </header>
+
+
+    <!-- =========================
+         MAIN
+    ========================= -->
+
+    <main class="container">
+
+
+        <!-- BACK LINK -->
+
+        <a
+            href="{{ url_for('admin.service_requests') }}"
+            class="back-link"
+        >
+            ← Back to Service Requests
+        </a>
+
+
+        <!-- PAGE HEADER -->
+
+        <div class="page-header">
+
+            <h1>
+                Service Request Details
+            </h1>
+
+            <p>
+                Review the professional's request before approving or rejecting it.
+            </p>
+
+        </div>
+
+
+        <!-- =========================
+             FLASH MESSAGES
+        ========================= -->
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+
+            {% if messages %}
+
+                <div class="flash-container">
+
+                    {% for category, message in messages %}
+
+                        <div class="flash {{ category }}">
+                            {{ message }}
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% endif %}
+
+        {% endwith %}
+
+
+        <!-- =========================
+             REQUEST DETAILS
+        ========================= -->
+
+        <div class="details-card">
+
+            <div class="card-title">
+                Request Information
+            </div>
+
+
+            <!-- REQUEST ID -->
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Request ID
+                </div>
+
+                <div class="detail-value">
+
+                    <span class="request-id">
+                        #{{ service_request.id }}
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- PROFESSIONAL -->
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Professional
+                </div>
+
+                <div class="detail-value">
+
+                    <div class="professional-name">
+                        {{ service_request.professional.user.name }}
+                    </div>
+
+                    <div class="professional-email">
+                        {{ service_request.professional.user.email }}
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- SERVICE -->
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Requested Service
+                </div>
+
+                <div class="detail-value">
+
+                    <div class="service-name">
+                        {{ service_request.service.name }}
+                    </div>
+
+                    {% if service_request.service.category %}
+
+                        <div class="category-name">
+                            Category:
+                            {{ service_request.service.category.name }}
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <!-- STATUS -->
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Status
+                </div>
+
+                <div class="detail-value">
+
+                    <span
+                        class="status {{ service_request.status }}"
+                    >
+                        {{ service_request.status }}
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- REQUESTED DATE -->
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Requested On
+                </div>
+
+                <div class="detail-value">
+
+                    {% if service_request.created_at %}
+
+                        {{ service_request.created_at.strftime('%d %b %Y, %I:%M %p') }}
+
+                    {% else %}
+
+                        —
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <!-- LAST UPDATED -->
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Last Updated
+                </div>
+
+                <div class="detail-value">
+
+                    {% if service_request.updated_at %}
+
+                        {{ service_request.updated_at.strftime('%d %b %Y, %I:%M %p') }}
+
+                    {% else %}
+
+                        —
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+        <!-- =========================
+             ACTIONS
+        ========================= -->
+
+        <div class="actions-card">
+
+            <div class="actions-title">
+                Request Actions
+            </div>
+
+
+            {% if service_request.status == "pending" %}
+
+                <div class="actions">
+
+
+                    <!-- APPROVE -->
+
+                    <form
+                        method="POST"
+                        action="{{ url_for(
+                            'admin.approve_service_request',
+                            request_id=service_request.id
+                        ) }}"
+                    >
+
+                        <button
+                            type="submit"
+                            class="btn approve-btn"
+                            onclick="return confirm(
+                                'Approve this service request?'
+                            );"
+                        >
+                            Approve Request
+                        </button>
+
+                    </form>
+
+
+                    <!-- REJECT -->
+
+                    <form
+                        method="POST"
+                        action="{{ url_for(
+                            'admin.reject_service_request',
+                            request_id=service_request.id
+                        ) }}"
+                    >
+
+                        <button
+                            type="submit"
+                            class="btn reject-btn"
+                            onclick="return confirm(
+                                'Reject this service request?'
+                            );"
+                        >
+                            Reject Request
+                        </button>
+
+                    </form>
+
+
+                    <!-- BACK -->
+
+                    <a
+                        href="{{ url_for('admin.service_requests') }}"
+                        class="btn back-btn"
+                    >
+                        Back
+                    </a>
+
+                </div>
+
+            {% else %}
+
+                <p style="color: #6b7280; margin-bottom: 15px;">
+                    This request has already been processed.
+                </p>
+
+                <a
+                    href="{{ url_for('admin.service_requests') }}"
+                    class="btn back-btn"
+                >
+                    ← Back to Service Requests
+                </a>
+
+            {% endif %}
+
+        </div>
+
+
+    </main>
+
+
+</body>
+
+</html>

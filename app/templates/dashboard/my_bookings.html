@@ -1,0 +1,2004 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>My Bookings - AllYourHelp</title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+
+            margin: 0;
+
+            font-family: Arial, sans-serif;
+
+            background: #f5f7fb;
+
+            color: #222;
+        }
+
+
+        .container {
+
+            max-width: 1100px;
+
+            margin: 50px auto;
+
+            padding: 20px;
+        }
+
+
+        /* --------------------------------
+           HEADER
+        -------------------------------- */
+
+        .header {
+
+            margin-bottom: 30px;
+        }
+
+
+        .header h1 {
+
+            margin: 0 0 8px;
+
+            font-size: 32px;
+        }
+
+
+        .header p {
+
+            margin: 0;
+
+            color: #666;
+        }
+
+
+        .back-link {
+
+            display: inline-block;
+
+            margin-bottom: 25px;
+
+            text-decoration: none;
+
+            color: #2563eb;
+
+            font-weight: bold;
+        }
+
+
+        .back-link:hover {
+
+            text-decoration: underline;
+        }
+
+
+        /* --------------------------------
+           EMPTY STATE
+        -------------------------------- */
+
+        .empty-card {
+
+            background: white;
+
+            padding: 60px 30px;
+
+            border-radius: 16px;
+
+            text-align: center;
+
+            box-shadow:
+                0 5px 20px rgba(0, 0, 0, 0.06);
+        }
+
+
+        .empty-icon {
+
+            font-size: 50px;
+
+            margin-bottom: 15px;
+        }
+
+
+        .empty-card h2 {
+
+            margin-bottom: 10px;
+        }
+
+
+        .empty-card p {
+
+            color: #666;
+
+            margin-bottom: 25px;
+        }
+
+
+        .browse-btn {
+
+            display: inline-block;
+
+            padding: 12px 22px;
+
+            background: #2563eb;
+
+            color: white;
+
+            text-decoration: none;
+
+            border-radius: 8px;
+
+            font-weight: bold;
+        }
+
+
+        .browse-btn:hover {
+
+            opacity: 0.9;
+        }
+
+
+        /* --------------------------------
+           BOOKINGS
+        -------------------------------- */
+
+        .bookings {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 20px;
+        }
+
+
+        .booking-card {
+
+            background: white;
+
+            border-radius: 16px;
+
+            padding: 25px;
+
+            box-shadow:
+                0 5px 20px rgba(0, 0, 0, 0.06);
+        }
+
+
+        /* --------------------------------
+           BOOKING TOP
+        -------------------------------- */
+
+        .booking-top {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin-bottom: 20px;
+        }
+
+
+        .booking-id {
+
+            font-size: 14px;
+
+            color: #777;
+        }
+        .booking-message.completed {
+            background: #eff6ff;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+        }
+
+        .service-name {
+
+            font-size: 21px;
+
+            font-weight: bold;
+
+            margin-top: 5px;
+        }
+
+
+        /* --------------------------------
+           STATUS
+        -------------------------------- */
+
+        .status {
+
+            padding: 7px 13px;
+
+            border-radius: 20px;
+
+            font-size: 13px;
+
+            font-weight: bold;
+
+            text-transform: capitalize;
+        }
+
+
+        .status-confirmed {
+
+            background: #ecfdf5;
+
+            color: #15803d;
+        }
+
+
+        .status-completed {
+
+            background: #eff6ff;
+
+            color: #1d4ed8;
+        }
+
+
+        .status-cancelled {
+
+            background: #fef2f2;
+
+            color: #dc2626;
+        }
+
+
+        .status-pending {
+
+            background: #fff7ed;
+
+            color: #c2410c;
+        }
+
+
+        .status-accepted {
+
+            background: #ecfdf5;
+
+            color: #15803d;
+        }
+
+
+        .status-rejected {
+
+            background: #fef2f2;
+
+            color: #dc2626;
+        }
+
+
+        /* --------------------------------
+           BOOKING MESSAGE
+        -------------------------------- */
+
+        .booking-message {
+
+            margin-bottom: 20px;
+
+            padding: 15px 18px;
+
+            border-radius: 10px;
+
+            font-size: 14px;
+
+            line-height: 1.5;
+        }
+
+
+        .booking-message.confirmed {
+
+            background: #eff6ff;
+
+            color: #1e40af;
+
+            border: 1px solid #bfdbfe;
+        }
+
+
+        .booking-message.accepted {
+
+            background: #ecfdf5;
+
+            color: #166534;
+
+            border: 1px solid #bbf7d0;
+        }
+
+
+        .booking-message.rejected {
+
+            background: #fef2f2;
+
+            color: #991b1b;
+
+            border: 1px solid #fecaca;
+        }
+
+
+        .booking-message.cancelled {
+
+            background: #fef2f2;
+
+            color: #991b1b;
+
+            border: 1px solid #fecaca;
+        }
+
+
+        /* --------------------------------
+           BOOKING INFORMATION
+        -------------------------------- */
+
+        .booking-info {
+
+            display: grid;
+
+            grid-template-columns: repeat(2, 1fr);
+
+            gap: 15px;
+
+            margin-bottom: 20px;
+        }
+
+
+        .info-item {
+
+            background: #f8f9fc;
+
+            padding: 15px;
+
+            border-radius: 10px;
+        }
+
+
+        .info-label {
+
+            display: block;
+
+            font-size: 12px;
+
+            color: #777;
+
+            margin-bottom: 5px;
+
+            text-transform: uppercase;
+        }
+
+
+        .info-value {
+
+            font-weight: bold;
+        }
+
+
+        /* --------------------------------
+           PAYMENT
+        -------------------------------- */
+
+        .payment-paid {
+
+            color: #16a34a;
+        }
+
+
+        .payment-pending {
+
+            color: #d97706;
+        }
+
+
+        .payment-failed {
+
+            color: #dc2626;
+        }
+
+
+        /* --------------------------------
+           FOOTER
+        -------------------------------- */
+
+        .booking-footer {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            border-top: 1px solid #eee;
+
+            padding-top: 18px;
+        }
+
+
+        .amount {
+
+            font-size: 18px;
+
+            font-weight: bold;
+        }
+
+
+        .view-details-btn {
+
+            text-decoration: none;
+
+            background: #2563eb;
+
+            color: white;
+
+            padding: 10px 18px;
+
+            border-radius: 8px;
+
+            font-weight: bold;
+        }
+
+
+        .view-details-btn:hover {
+
+            opacity: 0.9;
+        }
+
+
+        /* --------------------------------
+           MOBILE
+        -------------------------------- */
+
+        @media (max-width: 700px) {
+
+            .container {
+
+                margin: 25px auto;
+            }
+
+
+            .booking-top {
+
+                align-items: flex-start;
+
+                gap: 15px;
+
+                flex-direction: column;
+            }
+
+
+            .booking-info {
+
+                grid-template-columns: 1fr;
+            }
+
+
+            .booking-footer {
+
+                gap: 15px;
+
+                align-items: flex-start;
+
+                flex-direction: column;
+            }
+
+
+            .view-details-btn {
+
+                width: 100%;
+
+                text-align: center;
+            }
+
+        }
+        /* Review Section */
+        .review-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+        }
+
+        .review-section h4 {
+            margin: 0 0 15px;
+            color: #1e293b;
+            font-size: 17px;
+        }
+
+        .star-rating {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+            gap: 4px;
+            margin-bottom: 15px;
+        }
+
+        .star-rating input {
+            display: none;
+        }
+
+        .star-rating label {
+            font-size: 30px;
+            color: #cbd5e1;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .star-rating label:hover,
+        .star-rating label:hover ~ label,
+        .star-rating input:checked ~ label {
+            color: #f59e0b;
+        }
+
+        .review-section textarea {
+            width: 100%;
+            min-height: 90px;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            resize: vertical;
+            font-family: inherit;
+            font-size: 14px;
+            box-sizing: border-box;
+            margin-bottom: 12px;
+        }
+
+        .review-section textarea:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+
+        .submit-review-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .submit-review-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .review-submitted {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 10px;
+        }
+
+        .review-submitted h4 {
+            margin: 0 0 8px;
+            color: #166534;
+        }
+
+        .review-stars {
+            color: #f59e0b;
+            font-size: 22px;
+            letter-spacing: 2px;
+        }
+
+        .review-comment {
+            margin-top: 8px;
+            color: #475569;
+            line-height: 1.5;
+        }
+
+        /* =========================================================
+   CUSTOMER MY BOOKINGS - MODERN UI
+   ========================================================= */
+
+body {
+    background: #f4f7fb;
+    color: #111827;
+}
+
+
+/* =========================================================
+   MAIN CONTAINER
+   ========================================================= */
+
+.container {
+    max-width: 1250px;
+    margin: 0 auto;
+    padding: 35px 30px 60px;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.header {
+    margin-bottom: 28px;
+}
+
+.header h1 {
+    margin: 0 0 8px;
+
+    font-size: 34px;
+    font-weight: 750;
+
+    color: #111827;
+
+    letter-spacing: -0.6px;
+}
+
+.header p {
+    margin: 0;
+
+    color: #6b7280;
+
+    font-size: 15px;
+}
+
+
+/* =========================================================
+   BACK LINK
+   ========================================================= */
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+
+    margin-bottom: 22px;
+
+    color: #2563eb;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition: 0.2s ease;
+}
+
+.back-link:hover {
+    color: #1d4ed8;
+    transform: translateX(-2px);
+}
+
+
+/* =========================================================
+   STATISTICS
+   ========================================================= */
+
+.booking-stats {
+    display: grid;
+
+    grid-template-columns: repeat(4, 1fr);
+
+    gap: 18px;
+
+    margin-bottom: 28px;
+}
+
+
+.booking-stat-card {
+    display: flex;
+    align-items: center;
+
+    gap: 15px;
+
+    min-height: 110px;
+
+    padding: 21px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 2px 5px rgba(15, 23, 42, 0.03),
+        0 8px 20px rgba(15, 23, 42, 0.035);
+
+    transition: 0.2s ease;
+}
+
+
+.booking-stat-card:hover {
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 5px 12px rgba(15, 23, 42, 0.06),
+        0 12px 28px rgba(15, 23, 42, 0.06);
+}
+
+
+.booking-stat-icon {
+    width: 48px;
+    height: 48px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    background: #eff6ff;
+
+    border-radius: 12px;
+
+    font-size: 23px;
+}
+
+
+.booking-stat-icon.upcoming {
+    background: #fff7ed;
+}
+
+
+.booking-stat-icon.completed {
+    background: #ecfdf5;
+}
+
+
+.booking-stat-icon.refunded {
+    background: #fef2f2;
+}
+
+
+.booking-stat-card span {
+    display: block;
+
+    margin-bottom: 6px;
+
+    color: #6b7280;
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+
+.booking-stat-card strong {
+    display: block;
+
+    color: #111827;
+
+    font-size: 25px;
+    font-weight: 750;
+}
+
+
+/* =========================================================
+   FILTERS
+   ========================================================= */
+
+.booking-filters {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 10px;
+
+    margin-bottom: 20px;
+
+    padding: 5px 0;
+}
+
+
+.booking-filter {
+    padding: 9px 17px;
+
+    background: #ffffff;
+
+    color: #475569;
+
+    border: 1px solid #dbe1e8;
+
+    border-radius: 8px;
+
+    font-size: 13px;
+    font-weight: 650;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+
+.booking-filter:hover {
+    border-color: #2563eb;
+
+    color: #2563eb;
+}
+
+
+.booking-filter.active {
+    background: #2563eb;
+
+    color: #ffffff;
+
+    border-color: #2563eb;
+}
+
+
+/* =========================================================
+   BOOKING CARDS
+   ========================================================= */
+
+.bookings {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 18px;
+}
+
+
+.booking-card {
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 15px;
+
+    padding: 25px;
+
+    box-shadow:
+        0 2px 5px rgba(15, 23, 42, 0.025),
+        0 8px 22px rgba(15, 23, 42, 0.035);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.booking-card:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 5px 12px rgba(15, 23, 42, 0.06),
+        0 14px 30px rgba(15, 23, 42, 0.06);
+}
+
+
+/* =========================================================
+   BOOKING HEADER
+   ========================================================= */
+
+.booking-top {
+    margin-bottom: 20px;
+
+    padding-bottom: 18px;
+
+    border-bottom: 1px solid #edf0f4;
+}
+
+
+.booking-id {
+    color: #94a3b8;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    margin-bottom: 5px;
+}
+
+
+.service-name {
+    color: #111827;
+
+    font-size: 21px;
+
+    font-weight: 750;
+}
+
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+.status {
+    padding: 6px 12px;
+
+    border-radius: 20px;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   BOOKING MESSAGE
+   ========================================================= */
+
+.booking-message {
+    margin-bottom: 20px;
+
+    padding: 14px 16px;
+
+    border-radius: 10px;
+
+    font-size: 13px;
+
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   BOOKING INFORMATION
+   ========================================================= */
+
+.booking-info {
+    display: grid;
+
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 13px;
+
+    margin-bottom: 20px;
+}
+
+
+.info-item {
+    background: #f8fafc;
+
+    border: 1px solid #edf0f4;
+
+    padding: 15px;
+
+    border-radius: 10px;
+}
+
+
+.info-label {
+    display: block;
+
+    margin-bottom: 6px;
+
+    color: #64748b;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    letter-spacing: 0.4px;
+
+    text-transform: uppercase;
+}
+
+
+.info-value {
+    color: #1e293b;
+
+    font-size: 14px;
+
+    font-weight: 650;
+}
+
+
+/* =========================================================
+   BOOKING FOOTER
+   ========================================================= */
+
+.booking-footer {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    padding-top: 18px;
+
+    border-top: 1px solid #edf0f4;
+}
+
+
+.amount {
+    color: #111827;
+
+    font-size: 20px;
+
+    font-weight: 750;
+}
+
+
+.view-details-btn {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 10px 17px;
+
+    background: #2563eb;
+
+    color: #ffffff;
+
+    border-radius: 8px;
+
+    text-decoration: none;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    transition: 0.2s ease;
+}
+
+
+.view-details-btn:hover {
+    background: #1d4ed8;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   REVIEW SECTION
+   ========================================================= */
+
+.review-section {
+    margin-top: 20px;
+
+    padding: 20px;
+
+    background: #f8fafc;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 12px;
+}
+
+
+.review-section h4 {
+    color: #1e293b;
+
+    font-size: 16px;
+}
+
+
+.review-submitted {
+    margin-top: 20px;
+
+    padding: 18px;
+
+    background: #f0fdf4;
+
+    border: 1px solid #bbf7d0;
+
+    border-radius: 12px;
+}
+
+
+.review-submitted h4 {
+    margin: 0 0 8px;
+
+    color: #166534;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+.empty-card {
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 16px;
+
+    padding: 65px 30px;
+
+    text-align: center;
+
+    box-shadow:
+        0 5px 20px rgba(15, 23, 42, 0.04);
+}
+
+
+.empty-icon {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 70px;
+    height: 70px;
+
+    margin: 0 auto 18px;
+
+    background: #eff6ff;
+
+    border-radius: 50%;
+
+    font-size: 30px;
+}
+
+
+.empty-card h2 {
+    margin: 0 0 10px;
+
+    color: #111827;
+}
+
+
+.empty-card p {
+    max-width: 500px;
+
+    margin: 0 auto 25px;
+
+    color: #6b7280;
+
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 950px) {
+
+    .booking-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    .container {
+        padding: 25px 18px 45px;
+    }
+
+
+    .header h1 {
+        font-size: 28px;
+    }
+
+
+    .booking-stats {
+        grid-template-columns: 1fr;
+    }
+
+
+    .booking-info {
+        grid-template-columns: 1fr;
+    }
+
+
+    .booking-footer {
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        gap: 15px;
+    }
+
+
+    .view-details-btn {
+        width: 100%;
+    }
+
+
+    .booking-filters {
+        display: grid;
+
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+
+    .booking-filter {
+        width: 100%;
+    }
+
+}
+
+
+@media (max-width: 450px) {
+
+    .booking-filters {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+.no-bookings-message {
+    text-align: center;
+    padding: 60px 20px;
+    margin-top: 20px;
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #e5e7eb;
+}
+
+.no-bookings-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+}
+
+.no-bookings-message h3 {
+    margin: 0 0 8px;
+    font-size: 22px;
+    color: #1f2937;
+}
+
+.no-bookings-message p {
+    margin: 0;
+    font-size: 15px;
+    color: #6b7280;
+}
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <!-- --------------------------------
+         BACK TO DASHBOARD
+    --------------------------------- -->
+
+    <a
+        href="{{ url_for('dashboard.user_dashboard') }}"
+        class="back-link"
+    >
+        ← Back to Dashboard
+    </a>
+
+
+    <!-- --------------------------------
+         HEADER
+    --------------------------------- -->
+
+    <div class="header">
+
+        <h1>
+            My Bookings
+        </h1>
+
+        <p>
+            View and manage all your service bookings.
+        </p>
+
+    </div>
+
+    <!-- BOOKING STATISTICS -->
+
+<div class="booking-stats">
+
+    <div class="booking-stat-card">
+
+        <div class="booking-stat-icon">
+            📋
+        </div>
+
+        <div>
+
+            <span>
+                Total Bookings
+            </span>
+
+            <strong>
+                {{ total_bookings }}
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <div class="booking-stat-card">
+
+        <div class="booking-stat-icon upcoming">
+            📅
+        </div>
+
+        <div>
+
+            <span>
+                Upcoming
+            </span>
+
+            <strong>
+                {{ upcoming_bookings }}
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <div class="booking-stat-card">
+
+        <div class="booking-stat-icon completed">
+            ✓
+        </div>
+
+        <div>
+
+            <span>
+                Completed
+            </span>
+
+            <strong>
+                {{ completed_bookings }}
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <div class="booking-stat-card">
+
+            <div class="booking-stat-icon refunded">
+                ↩
+            </div>
+
+            <div>
+
+                <span>
+                    Refunded
+                </span>
+
+                <strong>
+                    {{ refunded_bookings }}
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- BOOKING FILTERS -->
+
+        <div class="booking-filters">
+
+            <button class="booking-filter active" data-filter="all">
+                All
+            </button>
+
+            <button class="booking-filter" data-filter="confirmed">
+                Confirmed
+            </button>
+
+            <button class="booking-filter" data-filter="upcoming">
+                Upcoming
+            </button>
+
+            <button class="booking-filter" data-filter="completed">
+                Completed
+            </button>
+
+            <button class="booking-filter" data-filter="rejected">
+                Rejected
+            </button>
+
+        </div>
+
+
+    <!-- --------------------------------
+         BOOKINGS
+    --------------------------------- -->
+
+    {% if bookings %}
+
+
+        <div class="bookings">
+
+
+            {% for booking in bookings %}
+
+
+                <div
+                    class="booking-card"
+                    data-status="{% if booking.status|lower == 'accepted' %}upcoming{% elif booking.status|lower == 'completed' %}completed{% elif booking.status|lower == 'rejected' %}rejected{% elif booking.status|lower == 'confirmed' %}confirmed{% else %}{{ booking.status|lower }}{% endif %}"
+                >
+
+
+                    <!-- --------------------------------
+                         BOOKING HEADER
+                    --------------------------------- -->
+
+                    <div class="booking-top">
+
+
+                        <div>
+
+                            <div class="booking-id">
+
+                                Booking ID:
+                                #{{ booking.id }}
+
+                            </div>
+
+
+                            <div class="service-name">
+
+                                {{ booking.service.name }}
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- STATUS -->
+
+                        {% set status = booking.status|lower %}
+
+
+                        <span
+                            class="status status-{{ status }}"
+                        >
+
+                            {% if status == "confirmed" %}
+
+                                Confirmed
+
+                            {% elif status == "accepted" %}
+
+                                Accepted
+
+                            {% elif status == "rejected" %}
+
+                                Rejected
+
+                            {% elif status == "cancelled" %}
+
+                                Cancelled
+
+                            {% elif status == "completed" %}
+
+                                Completed
+
+                            {% else %}
+
+                                {{ booking.status|capitalize }}
+
+                            {% endif %}
+
+                        </span>
+
+
+                    </div>
+
+
+                    <!-- --------------------------------
+                         BOOKING MESSAGE
+                    --------------------------------- -->
+
+
+                    {% if status == "confirmed" %}
+
+                        <div class="booking-message confirmed">
+
+                            <strong>
+                                Booking Confirmed
+                            </strong>
+
+                            <br>
+
+                            Your payment has been successfully completed
+                            and your booking has been confirmed.
+
+                        </div>
+
+
+                    {% elif status == "accepted" %}
+
+                        <div class="booking-message accepted">
+
+                            <strong>
+                                Booking Accepted
+                            </strong>
+
+                            <br>
+
+                            The professional has accepted your booking request.
+
+                        </div>
+
+
+                    {% elif status == "rejected" %}
+
+                        <div class="booking-message rejected">
+
+                            <strong>
+                                Booking Rejected
+                            </strong>
+
+                            <br>
+
+                            The professional has rejected your booking request.
+
+                        </div>
+
+
+                    {% elif status == "cancelled" %}
+
+                        <div class="booking-message cancelled">
+
+                            <strong>
+                                Booking Cancelled
+                            </strong>
+
+                            <br>
+
+                            This booking has been cancelled.
+
+                        </div>
+
+
+                    {% elif status == "completed" %}
+
+                        <div class="booking-message completed">
+
+                            <strong>
+                                Service Completed
+                            </strong>
+
+                            <br>
+
+                            The professional has marked this service as completed.
+
+                        </div>
+
+
+    {% if booking.review %}
+
+        <div class="review-submitted">
+
+            <h4>Your Review</h4>
+
+            <div class="review-stars">
+
+                {% for i in range(1, 6) %}
+
+                    {% if i <= booking.review.rating %}
+                        ★
+                    {% else %}
+                        ☆
+                    {% endif %}
+
+                {% endfor %}
+
+            </div>
+
+
+            {% if booking.review.comment %}
+
+                <div class="review-comment">
+                    {{ booking.review.comment }}
+                </div>
+
+            {% endif %}
+
+        </div>
+
+
+    {% else %}
+
+        <div class="review-section">
+
+            <h4>Rate Your Experience</h4>
+
+
+            <form
+                method="POST"
+                action="{{ url_for(
+                    'dashboard.submit_review',
+                    request_id=booking.id
+                ) }}"
+            >
+
+                <div class="star-rating">
+
+                    <input
+                        type="radio"
+                        id="star5-{{ booking.id }}"
+                        name="rating"
+                        value="5"
+                        required
+                    >
+
+                    <label for="star5-{{ booking.id }}">★</label>
+
+
+                    <input
+                        type="radio"
+                        id="star4-{{ booking.id }}"
+                        name="rating"
+                        value="4"
+                    >
+
+                    <label for="star4-{{ booking.id }}">★</label>
+
+
+                    <input
+                        type="radio"
+                        id="star3-{{ booking.id }}"
+                        name="rating"
+                        value="3"
+                    >
+
+                    <label for="star3-{{ booking.id }}">★</label>
+
+
+                    <input
+                        type="radio"
+                        id="star2-{{ booking.id }}"
+                        name="rating"
+                        value="2"
+                    >
+
+                    <label for="star2-{{ booking.id }}">★</label>
+
+
+                    <input
+                        type="radio"
+                        id="star1-{{ booking.id }}"
+                        name="rating"
+                        value="1"
+                    >
+
+                    <label for="star1-{{ booking.id }}">★</label>
+
+                </div>
+
+
+                <textarea
+                    name="comment"
+                    placeholder="Write a review about your experience (optional)..."
+                ></textarea>
+
+
+                <button
+                    type="submit"
+                    class="submit-review-btn"
+                >
+                    Submit Review
+                </button>
+
+            </form>
+
+        </div>
+
+    {% endif %}
+
+{% else %}
+
+    <!-- Other booking statuses -->
+
+{% endif %}
+
+
+                    <!-- --------------------------------
+                         BOOKING INFORMATION
+                    --------------------------------- -->
+
+
+                    <div class="booking-info">
+
+
+                        <!-- PROFESSIONAL -->
+
+                        <div class="info-item">
+
+                            <span class="info-label">
+                                Professional
+                            </span>
+
+                            <span class="info-value">
+
+                                {{ booking.professional.user.name }}
+
+                            </span>
+
+                        </div>
+
+
+                        <!-- DATE -->
+
+                        {% if booking.preferred_date %}
+
+                            <div class="info-item">
+
+                                <span class="info-label">
+                                    Date
+                                </span>
+
+                                <span class="info-value">
+
+                                    {{ booking.preferred_date.strftime(
+                                        '%d %b %Y'
+                                    ) }}
+
+                                </span>
+
+                            </div>
+
+                        {% endif %}
+
+
+                        <!-- TIME -->
+
+                        {% if booking.preferred_time %}
+
+                            <div class="info-item">
+
+                                <span class="info-label">
+                                    Time
+                                </span>
+
+                                <span class="info-value">
+
+                                    {{ booking.preferred_time.strftime(
+                                        '%I:%M %p'
+                                    ) }}
+
+                                </span>
+
+                            </div>
+
+                        {% endif %}
+
+
+                        <!-- PAYMENT STATUS -->
+
+                        <div class="info-item">
+
+                            <span class="info-label">
+                                Payment
+                            </span>
+
+
+                            {% set payment_status =
+                                booking.payment_status|lower
+                                if booking.payment_status
+                                else 'pending'
+                            %}
+
+
+                            <span
+                                class="info-value payment-{{ payment_status }}"
+                            >
+
+                                {{ payment_status|capitalize }}
+
+                            </span>
+
+                        </div>
+
+
+                    </div>
+
+
+                    <!-- --------------------------------
+                         FOOTER
+                    --------------------------------- -->
+
+                    <div class="booking-footer">
+
+
+                        <!-- AMOUNT -->
+
+                        <div class="amount">
+
+                            {% if booking.payment_amount %}
+
+                                ₹{{ "%.2f"|format(
+                                    booking.payment_amount
+                                ) }}
+
+                            {% else %}
+
+                                ₹{{ "%.2f"|format(
+                                    booking.service.price or 0
+                                ) }}
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- VIEW DETAILS -->
+
+                        <a
+                            href="{{ url_for(
+                                'dashboard.booking_details',
+                                request_id=booking.id
+                            ) }}"
+                            class="view-details-btn"
+                        >
+
+                            View Details
+
+                        </a>
+
+
+                    </div>
+
+
+                </div>
+
+
+            {% endfor %}
+
+
+
+        </div>
+
+        <div id="no-bookings-message" class="no-bookings-message" style="display: none;">
+            <div class="no-bookings-icon">📅</div>
+            <h3 id="no-bookings-title">No bookings available</h3>
+            <p id="no-bookings-text">
+                There are no bookings matching the selected filter.
+            </p>
+        </div>
+
+
+    {% else %}
+
+
+        <!-- --------------------------------
+             NO BOOKINGS
+        --------------------------------- -->
+
+        <div class="empty-card">
+
+
+            <div class="empty-icon">
+                📅
+            </div>
+
+
+            <h2>
+                No Bookings Yet
+            </h2>
+
+
+            <p>
+
+                You haven't booked any services yet.
+                Browse our services and find the right
+                professional for you.
+
+            </p>
+
+
+            <a
+                href="{{ url_for('dashboard.user_dashboard') }}"
+                class="browse-btn"
+            >
+
+                Browse Services
+
+            </a>
+
+
+        </div>
+
+
+    {% endif %}
+
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const filterButtons =
+        document.querySelectorAll(".booking-filter");
+
+    const bookingCards =
+        document.querySelectorAll(".booking-card");
+
+    const noBookingsMessage =
+        document.getElementById("no-bookings-message");
+
+    filterButtons.forEach(function (button) {
+
+        button.addEventListener("click", function () {
+
+            const filter =
+                this.getAttribute("data-filter");
+
+            filterButtons.forEach(function (btn) {
+                btn.classList.remove("active");
+            });
+
+            this.classList.add("active");
+
+            let visibleBookings = 0;
+
+            bookingCards.forEach(function (card) {
+
+                const status =
+                    card.getAttribute("data-status");
+
+                if (
+                    filter === "all" ||
+                    status === filter
+                ) {
+                    card.style.display = "";
+                    visibleBookings++;
+                } else {
+                    card.style.display = "none";
+                }
+
+            });
+
+            // Show message when no bookings match
+            if (visibleBookings === 0) {
+
+                const title =
+                    document.getElementById("no-bookings-title");
+
+                const text =
+                    document.getElementById("no-bookings-text");
+
+                if (filter === "upcoming") {
+                    title.textContent = "No upcoming bookings available";
+                    text.textContent =
+                        "You don't have any upcoming bookings at the moment.";
+                }
+                else if (filter === "completed") {
+                    title.textContent = "No completed bookings available";
+                    text.textContent =
+                        "You don't have any completed bookings yet.";
+                }
+                else if (filter === "rejected") {
+                    title.textContent = "No rejected bookings";
+                    text.textContent =
+                        "You don't have any rejected bookings.";
+                }
+                else {
+                    title.textContent = "No bookings available";
+                    text.textContent =
+                        "There are no bookings matching the selected filter.";
+                }
+
+                noBookingsMessage.style.display = "block";
+
+            } else {
+
+                noBookingsMessage.style.display = "none";
+
+            }
+
+        });
+
+    });
+
+});
+</script>
+
+</body>
+
+</html>

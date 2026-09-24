@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Professional Dashboard - AllYourHelp
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for(
+            'static',
+            filename='css/dashboard.css'
+        ) }}"
+    >
+
+</head>
+
+<body>
+
+
+<!-- =========================================
+     HEADER
+     ========================================= -->
+
+<header class="dashboard-header">
+
+    <div class="dashboard-header-inner">
+
+        <div class="dashboard-logo">
+            AllYourHelp
+        </div>
+
+        
+
+        <div class="dashboard-user">
+
+            <a
+                href="{{ url_for('dashboard.notifications') }}"
+                class="notification-bell"
+                aria-label="Notifications"
+            >
+                <span class="bell-icon">🔔</span>
+
+                {% if unread_notifications > 0 %}
+                    <span class="notification-dot"></span>
+                {% endif %}
+            </a>
+
+            <span>
+                {{ user.name }}
+            </span>
+
+            <a
+                href="{{ url_for('auth.logout') }}"
+                class="logout-button"
+            >
+                Logout
+            </a>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+
+<!-- =========================================
+     MAIN
+     ========================================= -->
+
+<main class="dashboard-container">
+
+
+    <!-- =====================================
+         WELCOME
+         ===================================== -->
+
+    <section class="welcome-section">
+
+        <h1>
+            Welcome, {{ user.name }}! 👋
+        </h1>
+
+        <p>
+            Manage your service requests, appointments
+            and customer reviews from here.
+        </p>
+
+    </section>
+
+
+
+    <!-- =====================================
+         STATISTICS
+         ===================================== -->
+
+    <section class="professional-stats">
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                📋
+            </div>
+
+            <div class="stat-number">
+                {{ total_requests }}
+            </div>
+
+            <div class="stat-label">
+                Total Requests
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                ⏳
+            </div>
+
+            <div class="stat-number">
+                {{ pending_requests }}
+            </div>
+
+            <div class="stat-label">
+                Pending Requests
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                📅
+            </div>
+
+            <div class="stat-number">
+                {{ accepted_requests }}
+            </div>
+
+            <div class="stat-label">
+                Upcoming Services
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                ✓
+            </div>
+
+            <div class="stat-number">
+                {{ completed_requests }}
+            </div>
+
+            <div class="stat-label">
+                Completed
+            </div>
+
+        </div>
+
+
+        <div class="stat-card rating-stat-card">
+
+            <div class="stat-icon">
+                ⭐
+            </div>
+
+            <div class="stat-number">
+                {{ "%.1f"|format(average_rating) }}
+            </div>
+
+            <div class="stat-label">
+                {{ review_count }}
+                {% if review_count == 1 %}
+                    Review
+                {% else %}
+                    Reviews
+                {% endif %}
+            </div>
+
+        </div>
+
+
+    </section>
+
+
+
+    <!-- =====================================
+         PROFESSIONAL PROFILE
+         ===================================== -->
+
+    <section class="professional-summary">
+
+
+        <div class="professional-summary-info">
+
+            <div class="professional-dashboard-avatar">
+
+                {% if professional.user.profile_image %}
+
+                    <img
+                        src="{{ url_for(
+                            'static',
+                            filename=professional.user.profile_image
+                        ) }}"
+                        alt="Profile"
+                    >
+
+                {% else %}
+
+                    <span>
+                        {{ professional.user.name[0]|upper }}
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+
+            <div>
+
+                <h2>
+                    {{ professional.user.name }}
+                </h2>
+
+                {% if professional.location %}
+
+                    <p>
+                        📍 {{ professional.location }}
+                    </p>
+
+                {% endif %}
+
+                {% if professional.experience is not none %}
+
+                    <p>
+                        {{ professional.experience }}
+                        years of experience
+                    </p>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        {% if professional.is_verified %}
+
+            <div class="verified-badge">
+                ✓ Verified Professional
+            </div>
+
+        {% endif %}
+
+
+    </section>
+
+
+
+    <!-- =====================================
+         QUICK ACTIONS
+         ===================================== -->
+
+    <div class="professional-action-buttons">
+
+        <div class="professional-action-left">
+
+            <a
+                href="{{ url_for('dashboard.manage_availability') }}"
+                class="professional-action-btn availability-btn"
+            >
+                📅 Manage Availability
+            </a>
+            <a
+                href="{{ url_for('dashboard.professional_bookings') }}"
+                class="professional-action-btn bookings-btn-dashboard"
+            >
+                📋 Manage Bookings
+            </a>
+            <a
+                href="{{ url_for('dashboard.manage_professional_services') }}"
+                class="professional-action-btn services-btn-dashboard"
+            >
+                🛠️ Manage Services
+            </a>
+
+        </div>
+
+        <a href="{{ url_for('dashboard.professional_earnings') }}"
+        class="professional-action-btn earnings-btn-dashboard">
+
+            💰 Earnings & Payments
+
+        </a>
+
+
+        <a
+            href="{{ url_for('dashboard.edit_professional_profile') }}"
+            class="professional-action-btn edit-profile-btn"
+        >
+            ✏️ Edit Profile
+        </a>
+
+    </div>
+
+
+
+    <!-- =====================================
+         UPCOMING APPOINTMENTS
+         ===================================== -->
+
+    <section class="dashboard-section">
+
+        <div class="section-heading">
+
+            <h2>
+                Upcoming Appointments
+            </h2>
+
+            <span>
+                {{ upcoming_requests|length }}
+            </span>
+
+        </div>
+
+
+        {% if upcoming_requests %}
+
+            <div class="upcoming-list">
+
+                {% for service_request in upcoming_requests %}
+
+                    <div class="upcoming-card">
+
+
+                        <div class="upcoming-date">
+
+                            <div class="upcoming-day">
+                                {{ service_request.preferred_date.strftime('%d') }}
+                            </div>
+
+                            <div class="upcoming-month">
+                                {{ service_request.preferred_date.strftime('%b') }}
+                            </div>
+
+                        </div>
+
+
+                        <div class="upcoming-details">
+
+                            <h3>
+                                {{ service_request.service.name }}
+                            </h3>
+
+                            <p>
+                                Customer:
+                                <strong>
+                                    {{ service_request.user.name }}
+                                </strong>
+                            </p>
+
+                            {% if service_request.preferred_time %}
+
+                                <p>
+                                    🕐
+                                    {{ service_request.preferred_time.strftime('%I:%M %p') }}
+                                </p>
+
+                            {% endif %}
+
+                            {% if service_request.location %}
+
+                                <p>
+                                    📍
+                                    {{ service_request.location }}
+                                </p>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <div class="upcoming-status">
+                            Confirmed
+                        </div>
+
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="dashboard-empty-state">
+
+                <div>
+                    📅
+                </div>
+
+                <h3>
+                    No upcoming appointments
+                </h3>
+
+                <p>
+                    Your accepted upcoming services will appear here.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+
+
+    <!-- =====================================
+         CUSTOMER REVIEWS
+         ===================================== -->
+
+    <section class="dashboard-section">
+
+        <div class="section-heading">
+
+            <h2>
+                Customer Reviews
+            </h2>
+
+            <span>
+                {{ review_count }}
+            </span>
+
+        </div>
+
+
+        {% if reviews %}
+
+            <div class="professional-reviews-list">
+
+                {% for review in reviews[:3] %}
+
+                    <div class="professional-review-card">
+
+
+                        <div class="professional-review-header">
+
+                            <div>
+
+                                <strong>
+                                    {{ review.user.name }}
+                                </strong>
+
+                                <div class="professional-review-stars">
+
+                                    {% for i in range(1, 6) %}
+
+                                        {% if i <= review.rating %}
+
+                                            <span class="star-full">
+                                                ★
+                                            </span>
+
+                                        {% else %}
+
+                                            <span class="star-empty">
+                                                ★
+                                            </span>
+
+                                        {% endif %}
+
+                                    {% endfor %}
+
+                                </div>
+
+                            </div>
+
+
+                            <span class="review-date">
+
+                                {{ review.created_at.strftime('%d %b %Y') }}
+
+                            </span>
+
+                        </div>
+
+
+                        {% if review.comment %}
+
+                            <p class="professional-review-comment">
+                                "{{ review.comment }}"
+                            </p>
+
+                        {% else %}
+
+                            <p class="professional-review-comment no-comment">
+                                Customer left a rating without a comment.
+                            </p>
+
+                        {% endif %}
+
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="dashboard-empty-state">
+
+                <div>
+                    ⭐
+                </div>
+
+                <h3>
+                    No reviews yet
+                </h3>
+
+                <p>
+                    Customer reviews will appear here after completed services.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+
+
+    <!-- =====================================
+         SERVICE REQUESTS
+         ===================================== -->
+
+    <section class="requests-section">
+
+        <div class="section-heading">
+
+            <h2>
+                Service Requests
+            </h2>
+
+            <span>
+                {{ requests|length }} request(s)
+            </span>
+
+        </div>
+
+
+        {% if requests %}
+
+            <div class="requests-list">
+
+                {% for service_request in requests %}
+
+                    <div class="request-card">
+
+
+                        <!-- Request Header -->
+
+                        <div class="request-card-header">
+
+                            <div>
+
+                                <h3>
+                                    {{ service_request.service.name }}
+                                </h3>
+
+                                <p class="request-customer">
+
+                                    Requested by:
+
+                                    <strong>
+                                        {{ service_request.user.name }}
+                                    </strong>
+
+                                </p>
+
+                            </div>
+
+
+                            <span
+                                class="status-badge status-{{ service_request.status }}"
+                            >
+                                {{ service_request.status|capitalize }}
+                            </span>
+
+                        </div>
+
+
+
+                        <!-- Description -->
+
+                        <div class="request-details">
+
+                            <p>
+                                <strong>
+                                    Requirement
+                                </strong>
+                            </p>
+
+                            <p>
+                                {{ service_request.description }}
+                            </p>
+
+                        </div>
+
+
+
+                        <!-- Date -->
+
+                        {% if service_request.preferred_date %}
+
+                            <div class="request-info">
+
+                                <strong>
+                                    Preferred Date:
+                                </strong>
+
+                                {{ service_request.preferred_date }}
+
+                            </div>
+
+                        {% endif %}
+
+
+
+                        <!-- Time -->
+
+                        <p>
+
+                            <strong>
+                                Preferred Time:
+                            </strong>
+
+                            {% if service_request.preferred_time %}
+
+                                {{ service_request.preferred_time.strftime('%I:%M %p') }}
+
+                            {% else %}
+
+                                Not specified
+
+                            {% endif %}
+
+                        </p>
+
+
+
+                        <!-- Location -->
+
+                        {% if service_request.location %}
+
+                            <div class="request-info">
+
+                                <strong>
+                                    Location:
+                                </strong>
+
+                                {{ service_request.location }}
+
+                            </div>
+
+                        {% endif %}
+
+
+
+                        <!-- Additional Details -->
+
+                        {% if service_request.additional_details %}
+
+                            <div class="request-details">
+
+                                <p>
+                                    <strong>
+                                        Additional Details
+                                    </strong>
+                                </p>
+
+                                <p>
+                                    {{ service_request.additional_details }}
+                                </p>
+
+                            </div>
+
+                        {% endif %}
+
+
+
+                        <!-- Created -->
+
+                        <div class="request-created">
+
+                            Request received:
+                            {{ service_request.created_at }}
+
+                        </div>
+
+
+
+                        <!-- Actions -->
+
+                        {% if service_request.status == "confirmed" %}
+
+                            <div class="request-actions">
+
+                                <form
+                                    method="POST"
+                                    action="{{ url_for(
+                                        'dashboard.accept_service_request',
+                                        request_id=service_request.id
+                                    ) }}"
+                                >
+
+                                    <button
+                                        type="submit"
+                                        class="accept-button"
+                                    >
+                                        Accept
+                                    </button>
+
+                                </form>
+
+
+                                <form
+                                    method="POST"
+                                    action="{{ url_for(
+                                        'dashboard.reject_service_request',
+                                        request_id=service_request.id
+                                    ) }}"
+                                >
+
+                                    <button
+                                        type="submit"
+                                        class="reject-button"
+                                    >
+                                        Reject
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        {% elif service_request.status == "accepted" %}
+
+                            <div class="request-actions">
+
+                                <form
+                                    method="POST"
+                                    action="{{ url_for(
+                                        'dashboard.complete_request',
+                                        request_id=service_request.id
+                                    ) }}"
+                                >
+
+                                    <button
+                                        type="submit"
+                                        class="complete-button"
+                                    >
+                                        Mark as Completed
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        {% endif %}
+
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+
+        {% else %}
+
+            <div class="empty-requests">
+
+                <div class="empty-icon">
+                    📋
+                </div>
+
+                <h3>
+                    No service requests yet
+                </h3>
+
+                <p>
+                    When customers request your services,
+                    their requests will appear here.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+
+</main>
+
+</body>
+
+</html>

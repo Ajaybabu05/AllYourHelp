@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Reports & Analytics - AllYourHelp</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f5f7fb;
+            color: #1f2937;
+        }
+
+
+        .container {
+            max-width: 1250px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+
+        /* HEADER */
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 25px;
+            text-decoration: none;
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+
+        .page-header h1 {
+            font-size: 32px;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+
+
+        .page-header p {
+            color: #6b7280;
+            font-size: 16px;
+        }
+
+
+        /* DATE FILTER */
+
+        .filter-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 22px;
+            margin-bottom: 30px;
+        }
+
+
+        .filter-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto auto;
+            gap: 15px;
+            align-items: end;
+        }
+
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+
+        .filter-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+
+        .filter-group input {
+            width: 100%;
+            padding: 11px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 7px;
+            font-size: 14px;
+        }
+
+
+        .filter-group input:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+
+
+        .apply-btn {
+            padding: 11px 20px;
+            border: none;
+            border-radius: 7px;
+            background: #2563eb;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+
+        .apply-btn:hover {
+            background: #1d4ed8;
+        }
+
+
+        .clear-btn {
+            padding: 11px 20px;
+            border-radius: 7px;
+            background: #e5e7eb;
+            color: #374151;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+
+        /* SUMMARY */
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 18px;
+            margin-bottom: 35px;
+        }
+
+
+        .summary-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 22px;
+        }
+
+
+        .summary-title {
+            color: #6b7280;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+
+
+        .summary-number {
+            font-size: 27px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+
+        /* SECTION */
+
+        .section {
+            margin-bottom: 35px;
+        }
+
+
+        .section-title {
+            font-size: 22px;
+            color: #111827;
+            margin-bottom: 18px;
+        }
+
+
+        /* CHART GRID */
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+
+        .chart-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 22px;
+        }
+
+
+        .chart-card h3 {
+            margin-bottom: 20px;
+            font-size: 17px;
+            color: #374151;
+        }
+
+
+        .chart-container {
+            position: relative;
+            height: 330px;
+        }
+
+
+        /* TABLE */
+
+        .table-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+
+        th,
+        td {
+            padding: 14px 18px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+
+        th {
+            background: #f9fafb;
+            color: #374151;
+            font-size: 13px;
+        }
+
+
+        td {
+            font-size: 14px;
+        }
+
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+
+        .amount {
+            font-weight: 600;
+        }
+
+
+        /* RESPONSIVE */
+
+        @media (max-width: 1100px) {
+
+            .summary-grid {
+                grid-template-columns:
+                    repeat(3, 1fr);
+            }
+
+            .filter-form {
+                grid-template-columns:
+                    1fr 1fr;
+            }
+
+        }
+
+
+        @media (max-width: 800px) {
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-grid {
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+        }
+
+
+        @media (max-width: 600px) {
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-form {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-form button,
+            .filter-form a {
+                width: 100%;
+                text-align: center;
+            }
+
+            .table-card {
+                overflow-x: auto;
+            }
+
+            table {
+                min-width: 600px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<main class="container">
+
+
+    <a
+        href="{{ url_for('admin.dashboard') }}"
+        class="back-link"
+    >
+        ← Admin Dashboard
+    </a>
+
+
+    <div class="page-header">
+
+        <h1>
+            Reports & Analytics
+        </h1>
+
+        <p>
+            Analyze bookings, revenue, services and professionals.
+        </p>
+
+    </div>
+
+
+    <!-- DATE FILTER -->
+
+    <div class="filter-card">
+
+        <form
+            method="GET"
+            action="{{ url_for('admin.reports') }}"
+            class="filter-form"
+        >
+
+            <div class="filter-group">
+
+                <label for="date_from">
+                    From Date
+                </label>
+
+                <input
+                    type="date"
+                    id="date_from"
+                    name="date_from"
+                    value="{{ date_from }}"
+                >
+
+            </div>
+
+
+            <div class="filter-group">
+
+                <label for="date_to">
+                    To Date
+                </label>
+
+                <input
+                    type="date"
+                    id="date_to"
+                    name="date_to"
+                    value="{{ date_to }}"
+                >
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="apply-btn"
+            >
+                Apply
+            </button>
+
+
+            <a
+                href="{{ url_for('admin.reports') }}"
+                class="clear-btn"
+            >
+                Clear
+            </a>
+
+        </form>
+
+    </div>
+
+
+    <!-- SUMMARY -->
+
+    <section class="section">
+
+        <h2 class="section-title">
+            Overview
+        </h2>
+
+
+        <div class="summary-grid">
+
+            <div class="summary-card">
+
+                <div class="summary-title">
+                    Total Bookings
+                </div>
+
+                <div class="summary-number">
+                    {{ total_bookings }}
+                </div>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <div class="summary-title">
+                    Paid Bookings
+                </div>
+
+                <div class="summary-number">
+                    {{ total_paid_bookings }}
+                </div>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <div class="summary-title">
+                    Total Revenue
+                </div>
+
+                <div class="summary-number">
+                    ₹{{ "%.2f"|format(total_revenue) }}
+                </div>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <div class="summary-title">
+                    Total Refunded
+                </div>
+
+                <div class="summary-number">
+                    ₹{{ "%.2f"|format(total_refunded) }}
+                </div>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <div class="summary-title">
+                    Net Revenue
+                </div>
+
+                <div class="summary-number">
+                    ₹{{ "%.2f"|format(net_revenue) }}
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- BOOKING ANALYTICS -->
+
+    <section class="section">
+
+        <h2 class="section-title">
+            Booking Analytics
+        </h2>
+
+
+        <div class="charts-grid">
+
+            <div class="chart-card">
+
+                <h3>
+                    Booking Status
+                </h3>
+
+                <div class="chart-container">
+
+                    <canvas id="bookingStatusChart"></canvas>
+
+                </div>
+
+            </div>
+
+
+            <div class="chart-card">
+
+                <h3>
+                    Monthly Bookings
+                </h3>
+
+                <div class="chart-container">
+
+                    <canvas id="monthlyBookingsChart"></canvas>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- REVENUE ANALYTICS -->
+
+    <section class="section">
+
+        <h2 class="section-title">
+            Revenue Analytics
+        </h2>
+
+
+        <div class="chart-card">
+
+            <h3>
+                Monthly Revenue
+            </h3>
+
+            <div class="chart-container">
+
+                <canvas id="revenueChart"></canvas>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- PAYMENT ANALYTICS -->
+
+    <section class="section">
+
+        <h2 class="section-title">
+            Payment Analytics
+        </h2>
+
+
+        <div class="chart-card">
+
+            <h3>
+                Payment Status
+            </h3>
+
+            <div class="chart-container">
+
+                <canvas id="paymentChart"></canvas>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- SERVICE / PROFESSIONAL ANALYTICS -->
+
+    <section class="section">
+
+        <h2 class="section-title">
+            Service & Professional Analytics
+        </h2>
+
+
+        <div class="charts-grid">
+
+            <div class="chart-card">
+
+                <h3>
+                    Bookings by Service
+                </h3>
+
+                <div class="chart-container">
+
+                    <canvas id="serviceChart"></canvas>
+
+                </div>
+
+            </div>
+
+
+            <div class="chart-card">
+
+                <h3>
+                    Top Professionals
+                </h3>
+
+                <div class="chart-container">
+
+                    <canvas id="professionalChart"></canvas>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- MONTHLY REVENUE TABLE -->
+
+    <section class="section">
+
+        <h2 class="section-title">
+            Monthly Revenue Report
+        </h2>
+
+
+        <div class="table-card">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Month</th>
+                        <th>Bookings</th>
+                        <th>Revenue</th>
+                        <th>Refunded</th>
+                        <th>Net Revenue</th>
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for month in monthly_labels %}
+
+                    <tr>
+
+                        <td>
+                            {{ month }}
+                        </td>
+
+                        <td>
+                            {{ monthly_booking_values[loop.index0] }}
+                        </td>
+
+                        <td class="amount">
+                            ₹{{ "%.2f"|format(
+                                monthly_revenue_values[loop.index0]
+                            ) }}
+                        </td>
+
+                        <td class="amount">
+                            ₹{{ "%.2f"|format(
+                                monthly_refunded_values[loop.index0]
+                            ) }}
+                        </td>
+
+                        <td class="amount">
+                            ₹{{ "%.2f"|format(
+                                monthly_net_values[loop.index0]
+                            ) }}
+                        </td>
+
+                    </tr>
+
+                    {% else %}
+
+                    <tr>
+
+                        <td colspan="5">
+                            No data available for the selected period.
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+</main>
+
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        if (typeof Chart === "undefined") {
+
+            console.error(
+                "Chart.js could not be loaded."
+            );
+
+            return;
+        }
+
+
+        /* BOOKING STATUS */
+
+        new Chart(
+            document.getElementById(
+                "bookingStatusChart"
+            ),
+            {
+                type: "doughnut",
+
+                data: {
+                    labels:
+                        {{ booking_status_labels | tojson }},
+
+                    datasets: [
+                        {
+                            data:
+                                {{ booking_status_values | tojson }},
+
+                            borderWidth: 1
+                        }
+                    ]
+                },
+
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            }
+        );
+
+
+        /* MONTHLY BOOKINGS */
+
+        new Chart(
+            document.getElementById(
+                "monthlyBookingsChart"
+            ),
+            {
+                type: "line",
+
+                data: {
+                    labels:
+                        {{ monthly_labels | tojson }},
+
+                    datasets: [
+                        {
+                            label: "Bookings",
+
+                            data:
+                                {{ monthly_booking_values | tojson }},
+
+                            borderWidth: 2,
+
+                            tension: 0.3
+                        }
+                    ]
+                },
+
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            }
+        );
+
+
+        /* REVENUE */
+
+        new Chart(
+            document.getElementById(
+                "revenueChart"
+            ),
+            {
+                type: "line",
+
+                data: {
+
+                    labels:
+                        {{ monthly_labels | tojson }},
+
+                    datasets: [
+
+                        {
+                            label: "Revenue",
+
+                            data:
+                                {{ monthly_revenue_values | tojson }},
+
+                            borderWidth: 2,
+
+                            tension: 0.3
+                        },
+
+                        {
+                            label: "Refunded",
+
+                            data:
+                                {{ monthly_refunded_values | tojson }},
+
+                            borderWidth: 2,
+
+                            tension: 0.3
+                        },
+
+                        {
+                            label: "Net Revenue",
+
+                            data:
+                                {{ monthly_net_values | tojson }},
+
+                            borderWidth: 2,
+
+                            tension: 0.3
+                        }
+
+                    ]
+
+                },
+
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+
+            }
+        );
+
+
+        /* PAYMENT */
+
+        new Chart(
+            document.getElementById(
+                "paymentChart"
+            ),
+            {
+                type: "bar",
+
+                data: {
+
+                    labels:
+                        {{ payment_labels | tojson }},
+
+                    datasets: [
+                        {
+                            label: "Bookings",
+
+                            data:
+                                {{ payment_values | tojson }},
+
+                            borderWidth: 1
+                        }
+                    ]
+
+                },
+
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+
+            }
+        );
+
+
+        /* SERVICE */
+
+        new Chart(
+            document.getElementById(
+                "serviceChart"
+            ),
+            {
+                type: "bar",
+
+                data: {
+
+                    labels:
+                        {{ service_labels | tojson }},
+
+                    datasets: [
+                        {
+                            label: "Bookings",
+
+                            data:
+                                {{ service_values | tojson }},
+
+                            borderWidth: 1
+                        }
+                    ]
+
+                },
+
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+
+            }
+        );
+
+
+        /* PROFESSIONAL */
+
+        new Chart(
+            document.getElementById(
+                "professionalChart"
+            ),
+            {
+                type: "bar",
+
+                data: {
+
+                    labels:
+                        {{ professional_labels | tojson }},
+
+                    datasets: [
+                        {
+                            label: "Bookings",
+
+                            data:
+                                {{ professional_values | tojson }},
+
+                            borderWidth: 1
+                        }
+                    ]
+
+                },
+
+                options: {
+                    indexAxis: "y",
+
+                    responsive: true,
+                    maintainAspectRatio: false,
+
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+
+            }
+        );
+
+    }
+);
+
+</script>
+
+</body>
+
+</html>

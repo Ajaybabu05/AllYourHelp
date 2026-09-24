@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Edit Professional Profile - AllYourHelp</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/dashboard.css') }}"
+    >
+
+    <style>
+
+        .edit-profile-container {
+            max-width: 850px;
+            margin: 40px auto;
+            padding: 0 20px 50px;
+        }
+
+        .edit-profile-card {
+            background: white;
+            border-radius: 16px;
+            padding: 35px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        .edit-profile-header {
+            margin-bottom: 30px;
+        }
+
+        .edit-profile-header h1 {
+            margin: 0 0 8px;
+            font-size: 30px;
+            color: #1f2937;
+        }
+
+        .edit-profile-header p {
+            margin: 0;
+            color: #6b7280;
+        }
+
+        .profile-photo-section {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            padding-bottom: 30px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .profile-photo {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #e5e7eb;
+        }
+
+        .profile-placeholder {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            background: #eef2ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 42px;
+            font-weight: 700;
+            color: #4f46e5;
+            border: 4px solid #e5e7eb;
+        }
+
+        .photo-info h3 {
+            margin: 0 0 7px;
+            color: #1f2937;
+        }
+
+        .photo-info p {
+            margin: 0 0 15px;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 9px;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: #4f46e5;
+        }
+
+        .form-group textarea {
+            min-height: 140px;
+            resize: vertical;
+        }
+
+        .verified-section {
+            padding: 18px;
+            border-radius: 10px;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 25px;
+        }
+
+        .verified-section strong {
+            color: #374151;
+        }
+
+        .verified-badge {
+            display: inline-block;
+            margin-left: 8px;
+            padding: 4px 9px;
+            border-radius: 20px;
+            background: #dcfce7;
+            color: #166534;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .verification-note {
+            margin: 8px 0 0;
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 11px 20px;
+            border-radius: 9px;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: #4f46e5;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #4338ca;
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        @media (max-width: 700px) {
+
+            .edit-profile-card {
+                padding: 25px 20px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .profile-photo-section {
+                align-items: flex-start;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .form-actions .btn {
+                text-align: center;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="edit-profile-container">
+
+        <div class="edit-profile-card">
+
+            <div class="edit-profile-header">
+
+                <h1>Edit Professional Profile</h1>
+
+                <p>
+                    Update your personal and professional information.
+                </p>
+
+            </div>
+
+
+            <form
+                method="POST"
+                enctype="multipart/form-data"
+            >
+
+                <!-- PROFILE PHOTO -->
+
+                <div class="profile-photo-section">
+
+                    {% if user.profile_image %}
+
+                        <img
+                            src="{{ url_for('static', filename=user.profile_image) }}"
+                            alt="Profile Photo"
+                            class="profile-photo"
+                        >
+
+                    {% else %}
+
+                        <div class="profile-placeholder">
+                            {{ user.name[0]|upper }}
+                        </div>
+
+                    {% endif %}
+
+
+                    <div class="photo-info">
+
+                        <h3>Profile Photo</h3>
+
+                        <p>
+                            Upload a JPG, PNG or WEBP image.
+                        </p>
+
+                        <input
+                            type="file"
+                            name="profile_image"
+                            accept=".jpg,.jpeg,.png,.webp"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- NAME + EMAIL -->
+
+                <div class="form-row">
+
+                    <div class="form-group">
+
+                        <label for="name">
+                            Full Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            value="{{ user.name }}"
+                            maxlength="100"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="email">
+                            Email
+                        </label>
+
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            value="{{ user.email }}"
+                            maxlength="150"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- PHONE + EXPERIENCE -->
+
+                <div class="form-row">
+
+                    <div class="form-group">
+
+                        <label for="phone">
+                            Phone Number
+                        </label>
+
+                        <input
+                            type="tel"
+                            id="phone"
+                            name="phone"
+                            value="{{ user.phone or '' }}"
+                            maxlength="20"
+                            placeholder="Enter your phone number"
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="experience">
+                            Years of Experience
+                        </label>
+
+                        <input
+                            type="number"
+                            id="experience"
+                            name="experience"
+                            value="{{ professional.experience if professional.experience is not none else '' }}"
+                            min="0"
+                            max="100"
+                            placeholder="e.g. 5"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- LOCATION -->
+
+                <div class="form-group">
+
+                    <label for="location">
+                        Location
+                    </label>
+
+                    <input
+                        type="text"
+                        id="location"
+                        name="location"
+                        value="{{ professional.location or '' }}"
+                        maxlength="150"
+                        placeholder="e.g. Hyderabad, Telangana"
+                    >
+
+                </div>
+
+
+                <!-- BIO -->
+
+                <div class="form-group">
+
+                    <label for="bio">
+                        Professional Bio
+                    </label>
+
+                    <textarea
+                        id="bio"
+                        name="bio"
+                        maxlength="5000"
+                        placeholder="Tell customers about your professional experience, expertise and services..."
+                    >{{ professional.bio or '' }}</textarea>
+
+                </div>
+
+
+                <!-- VERIFICATION -->
+
+                <div class="verified-section">
+
+                    <strong>
+                        Verification Status:
+                    </strong>
+
+                    {% if professional.is_verified %}
+
+                        <span class="verified-badge">
+                            ✓ Verified Professional
+                        </span>
+
+                    {% else %}
+
+                        <span>
+                            Not Verified
+                        </span>
+
+                    {% endif %}
+
+                    <p class="verification-note">
+                        Verification status can only be changed by an administrator.
+                    </p>
+
+                </div>
+
+
+                <!-- ACTIONS -->
+
+                <div class="form-actions">
+
+                    <a
+                        href="{{ url_for('dashboard.professional_dashboard') }}"
+                        class="btn btn-secondary"
+                    >
+                        Cancel
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >
+                        Save Changes
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

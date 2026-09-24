@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Notification Preferences - AllYourHelp</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f5f7fb;
+            color: #1f2937;
+            min-height: 100vh;
+        }
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        .header {
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+
+            padding: 18px 40px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2563eb;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .user-name {
+            color: #4b5563;
+            font-size: 14px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+
+            border-radius: 50%;
+            overflow: hidden;
+
+            background: #2563eb;
+            color: white;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* =========================
+           CONTAINER
+        ========================= */
+
+        .container {
+            max-width: 750px;
+            width: 100%;
+
+            margin: 45px auto;
+            padding: 0 20px;
+        }
+
+        .back-link {
+            display: inline-block;
+
+            color: #2563eb;
+            text-decoration: none;
+
+            font-size: 14px;
+            font-weight: 500;
+
+            margin-bottom: 20px;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .page-title {
+            font-size: 30px;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+
+        .page-description {
+            color: #6b7280;
+            font-size: 15px;
+            line-height: 1.6;
+
+            margin-bottom: 25px;
+        }
+
+        /* =========================
+           FLASH
+        ========================= */
+
+        .flash-container {
+            margin-bottom: 20px;
+        }
+
+        .flash-message {
+            padding: 13px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .flash-success {
+            background: #ecfdf5;
+            color: #047857;
+            border: 1px solid #a7f3d0;
+        }
+
+        .flash-error {
+            background: #fef2f2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+
+        /* =========================
+           CARD
+        ========================= */
+
+        .settings-card {
+            background: white;
+
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+
+            padding: 30px;
+
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+        }
+
+        .card-title {
+            font-size: 20px;
+            color: #111827;
+
+            margin-bottom: 6px;
+        }
+
+        .card-description {
+            color: #6b7280;
+            font-size: 14px;
+            line-height: 1.5;
+
+            margin-bottom: 25px;
+        }
+
+        /* =========================
+           NOTIFICATION ITEM
+        ========================= */
+
+        .notification-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 20px;
+
+            padding: 20px 0;
+
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .notification-item:first-child {
+            padding-top: 5px;
+        }
+
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+
+        .notification-info {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-size: 15px;
+            font-weight: 600;
+
+            color: #374151;
+
+            margin-bottom: 5px;
+        }
+
+        .notification-description {
+            font-size: 13px;
+            color: #6b7280;
+            line-height: 1.5;
+        }
+
+        /* =========================
+           TOGGLE
+        ========================= */
+
+        .switch {
+            position: relative;
+
+            width: 48px;
+            height: 26px;
+
+            flex-shrink: 0;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+
+            cursor: pointer;
+
+            inset: 0;
+
+            background: #d1d5db;
+
+            border-radius: 30px;
+
+            transition: 0.25s;
+        }
+
+        .slider::before {
+            content: "";
+
+            position: absolute;
+
+            width: 20px;
+            height: 20px;
+
+            left: 3px;
+            top: 3px;
+
+            background: white;
+
+            border-radius: 50%;
+
+            transition: 0.25s;
+
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        .switch input:checked + .slider {
+            background: #2563eb;
+        }
+
+        .switch input:checked + .slider::before {
+            transform: translateX(22px);
+        }
+
+        /* =========================
+           ACTIONS
+        ========================= */
+
+        .actions {
+            display: flex;
+
+            justify-content: flex-end;
+
+            gap: 12px;
+
+            margin-top: 25px;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 8px;
+
+            padding: 12px 20px;
+
+            font-size: 14px;
+            font-weight: 600;
+
+            text-decoration: none;
+
+            cursor: pointer;
+
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 600px) {
+
+            .header {
+                padding: 15px 20px;
+            }
+
+            .logo {
+                font-size: 21px;
+            }
+
+            .user-name {
+                display: none;
+            }
+
+            .container {
+                margin: 30px auto;
+            }
+
+            .page-title {
+                font-size: 25px;
+            }
+
+            .settings-card {
+                padding: 22px;
+            }
+
+            .notification-item {
+                align-items: flex-start;
+            }
+
+            .actions {
+                flex-direction: column-reverse;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <!-- =========================
+         HEADER
+    ========================= -->
+
+    <header class="header">
+
+        <div class="logo">
+            AllYourHelp
+        </div>
+
+        <div class="header-right">
+
+            <span class="user-name">
+                {{ user.name }}
+            </span>
+
+            <div class="user-avatar">
+
+                {% if user.profile_image %}
+
+                    <img
+                        src="{{ url_for(
+                            'static',
+                            filename=user.profile_image
+                        ) }}"
+                        alt="{{ user.name }}"
+                    >
+
+                {% else %}
+
+                    {{ user.name[0]|upper }}
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- =========================
+         MAIN
+    ========================= -->
+
+    <main class="container">
+
+        <a
+            href="{{ url_for('dashboard.customer_profile') }}"
+            class="back-link"
+        >
+            ← Back to Profile
+        </a>
+
+        <h1 class="page-title">
+            Notification Preferences
+        </h1>
+
+        <p class="page-description">
+            Choose which notifications you would like to receive
+            from AllYourHelp.
+        </p>
+
+
+        <!-- =========================
+             FLASH MESSAGES
+        ========================= -->
+
+        {% with messages = get_flashed_messages(
+            with_categories=true
+        ) %}
+
+            {% if messages %}
+
+                <div class="flash-container">
+
+                    {% for category, message in messages %}
+
+                        <div
+                            class="flash-message
+                            {% if category == 'success' %}
+                                flash-success
+                            {% else %}
+                                flash-error
+                            {% endif %}"
+                        >
+                            {{ message }}
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% endif %}
+
+        {% endwith %}
+
+
+        <!-- =========================
+             SETTINGS CARD
+        ========================= -->
+
+        <section class="settings-card">
+
+            <h2 class="card-title">
+                Email Notifications
+            </h2>
+
+            <p class="card-description">
+                Manage the notifications related to your bookings
+                and service requests.
+            </p>
+
+
+            <form
+                method="POST"
+                action="{{ url_for(
+                    'dashboard.notification_preferences'
+                ) }}"
+            >
+
+                <!-- BOOKING CONFIRMATION -->
+
+                <div class="notification-item">
+
+                    <div class="notification-info">
+
+                        <div class="notification-title">
+                            Booking Confirmation
+                        </div>
+
+                        <div class="notification-description">
+                            Receive a notification when your booking
+                            has been successfully confirmed.
+                        </div>
+
+                    </div>
+
+                    <label class="switch">
+
+                        <input
+                            type="checkbox"
+                            name="booking_confirmation"
+                            {% if preferences.booking_confirmation %}
+                                checked
+                            {% endif %}
+                        >
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                </div>
+
+
+                <!-- BOOKING UPDATES -->
+
+                <div class="notification-item">
+
+                    <div class="notification-info">
+
+                        <div class="notification-title">
+                            Booking Status Updates
+                        </div>
+
+                        <div class="notification-description">
+                            Receive updates when the status of your
+                            booking changes.
+                        </div>
+
+                    </div>
+
+                    <label class="switch">
+
+                        <input
+                            type="checkbox"
+                            name="booking_updates"
+                            {% if preferences.booking_updates %}
+                                checked
+                            {% endif %}
+                        >
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                </div>
+
+
+                <!-- PROFESSIONAL RESPONSES -->
+
+                <div class="notification-item">
+
+                    <div class="notification-info">
+
+                        <div class="notification-title">
+                            Professional Responses
+                        </div>
+
+                        <div class="notification-description">
+                            Get notified when a professional responds
+                            to your service request.
+                        </div>
+
+                    </div>
+
+                    <label class="switch">
+
+                        <input
+                            type="checkbox"
+                            name="professional_responses"
+                            {% if preferences.professional_responses %}
+                                checked
+                            {% endif %}
+                        >
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                </div>
+
+
+                <!-- COMPLETION REMINDERS -->
+
+                <div class="notification-item">
+
+                    <div class="notification-info">
+
+                        <div class="notification-title">
+                            Completion & Review Reminders
+                        </div>
+
+                        <div class="notification-description">
+                            Receive reminders when a service is
+                            completed and when you can leave a review.
+                        </div>
+
+                    </div>
+
+                    <label class="switch">
+
+                        <input
+                            type="checkbox"
+                            name="completion_reminders"
+                            {% if preferences.completion_reminders %}
+                                checked
+                            {% endif %}
+                        >
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                </div>
+
+
+                <!-- ACTION BUTTONS -->
+
+                <div class="actions">
+
+                    <a
+                        href="{{ url_for(
+                            'dashboard.customer_profile'
+                        ) }}"
+                        class="btn btn-secondary"
+                    >
+                        Cancel
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >
+                        Save Preferences
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+    </main>
+
+</body>
+
+</html>

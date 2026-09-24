@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <meta name="description"
+          content="AllYourHelp - Find trusted professionals and services in one place.">
+
+    <title>AllYourHelp - Everything You Need, All in One Place</title>
+
+    <link rel="stylesheet"
+      href="{{ url_for('static', filename='css/home.css') }}">
+
+</head>
+
+<body>
+
+
+<!-- ==================== NAVBAR ==================== -->
+
+<header class="navbar">
+
+    <div class="container navbar-container">
+
+        <a href="{{ url_for('home') }}" class="logo">
+            AllYourHelp
+        </a>
+
+
+        <nav class="nav-links">
+
+            <a href="{{ url_for('home') }}"
+               class="active">
+                Home
+            </a>
+
+            <a href="#">
+                Services
+            </a>
+
+            <a href="#">
+                Professionals
+            </a>
+
+            <a href="#">
+                How It Works
+            </a>
+
+            <a href="#">
+                About
+            </a>
+
+        </nav>
+
+
+        <div class="nav-actions">
+
+            <a href="{{ url_for('auth.login') }}"
+               class="login-btn">
+                Login
+            </a>
+
+            <a href="{{ url_for('auth.register') }}"
+               class="register-btn">
+                Register
+            </a>
+
+        </div>
+
+
+        <button class="menu-toggle"
+                id="menuToggle"
+                aria-label="Toggle navigation">
+
+            ☰
+
+        </button>
+
+    </div>
+
+</header>
+
+
+
+<!-- ==================== HERO SECTION ==================== -->
+
+<section class="hero">
+
+    <div class="container hero-container">
+
+
+        <div class="hero-content">
+
+            <div class="hero-badge">
+                Your Help. All in One Place.
+            </div>
+
+
+            <h1>
+                Find the Right Help
+                <span>When You Need It.</span>
+            </h1>
+
+
+            <p>
+                Connect with trusted professionals for legal,
+                medical, tax, education, technology, property,
+                business and many more services — all from one
+                platform.
+            </p>
+
+
+            <!-- SEARCH -->
+
+            <div class="search-box">
+
+                <input
+                    type="text"
+                    id="serviceSearch"
+                    placeholder="What service do you need?"
+                >
+
+                <button id="searchButton">
+                    Search
+                </button>
+
+            </div>
+
+
+            <div class="hero-actions">
+
+                <a href="#services"
+                   class="primary-btn">
+                    Explore Services
+                </a>
+
+                <a href="{{ url_for('auth.register') }}"
+                   class="secondary-btn">
+                    Become a Professional
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <div class="hero-visual">
+
+            <div class="hero-card main-card">
+
+                <div class="hero-card-icon">
+                    ✓
+                </div>
+
+                <h3>
+                    Trusted Professionals
+                </h3>
+
+                <p>
+                    Find the right professional
+                    for your needs.
+                </p>
+
+            </div>
+
+
+            <div class="floating-card card-one">
+
+                <strong>
+                    10+
+                </strong>
+
+                <span>
+                    Service Categories
+                </span>
+
+            </div>
+
+
+            <div class="floating-card card-two">
+
+                <strong>
+                    Easy
+                </strong>
+
+                <span>
+                    Booking
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- ==================== SERVICES ==================== -->
+
+<section class="services-section"
+         id="services">
+
+    <div class="container">
+
+        <div class="section-heading">
+
+            <span>
+                OUR SERVICES
+            </span>
+
+            <h2>
+                Everything You Need,
+                In One Place
+            </h2>
+
+            <p>
+                Find professionals across a wide range
+                of services to help you solve your needs.
+            </p>
+
+        </div>
+
+
+        <div class="services-grid">
+
+
+            <a href="#" class="service-card">
+
+                <div class="service-icon">
+                    ⚖
+                </div>
+
+                <h3>
+                    Legal
+                </h3>
+
+                <p>
+                    Lawyers and legal consultants
+                </p>
+
+            </a>
+
+
+            <a href="#" class="service-card">
+
+                <div class="service-icon">
+                    ⚕
+                </div>
+
+                <h3>
+                    Medical
+                </h3>
+
+                <p>
+                    Doctors and healthcare services
+                </p>
+
+            </a>
+
+
+            <a href="#" class="service-card">
+
+                <div class="service-icon">
+                    ₹
+                </div>
+
+                <h3>
+                    CA & Tax
+                </h3>
+
+                <p>
+                    Tax and financial professionals
+                </p>
+
+            </a>
+
+
+            <a href="#" class="service-card">
+
+                <div class="service-icon">
+                    🏠
+                </div>
+
+                <h3>
+                    Property
+                </h3>
+
+                <p>
+                    Property and real estate services
+                </p>
+
+            </a>
+
+
+            <a href="#" class="service-card">
+
+                <div class="service-icon">
+                    🎓
+                </div>
+
+                <h3>
+                    Education
+                </h3>
+
+                <p>
+                    Teachers, tutors and mentors
+                </p>
+
+            </a>
+
+
+            <a href="#" class="service-card">
+
+                <div class="service-icon">
+                    ✈
+                </div>
+
+                <h3>
+                    Visa
+                </h3>
+
+                <p>
+                    Visa and immigration assistance
+                </p>
+
+            </a>
+
+
+            <a href="#" class="service-card">
+
+                <div class="service-icon">
+                    💻
+                </div>
+
+                <h3>
+                    Technology
+                </h3>
+
+                <p>
+                    IT and technology professionals
+                </p>
+
+            </a>
+
+
+            <a href="#" class="service-card">
+
+                <div class="service-icon">
+                    📄
+                </div>
+
+                <h3>
+                    Documentation
+                </h3>
+
+                <p>
+                    Document and application assistance
+                </p>
+
+            </a>
+
+
+            <a href="#" class="service-card">
+
+                <div class="service-icon">
+                    💼
+                </div>
+
+                <h3>
+                    Business
+                </h3>
+
+                <p>
+                    Business and consulting services
+                </p>
+
+            </a>
+
+
+            <a href="#" class="service-card">
+
+                <div class="service-icon">
+                    🏦
+                </div>
+
+                <h3>
+                    Loans
+                </h3>
+
+                <p>
+                    Loan and financial assistance
+                </p>
+
+            </a>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- ==================== HOW IT WORKS ==================== -->
+
+<section class="how-section"
+         id="how-it-works">
+
+    <div class="container">
+
+        <div class="section-heading">
+
+            <span>
+                HOW IT WORKS
+            </span>
+
+            <h2>
+                Getting Help Is Simple
+            </h2>
+
+            <p>
+                Find the right professional and get
+                the help you need in just a few steps.
+            </p>
+
+        </div>
+
+
+        <div class="steps">
+
+
+            <div class="step">
+
+                <div class="step-number">
+                    01
+                </div>
+
+                <h3>
+                    Search
+                </h3>
+
+                <p>
+                    Search for the service or professional
+                    you need.
+                </p>
+
+            </div>
+
+
+            <div class="step">
+
+                <div class="step-number">
+                    02
+                </div>
+
+                <h3>
+                    Choose
+                </h3>
+
+                <p>
+                    Compare professionals and choose
+                    the one that suits you.
+                </p>
+
+            </div>
+
+
+            <div class="step">
+
+                <div class="step-number">
+                    03
+                </div>
+
+                <h3>
+                    Book
+                </h3>
+
+                <p>
+                    Book the service and connect
+                    with your chosen professional.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- ==================== WHY ALLYOURHELP ==================== -->
+
+<section class="why-section">
+
+    <div class="container why-container">
+
+
+        <div class="why-content">
+
+            <span>
+                WHY ALLYOURHELP?
+            </span>
+
+            <h2>
+                One Platform.
+                Many Solutions.
+            </h2>
+
+            <p>
+                Instead of searching across different
+                websites and contacting multiple people,
+                AllYourHelp brings professionals and
+                services together in one convenient platform.
+            </p>
+
+
+            <div class="benefits">
+
+                <div class="benefit">
+
+                    <div class="benefit-icon">
+                        ✓
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            Multiple Services
+                        </h3>
+
+                        <p>
+                            Access professionals from
+                            different industries.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="benefit">
+
+                    <div class="benefit-icon">
+                        ✓
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            Easy Booking
+                        </h3>
+
+                        <p>
+                            Find and book services without
+                            unnecessary complexity.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="benefit">
+
+                    <div class="benefit-icon">
+                        ✓
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            Save Time
+                        </h3>
+
+                        <p>
+                            Find the help you need from
+                            one convenient platform.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="why-card">
+
+            <div class="large-icon">
+                ?
+            </div>
+
+            <h3>
+                Need Help?
+            </h3>
+
+            <p>
+                Tell us what you need and
+                we'll help you find the right service.
+            </p>
+
+            <a href="#services">
+                Explore Services →
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- ==================== CTA ==================== -->
+
+<section class="cta-section">
+
+    <div class="container cta-container">
+
+        <h2>
+            Ready to Find the Help You Need?
+        </h2>
+
+        <p>
+            Explore our services and connect
+            with professionals today.
+        </p>
+
+        <a href="{{ url_for('auth.register') }}"
+           class="cta-button">
+            Get Started
+        </a>
+
+    </div>
+
+</section>
+
+
+
+<!-- ==================== FOOTER ==================== -->
+
+<footer class="footer">
+
+    <div class="container footer-container">
+
+
+        <div class="footer-brand">
+
+            <h2>
+                AllYourHelp
+            </h2>
+
+            <p>
+                Your trusted platform for finding
+                professional services.
+            </p>
+
+        </div>
+
+
+        <div class="footer-column">
+
+            <h3>
+                Platform
+            </h3>
+
+            <a href="{{ url_for('home') }}">
+                Home
+            </a>
+
+            <a href="#services">
+                Services
+            </a>
+
+            <a href="#">
+                Professionals
+            </a>
+
+            <a href="#how-it-works">
+                How It Works
+            </a>
+
+        </div>
+
+
+        <div class="footer-column">
+
+            <h3>
+                Account
+            </h3>
+
+            <a href="{{ url_for('auth.login') }}">
+                Login
+            </a>
+
+            <a href="{{ url_for('auth.register') }}">
+                Register
+            </a>
+
+        </div>
+
+
+        <div class="footer-column">
+
+            <h3>
+                Support
+            </h3>
+
+            <a href="#">
+                About
+            </a>
+
+            <a href="#">
+                Contact
+            </a>
+
+            <a href="#">
+                Help Center
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <div class="footer-bottom">
+
+        <p>
+            © 2026 AllYourHelp. All rights reserved.
+        </p>
+
+    </div>
+
+</footer>
+
+
+
+<script src="{{ url_for('static', filename='js/home.js') }}">
+</script>
+
+</body>
+
+</html>

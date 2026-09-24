@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Earnings & Payments - AllYourHelp</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/dashboard.css') }}">
+
+</head>
+
+
+<body>
+
+<div class="dashboard-container">
+
+
+    <!-- HEADER -->
+
+    <header class="dashboard-header">
+
+        <div class="dashboard-logo">
+            AllYourHelp
+        </div>
+
+        <div class="dashboard-header-right">
+
+            <span>
+                {{ user.name }}
+            </span>
+
+            <a href="{{ url_for('auth.logout') }}"
+               class="logout-btn">
+                Logout
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <!-- MAIN -->
+
+    <main class="dashboard-main">
+
+
+        <a href="{{ url_for('dashboard.professional_dashboard') }}"
+           class="back-link">
+
+            ← Back to Dashboard
+
+        </a>
+
+
+        <!-- TITLE -->
+
+        <div class="page-title-section">
+
+            <h1>
+                Earnings & Payments
+            </h1>
+
+            <p>
+                Track your earnings, payments and refunds.
+            </p>
+
+        </div>
+
+
+        <!-- STATISTICS -->
+
+        <div class="earnings-stats-grid">
+
+
+            <div class="earnings-stat-card">
+
+                <div class="earnings-stat-icon">
+                    💰
+                </div>
+
+                <div>
+
+                    <span>
+                        Total Earnings
+                    </span>
+
+                    <h2>
+                        ₹{{ "%.2f"|format(total_earnings) }}
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <div class="earnings-stat-card">
+
+                <div class="earnings-stat-icon">
+                    💵
+                </div>
+
+                <div>
+
+                    <span>
+                        Net Earnings
+                    </span>
+
+                    <h2>
+                        ₹{{ "%.2f"|format(net_earnings) }}
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <div class="earnings-stat-card">
+
+                <div class="earnings-stat-icon">
+                    ⏳
+                </div>
+
+                <div>
+
+                    <span>
+                        Pending Payments
+                    </span>
+
+                    <h2>
+                        ₹{{ "%.2f"|format(pending_earnings) }}
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <div class="earnings-stat-card">
+
+                <div class="earnings-stat-icon">
+                    ↩️
+                </div>
+
+                <div>
+
+                    <span>
+                        Total Refunded
+                    </span>
+
+                    <h2>
+                        ₹{{ "%.2f"|format(total_refunded) }}
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+        <!-- SUMMARY -->
+
+        <div class="earnings-summary-card">
+
+            <h2>
+                Payment Summary
+            </h2>
+
+            <div class="earnings-summary-grid">
+
+
+                <div>
+                    <span>Paid Bookings</span>
+                    <strong>{{ paid_bookings }}</strong>
+                </div>
+
+
+                <div>
+                    <span>Pending Payments</span>
+                    <strong>{{ pending_bookings }}</strong>
+                </div>
+
+
+                <div>
+                    <span>Refunded Bookings</span>
+                    <strong>{{ refunded_bookings }}</strong>
+                </div>
+
+
+                <div>
+                    <span>Completed Services</span>
+                    <strong>{{ completed_bookings }}</strong>
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+        <!-- MONTHLY CHART -->
+
+        <div class="earnings-chart-card">
+
+            <div class="earnings-section-header">
+
+                <div>
+
+                    <h2>
+                        Monthly Earnings
+                    </h2>
+
+                    <p>
+                        Your net earnings over time.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="earnings-chart-container">
+
+                <canvas id="earningsChart"></canvas>
+
+            </div>
+
+        </div>
+
+
+        <!-- TRANSACTIONS -->
+
+        <div class="earnings-transactions-card">
+
+            <div class="earnings-section-header">
+
+                <div>
+
+                    <h2>
+                        Payment History
+                    </h2>
+
+                    <p>
+                        Recent booking payments and refunds.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            {% if bookings %}
+
+            <div class="earnings-table-wrapper">
+
+                <table class="earnings-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Service</th>
+
+                            <th>Customer</th>
+
+                            <th>Date</th>
+
+                            <th>Amount</th>
+
+                            <th>Payment</th>
+
+                            <th>Refund</th>
+
+                            <th>Action</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                    {% for booking in bookings %}
+
+                        <tr>
+
+                            <td>
+                                {{ booking.service.name }}
+                            </td>
+
+                            <td>
+                                {{ booking.user.name }}
+                            </td>
+
+                            <td>
+
+                                {% if booking.created_at %}
+
+                                    {{ booking.created_at.strftime('%d %b %Y') }}
+
+                                {% else %}
+
+                                    —
+
+                                {% endif %}
+
+                            </td>
+
+                            <td class="earnings-amount">
+
+                                ₹{{ "%.2f"|format(booking.payment_amount or 0) }}
+
+                            </td>
+
+                            <td>
+
+                                <span class="payment-status
+                                    payment-{{ booking.payment_status|lower }}">
+
+                                    {{ booking.payment_status|title
+                                       if booking.payment_status
+                                       else "Unknown" }}
+
+                                </span>
+
+                            </td>
+
+                            <td>
+
+                                {% if booking.refund_amount
+                                      and booking.refund_amount > 0 %}
+
+                                    ₹{{ "%.2f"|format(booking.refund_amount) }}
+
+                                {% else %}
+
+                                    —
+
+                                {% endif %}
+
+                            </td>
+
+                            <td>
+
+                                <a href="{{ url_for(
+                                    'dashboard.professional_booking_details',
+                                    request_id=booking.id
+                                ) }}"
+                                   class="earnings-view-btn">
+
+                                    View
+
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            {% else %}
+
+            <div class="empty-state">
+
+                <div class="empty-state-icon">
+                    💳
+                </div>
+
+                <h3>
+                    No payment records yet
+                </h3>
+
+                <p>
+                    Your payment history will appear here
+                    when customers make bookings.
+                </p>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+
+    </main>
+
+</div>
+
+
+<!-- CHART.JS -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+<script>
+
+const labels = {{ monthly_labels | tojson }};
+
+const values = {{ monthly_values | tojson }};
+
+
+const ctx = document
+    .getElementById("earningsChart")
+    .getContext("2d");
+
+
+new Chart(ctx, {
+
+    type: "line",
+
+    data: {
+
+        labels: labels,
+
+        datasets: [{
+
+            label: "Net Earnings",
+
+            data: values,
+
+            tension: 0.3,
+
+            fill: true,
+
+            borderWidth: 2,
+
+            pointRadius: 4
+
+        }]
+
+    },
+
+    options: {
+
+        responsive: true,
+
+        maintainAspectRatio: false,
+
+        plugins: {
+
+            legend: {
+                display: true
+            }
+
+        },
+
+        scales: {
+
+            y: {
+
+                beginAtZero: true,
+
+                ticks: {
+
+                    callback: function(value) {
+                        return "₹" + value;
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+
+});
+
+</script>
+
+
+</body>
+
+</html>

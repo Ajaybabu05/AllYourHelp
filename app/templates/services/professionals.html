@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {{ service.name }} Professionals - AllYourHelp
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/services.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+    <!-- Header -->
+
+    <header class="services-header">
+
+        <div class="header-content">
+
+            <a
+                href="{{ url_for(
+                    'services.category_services',
+                    slug=service.category.slug
+                ) }}"
+                class="back-button"
+            >
+                ← Back to {{ service.category.name }}
+            </a>
+
+            <h1>
+                {{ service.name }}
+            </h1>
+
+            <p>
+                Find professionals who can help you with
+                {{ service.name }}.
+            </p>
+
+        </div>
+
+    </header>
+
+
+    <!-- Main -->
+
+    <main class="services-container">
+
+        <div class="page-heading">
+
+            <h2>
+                Available Professionals
+            </h2>
+
+            <p>
+                Choose a professional that suits your needs.
+            </p>
+
+        </div>
+
+
+        {% if professionals %}
+
+            <div class="professionals-grid">
+
+                {% for professional in professionals %}
+
+                    <div class="professional-card">
+
+                        <div class="professional-avatar">
+
+                            {% if professional.user.profile_image %}
+
+                                <img
+                                    src="{{ url_for(
+                                        'static',
+                                        filename=professional.user.profile_image
+                                    ) }}"
+                                    alt="{{ professional.user.name }}"
+                                >
+
+                            {% else %}
+
+                                <span>
+                                    {{ professional.user.name[0]|upper }}
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <div class="professional-info">
+
+                            <h3>
+                                {{ professional.user.name }}
+                            </h3>
+
+
+                            {% if professional.is_verified %}
+
+                                <span class="verified-badge">
+                                    ✓ Verified
+                                </span>
+
+                            {% endif %}
+
+
+                            {% if professional.experience is not none %}
+
+                                <p>
+                                    <strong>Experience:</strong>
+                                    {{ professional.experience }}
+                                    years
+                                </p>
+
+                            {% endif %}
+
+
+                            {% if professional.location %}
+
+                                <p>
+                                    📍 {{ professional.location }}
+                                </p>
+
+                            {% endif %}
+
+
+                            {% if professional.bio %}
+
+                                <p class="professional-bio">
+                                    {{ professional.bio }}
+                                </p>
+
+                            {% endif %}
+
+
+                            <a href="{{ url_for(
+                                'services.professional_profile',
+                                professional_id=professional.id,
+                                service=service.slug
+                            ) }}"
+                                class="professional-button"
+                            >
+                                View Profile
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    👤
+                </div>
+
+                <h3>
+                    No professionals available
+                </h3>
+
+                <p>
+                    There are currently no professionals
+                    available for this service.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </main>
+
+</body>
+
+</html>

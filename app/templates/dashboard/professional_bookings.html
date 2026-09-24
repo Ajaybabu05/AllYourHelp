@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Booking Management - AllYourHelp
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for(
+            'static',
+            filename='css/dashboard.css'
+        ) }}"
+    >
+
+</head>
+
+<body>
+
+
+<!-- =========================================
+     HEADER
+     ========================================= -->
+
+<header class="dashboard-header">
+
+    <div class="dashboard-header-inner">
+
+        <div class="dashboard-logo">
+            AllYourHelp
+        </div>
+
+        <div class="dashboard-user">
+
+            <span>
+                {{ current_user.name }}
+            </span>
+
+            <a
+                href="{{ url_for('auth.logout') }}"
+                class="logout-button"
+            >
+                Logout
+            </a>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+
+<!-- =========================================
+     MAIN
+     ========================================= -->
+
+<main class="dashboard-container">
+
+
+    <!-- =====================================
+         PAGE HEADER
+         ===================================== -->
+
+    <section class="welcome-section">
+
+        <a href="{{ url_for('dashboard.professional_dashboard') }}" class="back-link">
+
+            ← Back to Dashboard
+        </a>
+
+        <h1>
+            Booking Management
+        </h1>
+
+        <p>
+            View and manage all your customer bookings.
+        </p>
+
+    </section>
+
+
+
+    <!-- =====================================
+         BOOKING COUNTS
+         ===================================== -->
+
+    <section class="professional-stats">
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                📋
+            </div>
+
+            <div class="stat-number">
+                {{ bookings|length }}
+            </div>
+
+            <div class="stat-label">
+                Total Bookings
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                ⏳
+            </div>
+
+            <div class="stat-number">
+
+                {{
+                    bookings
+                    |selectattr("status", "equalto", "confirmed")
+                    |list
+                    |length
+                }}
+
+            </div>
+
+            <div class="stat-label">
+                Pending
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                📅
+            </div>
+
+            <div class="stat-number">
+
+                {{
+                    bookings
+                    |selectattr("status", "equalto", "accepted")
+                    |list
+                    |length
+                }}
+
+            </div>
+
+            <div class="stat-label">
+                Upcoming
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                ✓
+            </div>
+
+            <div class="stat-number">
+
+                {{
+                    bookings
+                    |selectattr("status", "equalto", "completed")
+                    |list
+                    |length
+                }}
+
+            </div>
+
+            <div class="stat-label">
+                Completed
+            </div>
+
+        </div>
+
+
+    </section>
+
+
+
+    <!-- =====================================
+         FILTERS
+         ===================================== -->
+
+    <section class="dashboard-section">
+
+        <div class="booking-filter-card">
+
+            <h2>
+                Filter Bookings
+            </h2>
+
+            <div class="booking-filter-buttons">
+
+                <button
+                    type="button"
+                    class="booking-filter-btn active"
+                    data-filter="all"
+                >
+                    All
+                </button>
+
+                <button
+                    type="button"
+                    class="booking-filter-btn"
+                    data-filter="confirmed"
+                >
+                    Pending
+                </button>
+
+                <button
+                    type="button"
+                    class="booking-filter-btn"
+                    data-filter="accepted"
+                >
+                    Upcoming
+                </button>
+
+                <button
+                    type="button"
+                    class="booking-filter-btn"
+                    data-filter="completed"
+                >
+                    Completed
+                </button>
+
+                <button
+                    type="button"
+                    class="booking-filter-btn"
+                    data-filter="rejected"
+                >
+                    Rejected
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================
+         BOOKINGS
+         ===================================== -->
+
+    <section class="requests-section">
+
+        <div class="section-heading">
+
+            <h2>
+                Your Bookings
+            </h2>
+
+            <span>
+                {{ bookings|length }} booking(s)
+            </span>
+
+        </div>
+
+
+        {% if bookings %}
+
+            <div class="professional-bookings-list">
+
+
+                {% for booking in bookings %}
+
+                    <div
+                        class="professional-booking-card"
+                        data-status="{{ booking.status }}"
+                    >
+
+
+                        <!-- HEADER -->
+
+                        <div class="professional-booking-header">
+
+                            <div>
+
+                                <h3>
+                                    {{ booking.service.name }}
+                                </h3>
+
+                                <p>
+                                    Customer:
+                                    <strong>
+                                        {{ booking.user.name }}
+                                    </strong>
+                                </p>
+
+                            </div>
+
+
+                            <span
+                                class="status-badge status-{{ booking.status }}"
+                            >
+                                {{ booking.status|capitalize }}
+                            </span>
+
+                        </div>
+
+
+
+                        <!-- DETAILS -->
+
+                        <div class="professional-booking-details">
+
+
+                            <div class="booking-detail-item">
+
+                                <strong>
+                                    📅 Date
+                                </strong>
+
+                                <span>
+
+                                    {% if booking.preferred_date %}
+
+                                        {{ booking.preferred_date.strftime('%d %b %Y') }}
+
+                                    {% else %}
+
+                                        Not specified
+
+                                    {% endif %}
+
+                                </span>
+
+                            </div>
+
+
+
+                            <div class="booking-detail-item">
+
+                                <strong>
+                                    🕐 Time
+                                </strong>
+
+                                <span>
+
+                                    {% if booking.preferred_time %}
+
+                                        {{ booking.preferred_time.strftime('%I:%M %p') }}
+
+                                    {% else %}
+
+                                        Not specified
+
+                                    {% endif %}
+
+                                </span>
+
+                            </div>
+
+
+
+                            <div class="booking-detail-item">
+
+                                <strong>
+                                    📍 Location
+                                </strong>
+
+                                <span>
+
+                                    {% if booking.location %}
+
+                                        {{ booking.location }}
+
+                                    {% else %}
+
+                                        Not specified
+
+                                    {% endif %}
+
+                                </span>
+
+                            </div>
+
+
+
+                            <div class="booking-detail-item">
+
+                                <strong>
+                                    💳 Payment
+                                </strong>
+
+                                <span>
+
+                                    {% if booking.payment_status %}
+
+                                        {{ booking.payment_status|capitalize }}
+
+                                    {% else %}
+
+                                        Not available
+
+                                    {% endif %}
+
+                                </span>
+
+                            </div>
+
+
+                        </div>
+
+
+
+                        <!-- REQUIREMENT -->
+
+                        {% if booking.description %}
+
+                            <div class="professional-booking-description">
+
+                                <strong>
+                                    Customer Requirement
+                                </strong>
+
+                                <p>
+                                    {{ booking.description }}
+                                </p>
+
+                            </div>
+
+                        {% endif %}
+
+
+
+                        <!-- ADDITIONAL DETAILS -->
+
+                        {% if booking.additional_details %}
+
+                            <div class="professional-booking-description">
+
+                                <strong>
+                                    Additional Details
+                                </strong>
+
+                                <p>
+                                    {{ booking.additional_details }}
+                                </p>
+
+                            </div>
+
+                        {% endif %}
+
+
+
+                        <!-- CREATED -->
+
+                        <div class="professional-booking-created">
+
+                            Booking received:
+
+                            {{ booking.created_at.strftime('%d %b %Y, %I:%M %p') }}
+
+                        </div>
+
+
+
+                        <!-- ACTIONS -->
+
+                        {% if booking.status == "confirmed" %}
+
+                            <div class="request-actions">
+
+                                <a href="{{ url_for('dashboard.professional_booking_details', request_id=booking.id) }}"
+                                class="booking-action-btn view-details-btn">
+
+                                    👁 View Details
+
+                                </a>
+
+                                <form
+                                    method="POST"
+                                    action="{{ url_for(
+                                        'dashboard.accept_service_request',
+                                        request_id=booking.id
+                                    ) }}"
+                                >
+
+                                    <button
+                                        type="submit"
+                                        class="accept-button"
+                                    >
+                                        Accept Booking
+                                    </button>
+
+                                </form>
+
+
+                                <form
+                                    method="POST"
+                                    action="{{ url_for(
+                                        'dashboard.reject_service_request',
+                                        request_id=booking.id
+                                    ) }}"
+                                >
+
+                                    <button
+                                        type="submit"
+                                        class="reject-button"
+                                    >
+                                        Reject Booking
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        {% elif booking.status == "accepted" %}
+
+                            <div class="request-actions">
+
+                                <form
+                                    method="POST"
+                                    action="{{ url_for(
+                                        'dashboard.complete_request',
+                                        request_id=booking.id
+                                    ) }}"
+                                >
+
+                                    <button
+                                        type="submit"
+                                        class="complete-button"
+                                    >
+                                        Mark as Completed
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        {% endif %}
+
+
+                    </div>
+
+                {% endfor %}
+
+
+            </div>
+
+
+            <!-- EMPTY FILTER RESULT -->
+
+            <div
+                id="no-filter-results"
+                class="dashboard-empty-state"
+                style="display: none;"
+            >
+
+                <div>
+                    🔍
+                </div>
+
+                <h3>
+                    No bookings found
+                </h3>
+
+                <p>
+                    There are no bookings with this status.
+                </p>
+
+            </div>
+
+
+        {% else %}
+
+            <div class="dashboard-empty-state">
+
+                <div>
+                    📋
+                </div>
+
+                <h3>
+                    No bookings yet
+                </h3>
+
+                <p>
+                    Customer bookings will appear here.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+
+    </section>
+
+
+</main>
+
+
+
+<!-- =========================================
+     FILTER JAVASCRIPT
+     ========================================= -->
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const filterButtons =
+            document.querySelectorAll(
+                ".booking-filter-btn"
+            );
+
+        const bookingCards =
+            document.querySelectorAll(
+                ".professional-booking-card"
+            );
+
+        const noResults =
+            document.getElementById(
+                "no-filter-results"
+            );
+
+
+        filterButtons.forEach(
+            function (button) {
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        const filter =
+                            this.dataset.filter;
+
+
+                        filterButtons.forEach(
+                            function (btn) {
+
+                                btn.classList.remove(
+                                    "active"
+                                );
+
+                            }
+                        );
+
+
+                        this.classList.add(
+                            "active"
+                        );
+
+
+                        let visibleCount = 0;
+
+
+                        bookingCards.forEach(
+                            function (card) {
+
+                                const status =
+                                    card.dataset.status;
+
+
+                                if (
+                                    filter === "all"
+                                    ||
+                                    status === filter
+                                ) {
+
+                                    card.style.display =
+                                        "block";
+
+                                    visibleCount++;
+
+                                }
+
+                                else {
+
+                                    card.style.display =
+                                        "none";
+
+                                }
+
+                            }
+                        );
+
+
+                        if (noResults) {
+
+                            if (visibleCount === 0) {
+
+                                noResults.style.display =
+                                    "block";
+
+                            }
+
+                            else {
+
+                                noResults.style.display =
+                                    "none";
+
+                            }
+
+                        }
+
+                    }
+                );
+
+            }
+        );
+
+    }
+);
+
+</script>
+
+
+</body>
+
+</html>

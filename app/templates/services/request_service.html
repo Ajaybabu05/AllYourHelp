@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Book Service - AllYourHelp
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/request_service.css') }}"
+    >
+
+</head>
+
+<body>
+
+<header class="dashboard-header">
+
+    <div class="dashboard-header-inner">
+
+        <div class="dashboard-logo">
+            AllYourHelp
+        </div>
+
+        <div class="dashboard-user">
+
+            <span>
+                {{ current_user.name }}
+            </span>
+
+            <a
+                href="{{ url_for('auth.logout') }}"
+                class="logout-button"
+            >
+                Logout
+            </a>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+<main class="dashboard-container">
+
+    <section class="welcome-section">
+
+        <h1>
+            Book a Service
+        </h1>
+
+        <p>
+            Book a service with
+            <strong>
+                {{ professional.user.name }}
+            </strong>
+        </p>
+
+    </section>
+
+
+    <!-- Flash messages -->
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+
+        {% if messages %}
+
+            {% for category, message in messages %}
+
+                <div class="flash-message {{ category }}">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+    {% endwith %}
+
+
+    <section class="professional-summary">
+
+        <h2>
+            Select Service
+        </h2>
+
+        <form
+            method="POST"
+            action="{{ url_for(
+                'services.request_service',
+                professional_id=professional.id
+            ) }}"
+        >
+
+            <!-- Service -->
+
+            <div>
+
+                <label for="service_id">
+                    Service
+                </label>
+
+                <select
+                    name="service_id"
+                    id="service_id"
+                    required
+                >
+
+                    <option value="">
+                        -- Select a Service --
+                    </option>
+
+                    {% for service in professional.services %}
+
+                        {% if service.is_active %}
+
+                            <option value="{{ service.id }}">
+                                {{ service.name }}
+                            </option>
+
+                        {% endif %}
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <!-- Available slots -->
+
+            <div>
+
+                <h2>
+                    Select an Available Slot
+                </h2>
+
+                {% if available_slots %}
+
+                    <div class="availability-slots">
+
+                        {% for slot in available_slots %}
+
+                            <label
+                                class="availability-slot"
+                            >
+
+                                <input
+                                    type="radio"
+                                    name="slot_id"
+                                    value="{{ slot.id }}"
+                                    required
+                                >
+
+                                <span>
+
+                                    <strong>
+                                        {{ slot.slot_date.strftime(
+                                            '%A, %d %B %Y'
+                                        ) }}
+                                    </strong>
+
+                                    <br>
+
+                                    {{ slot.start_time.strftime(
+                                        '%I:%M %p'
+                                    ) }}
+
+                                    -
+
+                                    {{ slot.end_time.strftime(
+                                        '%I:%M %p'
+                                    ) }}
+
+                                </span>
+
+                            </label>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% else %}
+
+                    <p>
+                        This professional currently has no
+                        available slots.
+                    </p>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- Requirement -->
+
+            <div>
+
+                <label for="description">
+                    Describe your requirement
+                </label>
+
+                <textarea
+                    id="description"
+                    name="description"
+                    rows="5"
+                    required
+                ></textarea>
+
+            </div>
+
+
+            <!-- Location -->
+
+            <div>
+
+                <label for="location">
+                    Location
+                </label>
+
+                <input
+                    type="text"
+                    id="location"
+                    name="location"
+                    placeholder="Enter service location"
+                >
+
+            </div>
+
+
+            <!-- Additional details -->
+
+            <div>
+
+                <label for="additional_details">
+                    Additional Details
+                </label>
+
+                <textarea
+                    id="additional_details"
+                    name="additional_details"
+                    rows="4"
+                ></textarea>
+
+            </div>
+
+
+            <button
+                type="submit"
+                {% if not available_slots %}
+                    disabled
+                {% endif %}
+            >
+                Continue to Booking
+            </button>
+
+        </form>
+
+    </section>
+
+
+    <section>
+
+        <a
+            href="{{ url_for(
+                'services.professional_profile',
+                professional_id=professional.id
+            ) }}"
+        >
+            ← Back to Professional Profile
+        </a>
+
+    </section>
+
+</main>
+
+</body>
+
+</html>

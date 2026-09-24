@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Manage Services - AllYourHelp</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/dashboard.css') }}"
+    >
+
+    <style>
+
+        .services-management-container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px 50px;
+        }
+
+        .services-management-card {
+            background: white;
+            border-radius: 16px;
+            padding: 35px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        .services-header {
+            margin-bottom: 30px;
+        }
+
+        .services-header h1 {
+            margin: 0 0 8px;
+            font-size: 30px;
+            color: #1f2937;
+        }
+
+        .services-header p {
+            margin: 0;
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+        /* ----------------------------------------
+           INFORMATION BOX
+           ---------------------------------------- */
+
+        .approval-info {
+            margin-top: 20px;
+            padding: 16px 18px;
+            border-radius: 10px;
+            background: #eef2ff;
+            border: 1px solid #c7d2fe;
+            color: #3730a3;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .approval-info strong {
+            color: #312e81;
+        }
+
+        /* ----------------------------------------
+           WARNING
+           ---------------------------------------- */
+
+        .selection-warning {
+            display: none;
+            margin-bottom: 20px;
+            padding: 14px 16px;
+            border-radius: 10px;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #b91c1c;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .selection-warning.show {
+            display: block;
+        }
+
+        /* ----------------------------------------
+           CATEGORY
+           ---------------------------------------- */
+
+        .service-category {
+            margin-bottom: 30px;
+        }
+
+        .service-category:last-child {
+            margin-bottom: 0;
+        }
+
+        .category-title {
+            font-size: 20px;
+            color: #1f2937;
+            margin: 0 0 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .category-description {
+            color: #6b7280;
+            font-size: 14px;
+            margin: -5px 0 18px;
+        }
+
+        /* ----------------------------------------
+           SERVICES GRID
+           ---------------------------------------- */
+
+        .services-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+            gap: 15px;
+        }
+
+        /* ----------------------------------------
+           SERVICE OPTION
+           ---------------------------------------- */
+
+        .service-option {
+            position: relative;
+        }
+
+        .service-checkbox {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .service-label {
+            display: block;
+            padding: 18px;
+            border: 1px solid #d1d5db;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: white;
+            min-height: 120px;
+            box-sizing: border-box;
+        }
+
+        .service-label:hover {
+            border-color: #4f46e5;
+            transform: translateY(-1px);
+        }
+
+        .service-checkbox:checked + .service-label {
+            border-color: #4f46e5;
+            background: #eef2ff;
+            box-shadow:
+                0 0 0 2px rgba(79, 70, 229, 0.12);
+        }
+
+        /* Pending */
+
+        .service-option.pending .service-label {
+            background: #fffbeb;
+            border-color: #f59e0b;
+            cursor: not-allowed;
+        }
+
+        .service-option.pending .service-label:hover {
+            transform: none;
+            border-color: #f59e0b;
+        }
+
+        /* Rejected */
+
+        .service-option.rejected .service-label {
+            background: #fef2f2;
+            border-color: #fca5a5;
+        }
+
+        .service-name {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 7px;
+        }
+
+        .service-check {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 2px solid #d1d5db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 12px;
+            color: transparent;
+        }
+
+        .service-checkbox:checked + .service-label .service-check {
+            background: #4f46e5;
+            border-color: #4f46e5;
+            color: white;
+        }
+
+        .service-description {
+            color: #6b7280;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        /* ----------------------------------------
+           STATUS BADGES
+           ---------------------------------------- */
+
+        .service-status {
+            display: inline-flex;
+            align-items: center;
+            padding: 5px 9px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .status-active {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-rejected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* ----------------------------------------
+           NO SERVICES
+           ---------------------------------------- */
+
+        .no-services {
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 10px;
+            color: #6b7280;
+            text-align: center;
+        }
+
+        /* ----------------------------------------
+           ACTIONS
+           ---------------------------------------- */
+
+        .services-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            margin-top: 35px;
+            padding-top: 25px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .selected-count {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .selected-count strong {
+            color: #4f46e5;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .services-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 22px;
+            border-radius: 9px;
+            border: none;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .dashboard-btn {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .dashboard-btn:hover {
+            background: #e5e7eb;
+        }
+
+        .save-btn {
+            background: #4f46e5;
+            color: white;
+        }
+
+        .save-btn:hover {
+            background: #4338ca;
+        }
+
+        /* ----------------------------------------
+           RESPONSIVE
+           ---------------------------------------- */
+
+        @media (max-width: 700px) {
+
+            .services-management-card {
+                padding: 25px 20px;
+            }
+
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .services-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .services-btn {
+                width: 100%;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+    <div class="services-management-container">
+
+        <div class="services-management-card">
+
+            <!-- HEADER -->
+
+            <div class="services-header">
+
+                <h1>
+                    Manage Your Services
+                </h1>
+
+                <p>
+                    Select the services you provide to customers.
+                    New services require admin approval before they
+                    become available on your professional profile.
+                </p>
+
+                <div class="approval-info">
+
+                    <strong>How service approval works:</strong>
+
+                    Select a new service and save your changes.
+                    The service will be submitted for admin approval.
+                    It will become active only after an administrator
+                    approves it.
+
+                    <br><br>
+
+                    <strong>Removing a service:</strong>
+
+                    You can remove an already approved service
+                    immediately. Admin approval is not required for
+                    removing a service.
+
+                </div>
+
+            </div>
+
+
+            <!-- WARNING -->
+
+            <div
+                id="selectionWarning"
+                class="selection-warning"
+            >
+                ⚠️ Please select at least one service before saving.
+            </div>
+
+
+            <form
+                method="POST"
+                id="servicesForm"
+            >
+
+                {% for category in categories %}
+
+                    {% set active_category_services = category.services
+                        |selectattr("is_active", "equalto", true)
+                        |list
+                    %}
+
+                    {% if active_category_services %}
+
+                        <div class="service-category">
+
+                            <h2 class="category-title">
+                                {{ category.name }}
+                            </h2>
+
+                            {% if category.description %}
+
+                                <p class="category-description">
+                                    {{ category.description }}
+                                </p>
+
+                            {% endif %}
+
+
+                            <div class="services-grid">
+
+                                {% for service in active_category_services %}
+
+                                    {% set is_approved =
+                                        service.id in approved_service_ids
+                                    %}
+
+                                    {% set is_pending =
+                                        service.id in pending_service_ids
+                                    %}
+
+                                    {% set is_rejected =
+                                        service.id in rejected_service_ids
+                                    %}
+
+
+                                    <div
+                                        class="service-option
+                                        {% if is_pending %}
+                                            pending
+                                        {% elif is_rejected %}
+                                            rejected
+                                        {% endif %}"
+                                    >
+
+                                        <input
+                                            type="checkbox"
+                                            id="service-{{ service.id }}"
+                                            name="service_ids"
+                                            value="{{ service.id }}"
+                                            class="service-checkbox"
+
+                                            {% if is_approved %}
+                                                checked
+                                            {% endif %}
+
+                                            {% if is_pending %}
+                                                checked
+                                                disabled
+                                            {% endif %}
+                                        >
+
+
+                                        <label
+                                            for="service-{{ service.id }}"
+                                            class="service-label"
+                                        >
+
+                                            <div class="service-name">
+
+                                                <span>
+                                                    {{ service.name }}
+                                                </span>
+
+                                                <span class="service-check">
+
+                                                    {% if is_pending %}
+                                                        ⏳
+                                                    {% elif is_rejected %}
+                                                        !
+                                                    {% else %}
+                                                        ✓
+                                                    {% endif %}
+
+                                                </span>
+
+                                            </div>
+
+
+                                            {% if service.description %}
+
+                                                <div class="service-description">
+                                                    {{ service.description }}
+                                                </div>
+
+                                            {% endif %}
+
+
+                                            {% if is_pending %}
+
+                                                <span class="service-status status-pending">
+                                                    ⏳ Pending Approval
+                                                </span>
+
+                                            {% elif is_rejected %}
+
+                                                <span class="service-status status-rejected">
+                                                    ✕ Rejected — Select to Request Again
+                                                </span>
+
+                                            {% elif is_approved %}
+
+                                                <span class="service-status status-active">
+                                                    ✓ Active
+                                                </span>
+
+                                            {% else %}
+
+                                                <span class="service-status">
+                                                    Available
+                                                </span>
+
+                                            {% endif %}
+
+                                        </label>
+
+                                    </div>
+
+                                {% endfor %}
+
+                            </div>
+
+                        </div>
+
+                    {% endif %}
+
+                {% endfor %}
+
+
+                <!-- ACTIONS -->
+
+                <div class="services-actions">
+
+                    <div class="selected-count">
+
+                        Selected:
+                        <strong id="selectedServiceCount">
+                            0
+                        </strong>
+                        services
+
+                    </div>
+
+
+                    <div class="action-buttons">
+
+                        <a
+                            href="{{ url_for('dashboard.professional_dashboard') }}"
+                            class="services-btn dashboard-btn"
+                        >
+                            ← Professional Dashboard
+                        </a>
+
+                        <button
+                            type="submit"
+                            class="services-btn save-btn"
+                        >
+                            Save Services
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        const form = document.getElementById(
+            "servicesForm"
+        );
+
+        const warning = document.getElementById(
+            "selectionWarning"
+        );
+
+        const countElement = document.getElementById(
+            "selectedServiceCount"
+        );
+
+
+        function updateSelectedCount() {
+
+            /*
+             * Count normal checked services.
+             *
+             * Pending services are disabled, so they are not
+             * included in the submitted form. They are preserved
+             * automatically by the backend.
+             */
+
+            const checkboxes = document.querySelectorAll(
+                ".service-checkbox:not(:disabled)"
+            );
+
+            let count = 0;
+
+            checkboxes.forEach(function(checkbox) {
+
+                if (checkbox.checked) {
+                    count++;
+                }
+
+            });
+
+
+            /*
+             * Add pending services to the visual count.
+             */
+
+            const pendingCheckboxes =
+                document.querySelectorAll(
+                    ".service-checkbox:disabled"
+                );
+
+            pendingCheckboxes.forEach(function(checkbox) {
+
+                if (checkbox.checked) {
+                    count++;
+                }
+
+            });
+
+
+            countElement.textContent = count;
+        }
+
+
+        document.querySelectorAll(
+            ".service-checkbox:not(:disabled)"
+        ).forEach(function(checkbox) {
+
+            checkbox.addEventListener(
+                "change",
+                function() {
+
+                    warning.classList.remove(
+                        "show"
+                    );
+
+                    updateSelectedCount();
+
+                }
+            );
+
+        });
+
+
+        form.addEventListener(
+            "submit",
+            function(event) {
+
+                /*
+                 * Count both selectable services and
+                 * pending services.
+                 */
+
+                const selectableChecked =
+                    document.querySelectorAll(
+                        ".service-checkbox:not(:disabled):checked"
+                    ).length;
+
+                const pendingChecked =
+                    document.querySelectorAll(
+                        ".service-checkbox:disabled:checked"
+                    ).length;
+
+
+                const totalSelected =
+                    selectableChecked + pendingChecked;
+
+
+                if (totalSelected === 0) {
+
+                    event.preventDefault();
+
+                    warning.classList.add(
+                        "show"
+                    );
+
+                    warning.scrollIntoView({
+                        behavior: "smooth",
+                        block: "center"
+                    });
+
+                    return;
+
+                }
+
+
+                warning.classList.remove(
+                    "show"
+                );
+
+            }
+        );
+
+
+        updateSelectedCount();
+
+    </script>
+
+</body>
+
+</html>

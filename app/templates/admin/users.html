@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Users Management - AllYourHelp</title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f5f7fb;
+            color: #1f2937;
+        }
+
+
+        /* HEADER */
+
+        .header {
+            height: 70px;
+
+            background: #ffffff;
+
+            border-bottom: 1px solid #e5e7eb;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding: 0 40px;
+        }
+
+
+        .logo {
+            font-size: 24px;
+
+            font-weight: 700;
+
+            color: #2563eb;
+        }
+
+
+        .admin-label {
+            color: #6b7280;
+
+            font-size: 14px;
+        }
+
+
+        /* MAIN */
+
+        .container {
+            max-width: 1250px;
+
+            margin: 40px auto;
+
+            padding: 0 20px;
+        }
+
+
+        .page-header {
+            margin-bottom: 25px;
+        }
+
+
+        .page-header h1 {
+            font-size: 32px;
+
+            color: #111827;
+
+            margin-bottom: 8px;
+        }
+
+
+        .page-header p {
+            color: #6b7280;
+
+            font-size: 16px;
+        }
+
+
+        /* FLASH */
+
+        .flash-container {
+            margin-bottom: 20px;
+        }
+
+
+        .flash {
+            padding: 14px 18px;
+
+            border-radius: 8px;
+
+            margin-bottom: 10px;
+
+            font-size: 14px;
+        }
+
+
+        .flash.success {
+            background: #dcfce7;
+
+            color: #166534;
+
+            border: 1px solid #bbf7d0;
+        }
+
+
+        .flash.error {
+            background: #fee2e2;
+
+            color: #991b1b;
+
+            border: 1px solid #fecaca;
+        }
+
+
+        /* USERS CARD */
+
+        .users-card {
+            background: #ffffff;
+
+            border: 1px solid #e5e7eb;
+
+            border-radius: 12px;
+
+            overflow: hidden;
+
+            box-shadow:
+                0 4px 12px
+                rgba(0, 0, 0, 0.04);
+        }
+
+
+        .card-header {
+            padding: 20px 24px;
+
+            border-bottom: 1px solid #e5e7eb;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+        }
+
+
+        .card-header h2 {
+            font-size: 20px;
+
+            color: #111827;
+        }
+
+
+        .user-count {
+            color: #6b7280;
+
+            font-size: 14px;
+        }
+
+
+        /* TABLE */
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+
+        table {
+            width: 100%;
+
+            border-collapse: collapse;
+        }
+
+
+        th {
+            background: #f9fafb;
+
+            padding: 15px 20px;
+
+            text-align: left;
+
+            font-size: 13px;
+
+            color: #6b7280;
+
+            text-transform: uppercase;
+
+            letter-spacing: 0.04em;
+
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+
+        td {
+            padding: 18px 20px;
+
+            border-bottom: 1px solid #f0f0f0;
+
+            vertical-align: middle;
+
+            font-size: 14px;
+        }
+
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+
+        .user-name {
+            font-weight: 600;
+
+            color: #111827;
+        }
+
+
+        .email {
+            color: #6b7280;
+        }
+
+
+        /* ROLE BADGES */
+
+        .role-badge {
+            display: inline-block;
+
+            padding: 5px 10px;
+
+            border-radius: 20px;
+
+            font-size: 12px;
+
+            font-weight: 600;
+        }
+
+
+        .role-user {
+            background: #eff6ff;
+
+            color: #1d4ed8;
+        }
+
+
+        .role-professional {
+            background: #f3e8ff;
+
+            color: #7e22ce;
+        }
+
+
+        .role-admin {
+            background: #fef3c7;
+
+            color: #92400e;
+        }
+
+
+        /* STATUS */
+
+        .status-badge {
+            display: inline-block;
+
+            padding: 5px 10px;
+
+            border-radius: 20px;
+
+            font-size: 12px;
+
+            font-weight: 600;
+        }
+
+
+        .status-active {
+            background: #dcfce7;
+
+            color: #166534;
+        }
+
+
+        .status-inactive {
+            background: #fee2e2;
+
+            color: #991b1b;
+        }
+
+
+        /* DATE */
+
+        .date {
+            color: #6b7280;
+
+            white-space: nowrap;
+        }
+
+
+        /* ACTION */
+
+        .action-form {
+            display: inline;
+        }
+
+
+        .action-btn {
+            border: none;
+
+            border-radius: 7px;
+
+            padding: 9px 14px;
+
+            font-size: 13px;
+
+            font-weight: 600;
+
+            cursor: pointer;
+        }
+
+
+        .deactivate-btn {
+            background: #fee2e2;
+
+            color: #b91c1c;
+        }
+
+
+        .deactivate-btn:hover {
+            background: #fecaca;
+        }
+
+
+        .activate-btn {
+            background: #dcfce7;
+
+            color: #15803d;
+        }
+
+
+        .activate-btn:hover {
+            background: #bbf7d0;
+        }
+
+
+        .protected {
+            color: #9ca3af;
+
+            font-size: 13px;
+        }
+
+
+        /* EMPTY */
+
+        .empty-state {
+            text-align: center;
+
+            padding: 70px 20px;
+        }
+
+
+        .empty-state h2 {
+            font-size: 22px;
+
+            color: #111827;
+
+            margin-bottom: 8px;
+        }
+
+
+        .empty-state p {
+            color: #6b7280;
+        }
+
+
+        /* RESPONSIVE */
+
+        @media (max-width: 800px) {
+
+            .header {
+                padding: 0 20px;
+            }
+
+
+            .container {
+                margin-top: 25px;
+            }
+
+
+            .page-header h1 {
+                font-size: 26px;
+            }
+
+
+            th,
+            td {
+                padding: 12px;
+            }
+
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            text-decoration: none;
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<header class="header">
+
+    <div class="logo">
+        AllYourHelp
+    </div>
+
+
+    <div class="admin-label">
+        Admin Panel
+    </div>
+
+</header>
+
+
+<main class="container">
+
+
+    <div class="page-header">
+
+        <h1>
+            Users Management
+        </h1>
+
+        <p>
+            View and manage all registered AllYourHelp accounts.
+        </p>
+
+    </div>
+
+
+    <!-- FLASH MESSAGES -->
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+
+        {% if messages %}
+
+            <div class="flash-container">
+
+                {% for category, message in messages %}
+
+                    <div class="flash {{ category }}">
+                        {{ message }}
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% endif %}
+
+    {% endwith %}
+
+
+    <div class="users-card">
+
+
+        <div class="card-header">
+
+            <h2>
+                Registered Users
+            </h2>
+
+            <span class="user-count">
+                {{ users|length }} account(s)
+            </span>
+
+        </div>
+
+
+        {% if users %}
+
+
+            <div class="table-wrapper">
+
+                <table>
+
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Name
+                            </th>
+
+                            <th>
+                                Email
+                            </th>
+
+                            <th>
+                                Role
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Joined
+                            </th>
+
+                            <th>
+                                Action
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+
+                        {% for user in users %}
+
+
+                            <tr>
+
+
+                                <td>
+
+                                    <div class="user-name">
+                                        {{ user.name }}
+                                    </div>
+
+                                </td>
+
+
+                                <td>
+
+                                    <span class="email">
+                                        {{ user.email }}
+                                    </span>
+
+                                </td>
+
+
+                                <td>
+
+                                    {% if user.role == "admin" %}
+
+                                        <span class="role-badge role-admin">
+                                            Admin
+                                        </span>
+
+                                    {% elif user.role == "professional" %}
+
+                                        <span class="role-badge role-professional">
+                                            Professional
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="role-badge role-user">
+                                            User
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <td>
+
+                                    {% if user.is_active %}
+
+                                        <span class="status-badge status-active">
+                                            Active
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="status-badge status-inactive">
+                                            Inactive
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <td>
+
+                                    <span class="date">
+
+                                        {% if user.created_at %}
+
+                                            {{ user.created_at.strftime('%d %b %Y') }}
+
+                                        {% else %}
+
+                                            —
+
+                                        {% endif %}
+
+                                    </span>
+
+                                </td>
+
+
+                                <td>
+
+
+                                    {% if user.id == current_user.id %}
+
+                                        <span class="protected">
+                                            Current Admin
+                                        </span>
+
+
+                                    {% else %}
+
+
+                                        <form
+                                            method="POST"
+                                            action="{{ url_for('admin.toggle_user_status', user_id=user.id) }}"
+                                            class="action-form"
+                                        >
+
+                                            {% if user.is_active %}
+
+                                                <button
+                                                    type="submit"
+                                                    class="action-btn deactivate-btn"
+                                                    onclick="return confirm('Deactivate this account?');"
+                                                >
+                                                    Deactivate
+                                                </button>
+
+                                            {% else %}
+
+                                                <button
+                                                    type="submit"
+                                                    class="action-btn activate-btn"
+                                                    onclick="return confirm('Activate this account?');"
+                                                >
+                                                    Activate
+                                                </button>
+
+                                            {% endif %}
+
+                                        </form>
+
+
+                                    {% endif %}
+
+
+                                </td>
+
+
+                            </tr>
+
+
+                        {% endfor %}
+
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+        {% else %}
+
+
+            <div class="empty-state">
+
+                <h2>
+                    No Users Found
+                </h2>
+
+                <p>
+                    There are currently no registered accounts.
+                </p>
+
+            </div>
+
+
+        {% endif %}
+
+
+    </div>
+    <div class="container">
+            <a
+                href="{{ url_for('admin.dashboard') }}"
+                class="back-link"
+            >
+                ← Admin Dashboard
+            </a>
+            </div>
+
+</main>
+
+
+</body>
+
+</html>

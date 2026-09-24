@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <meta name="description"
+          content="AllYourHelp User Dashboard">
+
+    <title>Dashboard | AllYourHelp</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/dashboard.css') }}">
+
+</head>
+
+<body>
+
+<!-- =========================================================
+     NAVBAR
+========================================================= -->
+
+<header class="dashboard-navbar">
+
+    <div class="navbar-container">
+
+        <!-- Logo -->
+        <a href="{{ url_for('home') }}"
+           class="dashboard-logo">
+
+            <span class="logo-mark">A</span>
+
+            <span>AllYourHelp</span>
+
+        </a>
+
+
+        <!-- Desktop Navigation -->
+        <nav class="dashboard-nav">
+
+            <a href="{{ url_for('dashboard.user_dashboard') }}"
+               class="nav-link active">
+
+                Dashboard
+
+            </a>
+
+            <a href="#services"
+               class="nav-link">
+
+                Services
+
+            </a>
+
+            <a href="{{ url_for('dashboard.my_bookings') }}"
+            class="nav-link">
+
+                My Bookings
+
+            </a>
+
+        </nav>
+
+        <a
+            href="{{ url_for('dashboard.notifications') }}"
+            class="notification-bell"
+            aria-label="Notifications"
+        >
+            <span class="bell-icon">🔔</span>
+
+            {% if unread_notifications > 0 %}
+                <span class="notification-dot"></span>
+            {% endif %}
+        </a>
+
+        <a
+            href="{{ url_for('dashboard.favorites') }}"
+            class="dashboard-card"
+        >
+            <div class="dashboard-card-icon">
+                ❤️
+            </div>
+        </a>
+
+
+        <!-- User Area -->
+        <div class="user-area">
+
+            <div class="user-profile">
+
+                <div class="profile-avatar">
+                    {% if user.profile_image %}
+                        <img
+                            src="{{ url_for('static', filename=user.profile_image) }}"
+                            alt="{{ user.name }}"
+                        >
+                    {% else %}
+                        {{ user.name[0]|upper }}
+                    {% endif %}
+                </div>
+
+                
+
+                <div class="user-details">
+
+                    <a
+                    href="{{ url_for('dashboard.customer_profile') }}"
+                    class="profile-link"
+                    >
+                        {{ user.name }}
+                    </a>
+
+                    <span class="user-role">
+
+                        {% if user.role == "professional" %}
+                            Professional
+                        {% else %}
+                        <a
+                            href="{{ url_for('dashboard.customer_profile') }}"
+                            class="profile-link"
+                        >
+                            User
+                        </a>
+                        {% endif %}
+
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <a href="{{ url_for('auth.logout') }}"
+               class="logout-button">
+
+                Logout
+
+            </a>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+<!-- =========================================================
+     MAIN CONTENT
+========================================================= -->
+
+<main class="dashboard-main">
+
+    <div class="dashboard-container">
+
+
+        <!-- =====================================================
+             WELCOME SECTION
+        ====================================================== -->
+
+        <section class="welcome-section">
+
+            <div class="welcome-content">
+
+                <span class="welcome-label">
+                    YOUR DASHBOARD
+                </span>
+
+                <h1>
+                    Welcome back, {{ user.name }}!
+                    <span class="wave">👋</span>
+                </h1>
+
+                <p>
+                    Find the right professional for whatever
+                    help you need.
+                </p>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================================
+             SEARCH SECTION
+        ====================================================== -->
+
+        <section class="search-section">
+
+            <div class="search-heading">
+
+                <span class="search-icon">🔍</span>
+
+                <div>
+
+                    <h2>
+                        What can we help you with?
+                    </h2>
+
+                    <p>
+                        Search for a service or professional.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="search-box">
+
+                <input
+                    type="text"
+                    id="dashboardSearch"
+                    placeholder="Search for a service..."
+                    autocomplete="off"
+                >
+
+                <button
+                    type="button"
+                    id="searchButton">
+
+                    Search
+
+                </button>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================================
+             SERVICES
+        ====================================================== -->
+
+        <section class="services-section"
+                 id="services">
+
+            <div class="section-header">
+
+                <div>
+
+                    <span class="section-label">
+                        SERVICES
+                    </span>
+
+                    <h2>
+                        Explore Services
+                    </h2>
+
+                    <p>
+                        Get help from trusted professionals
+                        across different fields.
+                    </p>
+
+                </div>
+
+
+                <a href="#services"
+                   class="view-all">
+
+                    View All
+                    <span>→</span>
+
+                </a>
+
+            </div>
+
+
+            <div class="categories-grid">
+
+                {% for category in categories %}
+
+                    <a
+                        href="{{ url_for('services.category_services', slug=category.slug) }}"
+                        class="category-card"
+                        data-service="{{ category.name }}"
+                    >
+
+                        <div class="category-icon">
+                            {% if category.slug == "legal" %}
+                                ⚖
+                            {% elif category.slug == "medical" %}
+                                ⚕
+                            {% elif category.slug == "ca-tax" %}
+                                ₹
+                            {% elif category.slug == "property" %}
+                                🏠
+                            {% elif category.slug == "education" %}
+                                🎓
+                            {% elif category.slug == "visa" %}
+                                ✈
+                            {% elif category.slug == "technology" %}
+                                💻
+                            {% elif category.slug == "documentation" %}
+                                📄
+                            {% elif category.slug == "business" %}
+                                💼
+                            {% elif category.slug == "loans" %}
+                                🏦
+                            {% else %}
+                                🔹
+                            {% endif %}
+                        </div>
+
+                        <div class="category-content">
+
+                            <h3>
+                                {{ category.name }}
+                            </h3>
+
+                            <p>
+                                {{ category.description }}
+                            </p>
+
+                        </div>
+
+                        <span class="category-arrow">
+                            →
+                        </span>
+
+                    </a>
+
+                {% endfor %}
+
+            </div>
+
+            <!-- No search results message -->
+
+            <div id="noResults"
+                 class="no-results">
+
+                <div class="no-results-icon">
+                    🔍
+                </div>
+
+                <h3>
+                    No services found
+                </h3>
+
+                <p>
+                    Try searching for another service.
+                </p>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================================
+             MY REQUESTS
+        ====================================================== -->
+
+        <!-- =====================================================
+        MY BOOKINGS
+        ====================================================== -->
+
+        <section class="requests-section"
+                id="bookings">
+
+            <div class="section-header">
+
+                <div>
+
+                    <span class="section-label">
+                        ACTIVITY
+                    </span>
+
+                    <h2>
+                        My Bookings
+                    </h2>
+
+                    <p>
+                        View and manage your service bookings.
+                    </p>
+
+                </div>
+
+
+                <a href="{{ url_for('dashboard.my_bookings') }}"
+                class="view-all">
+
+                    View All
+                    <span>→</span>
+
+                </a>
+
+            </div>
+
+
+            <div class="empty-requests">
+
+                <div class="empty-request-icon">
+                    📅
+                </div>
+
+                <h3>
+                    View Your Bookings
+                </h3>
+
+                <p>
+                    Check your booked services, professionals,
+                    appointment times and payment status.
+                </p>
+
+                <a
+                    href="{{ url_for('dashboard.my_bookings') }}"
+                    class="browse-button"
+                >
+                    My Bookings
+                </a>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================================
+             QUICK INFORMATION
+        ====================================================== -->
+
+        <section class="quick-info">
+
+            <div class="info-card">
+
+                <div class="info-icon">
+                    ✓
+                </div>
+
+                <div>
+
+                    <h3>
+                        Trusted Professionals
+                    </h3>
+
+                    <p>
+                        Find professionals for your specific needs.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="info-card">
+
+                <div class="info-icon">
+                    ⚡
+                </div>
+
+                <div>
+
+                    <h3>
+                        Simple & Fast
+                    </h3>
+
+                    <p>
+                        Find the help you need without the hassle.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="info-card">
+
+                <div class="info-icon">
+                    🔒
+                </div>
+
+                <div>
+
+                    <h3>
+                        Secure Platform
+                    </h3>
+
+                    <p>
+                        Your account information stays protected.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+    </div>
+
+</main>
+
+
+
+<!-- =========================================================
+     FOOTER
+========================================================= -->
+
+<footer class="dashboard-footer">
+
+    <div class="footer-container">
+
+        <div class="footer-brand">
+
+            <a href="{{ url_for('home') }}">
+                AllYourHelp
+            </a>
+
+            <p>
+                Everything you need, all in one place.
+            </p>
+
+        </div>
+
+
+        <div class="footer-links">
+
+            <a href="{{ url_for('home') }}">
+                Home
+            </a>
+
+            <a href="#services">
+                Services
+            </a>
+
+            <a href="{{ url_for('dashboard.my_bookings') }}">
+                My Bookings
+            </a>
+
+            <a href="{{ url_for('auth.logout') }}">
+                Logout
+            </a>
+
+        </div>
+
+
+        <div class="footer-copy">
+
+            © 2026 AllYourHelp
+
+        </div>
+
+    </div>
+
+</footer>
+
+
+
+<!-- =========================================================
+     SEARCH JAVASCRIPT
+========================================================= -->
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const searchInput =
+        document.getElementById("dashboardSearch");
+
+    const searchButton =
+        document.getElementById("searchButton");
+
+    const cards =
+        document.querySelectorAll(".category-card");
+
+    const noResults =
+        document.getElementById("noResults");
+
+
+    function searchServices() {
+
+        const searchTerm =
+            searchInput.value.trim().toLowerCase();
+
+        let visibleCards = 0;
+
+
+        cards.forEach(function (card) {
+
+            const service =
+                card.getAttribute("data-service").toLowerCase();
+
+            const cardText =
+                card.innerText.toLowerCase();
+
+
+            if (
+                searchTerm === "" ||
+                service.includes(searchTerm) ||
+                cardText.includes(searchTerm)
+            ) {
+
+                card.style.display = "flex";
+
+                visibleCards++;
+
+            } else {
+
+                card.style.display = "none";
+
+            }
+
+        });
+
+
+        if (visibleCards === 0) {
+
+            noResults.classList.add("show");
+
+        } else {
+
+            noResults.classList.remove("show");
+
+        }
+
+    }
+
+
+    searchButton.addEventListener(
+        "click",
+        searchServices
+    );
+
+
+    searchInput.addEventListener(
+        "input",
+        searchServices
+    );
+
+
+    searchInput.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (event.key === "Enter") {
+
+                searchServices();
+
+            }
+
+        }
+    );
+
+});
+
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Booking Details - AllYourHelp</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/dashboard.css') }}">
+</head>
+
+<body>
+
+<div class="dashboard-container">
+
+    <!-- HEADER -->
+    <header class="dashboard-header">
+
+        <div class="dashboard-logo">
+            AllYourHelp
+        </div>
+
+        <div class="dashboard-header-right">
+
+            <span>
+                {{ user.name }}
+            </span>
+
+            <a href="{{ url_for('auth.logout') }}"
+               class="logout-btn">
+                Logout
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <!-- MAIN CONTENT -->
+    <main class="dashboard-main">
+
+        <!-- BACK LINK -->
+
+        <a href="{{ url_for('dashboard.professional_bookings') }}"
+           class="back-link">
+
+            ← Back to Bookings
+
+        </a>
+
+
+        <!-- PAGE TITLE -->
+
+        <div class="page-title-section">
+
+            <h1>Booking Details</h1>
+
+            <p>
+                View complete information about this service request.
+            </p>
+
+        </div>
+
+
+        <!-- BOOKING CARD -->
+
+        <div class="booking-details-card">
+
+
+            <!-- TOP SECTION -->
+
+            <div class="booking-details-header">
+
+                <div>
+
+                    <h2>
+                        {{ booking.service.name }}
+                    </h2>
+
+                    <p>
+                        Booking #{{ booking.id }}
+                    </p>
+
+                </div>
+
+
+                <div>
+
+                    {% if booking.status == "confirmed" %}
+
+                        <span class="booking-status status-confirmed">
+                            Pending Your Response
+                        </span>
+
+                    {% elif booking.status == "accepted" %}
+
+                        <span class="booking-status status-accepted">
+                            Accepted
+                        </span>
+
+                    {% elif booking.status == "completed" %}
+
+                        <span class="booking-status status-completed">
+                            Completed
+                        </span>
+
+                    {% elif booking.status == "rejected" %}
+
+                        <span class="booking-status status-rejected">
+                            Rejected
+                        </span>
+
+                    {% else %}
+
+                        <span class="booking-status">
+                            {{ booking.status|title }}
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <!-- CUSTOMER INFORMATION -->
+
+            <section class="booking-details-section">
+
+                <h3>Customer Information</h3>
+
+                <div class="booking-details-grid">
+
+                    <div class="booking-info-item">
+
+                        <span class="booking-info-label">
+                            Name
+                        </span>
+
+                        <strong>
+                            {{ booking.user.name }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="booking-info-item">
+
+                        <span class="booking-info-label">
+                            Email
+                        </span>
+
+                        <strong>
+                            {{ booking.user.email }}
+                        </strong>
+
+                    </div>
+
+
+                    {% if booking.user.phone %}
+
+                    <div class="booking-info-item">
+
+                        <span class="booking-info-label">
+                            Phone
+                        </span>
+
+                        <strong>
+                            {{ booking.user.phone }}
+                        </strong>
+
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+            </section>
+
+
+            <!-- APPOINTMENT INFORMATION -->
+
+            <section class="booking-details-section">
+
+                <h3>Appointment Information</h3>
+
+                <div class="booking-details-grid">
+
+
+                    <div class="booking-info-item">
+
+                        <span class="booking-info-label">
+                            Service
+                        </span>
+
+                        <strong>
+                            {{ booking.service.name }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="booking-info-item">
+
+                        <span class="booking-info-label">
+                            Date
+                        </span>
+
+                        <strong>
+
+                            {% if booking.preferred_date %}
+
+                                {{ booking.preferred_date.strftime('%d %B %Y') }}
+
+                            {% else %}
+
+                                Not specified
+
+                            {% endif %}
+
+                        </strong>
+
+                    </div>
+
+
+                    <div class="booking-info-item">
+
+                        <span class="booking-info-label">
+                            Time
+                        </span>
+
+                        <strong>
+
+                            {% if booking.preferred_time %}
+
+                                {{ booking.preferred_time.strftime('%I:%M %p') }}
+
+                            {% else %}
+
+                                Not specified
+
+                            {% endif %}
+
+                        </strong>
+
+                    </div>
+
+
+                    <div class="booking-info-item">
+
+                        <span class="booking-info-label">
+                            Location
+                        </span>
+
+                        <strong>
+
+                            {% if booking.location %}
+
+                                {{ booking.location }}
+
+                            {% else %}
+
+                                Not specified
+
+                            {% endif %}
+
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- PAYMENT INFORMATION -->
+
+            <section class="booking-details-section">
+
+                <h3>Payment Information</h3>
+
+                <div class="booking-details-grid">
+
+                    <div class="booking-info-item">
+
+                        <span class="booking-info-label">
+                            Payment Status
+                        </span>
+
+                        <strong>
+                            {{ booking.payment_status|title }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- CUSTOMER REQUIREMENT -->
+
+            <section class="booking-details-section">
+
+                <h3>Customer Requirement</h3>
+
+                <div class="booking-text-box">
+
+                    {% if booking.description %}
+
+                        {{ booking.description }}
+
+                    {% else %}
+
+                        No description provided.
+
+                    {% endif %}
+
+                </div>
+
+            </section>
+
+
+            <!-- ADDITIONAL DETAILS -->
+
+            {% if booking.additional_details %}
+
+            <section class="booking-details-section">
+
+                <h3>Additional Details</h3>
+
+                <div class="booking-text-box">
+
+                    {{ booking.additional_details }}
+
+                </div>
+
+            </section>
+
+            {% endif %}
+
+
+            <!-- BOOKING CREATED -->
+
+            <section class="booking-details-section">
+
+                <h3>Booking Information</h3>
+
+                <div class="booking-details-grid">
+
+                    <div class="booking-info-item">
+
+                        <span class="booking-info-label">
+                            Booking Created
+                        </span>
+
+                        <strong>
+
+                            {% if booking.created_at %}
+
+                                {{ booking.created_at.strftime('%d %B %Y, %I:%M %p') }}
+
+                            {% else %}
+
+                                Not available
+
+                            {% endif %}
+
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ACTIONS -->
+
+            <section class="booking-details-actions">
+
+                {% if booking.status == "confirmed" %}
+
+                    <form method="POST"
+                          action="{{ url_for('dashboard.accept_service_request', request_id=booking.id) }}">
+
+                        <button type="submit"
+                                class="booking-action-btn accept-btn">
+
+                            ✓ Accept Booking
+
+                        </button>
+
+                    </form>
+
+
+                    <form method="POST"
+                          action="{{ url_for('dashboard.reject_service_request', request_id=booking.id) }}">
+
+                        <button type="submit"
+                                class="booking-action-btn reject-btn">
+
+                            ✕ Reject Booking
+
+                        </button>
+
+                    </form>
+
+
+                {% elif booking.status == "accepted" %}
+
+                    <form method="POST"
+                          action="{{ url_for('dashboard.complete_request', request_id=booking.id) }}">
+
+                        <button type="submit"
+                                class="booking-action-btn complete-btn">
+
+                            ✓ Mark as Completed
+
+                        </button>
+
+                    </form>
+
+                {% endif %}
+
+            </section>
+
+
+        </div>
+
+    </main>
+
+</div>
+
+
+</body>
+
+</html>

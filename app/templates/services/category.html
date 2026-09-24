@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {{ category.name }} - AllYourHelp
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/services.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+    <!-- Header -->
+
+    <header class="services-header">
+
+        <div class="header-content">
+
+            <a
+                href="{{ url_for('dashboard.user_dashboard') }}"
+                class="back-button"
+            >
+                ← Back to Dashboard
+            </a>
+
+            <h1>
+                {{ category.name }}
+            </h1>
+
+            {% if category.description %}
+
+                <p>
+                    {{ category.description }}
+                </p>
+
+            {% else %}
+
+                <p>
+                    Find the right professional for your needs.
+                </p>
+
+            {% endif %}
+
+        </div>
+
+    </header>
+
+
+    <!-- Main Content -->
+
+    <main class="services-container">
+
+        <div class="page-heading">
+
+            <h2>
+                Available Services
+            </h2>
+
+            <p>
+                Choose the service you need help with.
+            </p>
+
+        </div>
+
+
+        {% if services %}
+
+            <div class="services-grid">
+
+                {% for service in services %}
+
+                    <div class="service-card">
+
+                        <div class="service-icon">
+                            ✓
+                        </div>
+
+
+                        <div class="service-content">
+
+                            <h3>
+                                {{ service.name }}
+                            </h3>
+
+
+                            {% if service.description %}
+
+                                <p>
+                                    {{ service.description }}
+                                </p>
+
+                            {% else %}
+
+                                <p>
+                                    Professional help for
+                                    {{ service.name }}.
+                                </p>
+
+                            {% endif %}
+
+
+                            <a
+                                href="{{ url_for(
+                                    'services.service_professionals',
+                                    slug=service.slug
+                                ) }}"
+                                class="service-button"
+                            >
+                                View Professionals
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    🔍
+                </div>
+
+                <h3>
+                    No services available
+                </h3>
+
+                <p>
+                    There are currently no services available
+                    in this category.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </main>
+
+
+</body>
+
+</html>

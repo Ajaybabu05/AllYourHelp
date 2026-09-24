@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Manage Services - AllYourHelp</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f7fb;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            text-decoration: none;
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        h1 {
+            margin-bottom: 8px;
+            color: #111827;
+        }
+
+        .subtitle {
+            color: #6b7280;
+            margin-bottom: 25px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 14px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+        }
+
+        th {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        tr:hover {
+            background: #f9fafb;
+        }
+
+        .active {
+            color: #15803d;
+            font-weight: bold;
+        }
+
+        .inactive {
+            color: #dc2626;
+            font-weight: bold;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <a
+        href="{{ url_for('admin.dashboard') }}"
+        class="back-link"
+    >
+        ← Admin Dashboard
+    </a>
+
+    <h1>Manage Services</h1>
+    <a
+        href="{{ url_for('admin.create_service') }}"
+        style="
+            display: inline-block;
+            margin: 15px 0 25px;
+            padding: 12px 20px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+        "
+    >
+        + Add New Service
+    </a>
+
+    <p class="subtitle">
+        View all services available on AllYourHelp.
+    </p>
+
+    {% if services %}
+
+    <table>
+
+        <thead>
+            <tr>
+                <th>Service</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+        {% for service in services %}
+
+            <tr>
+
+                <td>
+                    {{ service.name }}
+                </td>
+
+                <td>
+                    {{ service.category.name }}
+                </td>
+
+                <td>
+                    ₹{{ service.price }}
+                </td>
+
+                <td>
+
+                    {% if service.is_active %}
+
+                        <span class="active">
+                            Active
+                        </span>
+
+                    {% else %}
+
+                        <span class="inactive">
+                            Inactive
+                        </span>
+
+                    {% endif %}
+
+                </td>
+                <td>
+
+                    <a
+                        href="{{ url_for('admin.edit_service', service_id=service.id) }}"
+                        style="
+                            display: inline-block;
+                            padding: 8px 14px;
+                            background: #f3f4f6;
+                            color: #374151;
+                            text-decoration: none;
+                            border-radius: 6px;
+                            font-weight: 600;
+                            margin-right: 6px;
+                        "
+                    >
+                        Edit
+                    </a>
+
+                    <form
+                        method="POST"
+                        action="{{ url_for('admin.toggle_service_status', service_id=service.id) }}"
+                        style="display: inline;"
+                    >
+
+                        {% if service.is_active %}
+
+                            <button
+                                type="submit"
+                                style="
+                                    padding: 8px 14px;
+                                    background: #fee2e2;
+                                    color: #b91c1c;
+                                    border: none;
+                                    border-radius: 6px;
+                                    font-weight: 600;
+                                    cursor: pointer;
+                                "
+                            >
+                                Deactivate
+                            </button>
+
+                        {% else %}
+
+                            <button
+                                type="submit"
+                                style="
+                                    padding: 8px 14px;
+                                    background: #dcfce7;
+                                    color: #15803d;
+                                    border: none;
+                                    border-radius: 6px;
+                                    font-weight: 600;
+                                    cursor: pointer;
+                                "
+                            >
+                                Activate
+                            </button>
+
+                        {% endif %}
+
+                    </form>
+
+                </td>
+
+            </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+    {% else %}
+
+        <div class="empty">
+            No services found.
+        </div>
+
+    {% endif %}
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Payment - AllYourHelp
+    </title>
+
+</head>
+
+<body>
+
+    <h1>Payment</h1>
+
+    <h2>
+        {{ service.name }}
+    </h2>
+
+    <p>
+        Professional:
+        {{ professional.user.name }}
+    </p>
+
+    <p>
+        Date:
+        {{ slot.slot_date.strftime('%d %B %Y') }}
+    </p>
+
+    <p>
+        Time:
+        {{ slot.start_time.strftime('%I:%M %p') }}
+        -
+        {{ slot.end_time.strftime('%I:%M %p') }}
+    </p>
+
+    <h2>
+        Amount:
+        ₹{{ "%.2f"|format(service.price) }}
+    </h2>
+
+    <p>
+        Payment integration will be added here.
+    </p>
+
+</body>
+
+</html>

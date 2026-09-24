@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {{ professional.user.name }} - AllYourHelp
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/services.css') }}"
+    >
+
+</head>
+
+<body>
+
+    <!-- Header -->
+
+    <header class="profile-header">
+
+        <div class="profile-header-content">
+
+            {% if service_slug %}
+
+            <a
+                href="{{ url_for(
+                    'services.service_professionals',
+                    slug=service_slug
+                ) }}"
+                class="back-link"
+            >
+                ← Back to Professionals
+            </a>
+
+            {% else %}
+
+            <a
+                href="{{ url_for('dashboard.user_dashboard') }}"
+                class="back-link"
+            >
+                ← Back to Dashboard
+            </a>
+
+            {% endif %}
+
+            <div class="header-title">
+                AllYourHelp
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- Main Content -->
+
+    <main class="professional-profile-container">
+
+        <div class="professional-profile-card">
+
+
+            <!-- Profile Avatar -->
+
+            <div class="professional-avatar">
+
+                {% if professional.user.profile_image %}
+
+                    <img
+                        src="{{ url_for(
+                            'static',
+                            filename=professional.user.profile_image
+                        ) }}"
+                        alt="Profile"
+                    >
+
+                {% else %}
+
+                    <span>
+                        {{ professional.user.name[0]|upper }}
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- Name -->
+
+            <h1>
+                {{ professional.user.name }}
+            </h1>
+
+
+            <!-- Verified -->
+
+            {% if professional.is_verified %}
+
+                <div class="verified-badge">
+                    ✓ Verified Professional
+                </div>
+
+            {% endif %}
+
+
+            <!-- Basic Information -->
+
+            <div class="professional-info">
+
+                {% if professional.experience is not none %}
+
+                    <div class="info-item">
+
+                        <span class="info-label">
+                            Experience
+                        </span>
+
+                        <span class="info-value">
+                            {{ professional.experience }} years
+                        </span>
+
+                    </div>
+
+                {% endif %}
+
+
+                {% if professional.location %}
+
+                    <div class="info-item">
+
+                        <span class="info-label">
+                            Location
+                        </span>
+
+                        <span class="info-value">
+                            {{ professional.location }}
+                        </span>
+
+                    </div>
+
+                {% endif %}
+
+
+                <div class="info-item">
+
+                    <span class="info-label">
+                        Email
+                    </span>
+
+                    <span class="info-value">
+                        {{ professional.user.email }}
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- About -->
+
+            {% if professional.bio %}
+
+                <section class="profile-section">
+
+                    <h2>
+                        About the Professional
+                    </h2>
+
+                    <p>
+                        {{ professional.bio }}
+                    </p>
+
+                </section>
+
+            {% endif %}
+
+
+            <!-- Services -->
+
+            <section class="profile-section">
+
+                <h2>
+                    Services Offered
+                </h2>
+
+                <div class="service-tags">
+
+                    {% for service in professional.services %}
+
+                        <span class="service-tag">
+                            {{ service.name }}
+                        </span>
+
+                    {% else %}
+
+                        <p>
+                            No services listed.
+                        </p>
+
+                    {% endfor %}
+
+                </div>
+
+            </section>
+
+
+            <!-- Ratings & Reviews -->
+
+                <section class="profile-section reviews-section">
+
+                    <h2>
+                        Ratings & Reviews
+                    </h2>
+
+                    <!-- Rating Summary -->
+
+                    <div class="rating-summary">
+
+                        <div class="average-rating">
+
+                            <div class="rating-number">
+                                {{ "%.1f"|format(average_rating) }}
+                            </div>
+
+                            <div class="rating-stars">
+
+                                {% for i in range(1, 6) %}
+
+                                    {% if average_rating >= i %}
+                                        <span class="star full">★</span>
+
+                                    {% elif average_rating >= i - 0.5 %}
+                                        <span class="star half">★</span>
+
+                                    {% else %}
+                                        <span class="star empty">★</span>
+
+                                    {% endif %}
+
+                                {% endfor %}
+
+                            </div>
+
+                            <div class="review-count">
+                                {{ review_count }}
+                                {% if review_count == 1 %}
+                                    review
+                                {% else %}
+                                    reviews
+                                {% endif %}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Individual Reviews -->
+
+                    {% if reviews %}
+
+                        <div class="reviews-list">
+
+                            {% for review in reviews %}
+
+                                <div class="review-card">
+
+                                    <div class="review-header">
+
+                                        <div class="reviewer-name">
+                                            {{ review.user.name }}
+                                        </div>
+
+                                        <div class="review-date">
+                                            {{ review.created_at.strftime('%d %b %Y') }}
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="review-rating">
+
+                                        {% for i in range(1, 6) %}
+
+                                            {% if i <= review.rating %}
+                                                <span class="star full">★</span>
+                                            {% else %}
+                                                <span class="star empty">★</span>
+                                            {% endif %}
+
+                                        {% endfor %}
+
+                                    </div>
+
+
+                                    {% if review.comment %}
+
+                                        <div class="review-comment">
+
+                                            {{ review.comment }}
+
+                                        </div>
+
+                                    {% endif %}
+
+                                </div>
+
+                            {% endfor %}
+
+                        </div>
+
+                    {% else %}
+
+                        <div class="no-reviews">
+
+                            <p>
+                                No reviews yet.
+                            </p>
+
+                            <span>
+                                Reviews will appear here after customers complete their services.
+                            </span>
+
+                        </div>
+
+                    {% endif %}
+
+                </section>
+
+
+                <!-- Actions -->
+
+                <div class="profile-action">
+
+                    <a
+                        href="{{ url_for(
+                            'services.request_service',
+                            professional_id=professional.id
+                        ) }}"
+                        class="request-service-button"
+                    >
+                        Request Service
+                    </a>
+
+
+                    {% if current_user.role == "user" %}
+
+                        {% if favorite %}
+
+                            <form
+                                method="POST"
+                                action="{{ url_for(
+                                    'dashboard.remove_favorite',
+                                    professional_id=professional.id
+                                ) }}"
+                                class="favorite-form"
+                            >
+
+                                <button
+                                    type="submit"
+                                    class="favorite-button favorite-saved"
+                                >
+                                    ♥ Remove from Favorites
+                                </button>
+
+                            </form>
+
+                        {% else %}
+
+                            <form
+                                method="POST"
+                                action="{{ url_for(
+                                    'dashboard.add_favorite',
+                                    professional_id=professional.id
+                                ) }}"
+                                class="favorite-form"
+                            >
+
+                                <button
+                                    type="submit"
+                                    class="favorite-button"
+                                >
+                                    ♡ Add to Favorites
+                                </button>
+
+                            </form>
+
+                        {% endif %}
+
+                    {% endif %}
+
+                </div>
+
+
+        </div>
+
+    </main>
+
+</body>
+
+</html>

@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Profile - AllYourHelp</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f7fb;
+            color: #1f2937;
+        }
+
+        .page-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 35px 20px 60px;
+        }
+
+        /* --------------------------------
+           HEADER
+        -------------------------------- */
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            font-size: 30px;
+            margin-bottom: 6px;
+        }
+
+        .page-header p {
+            color: #6b7280;
+            font-size: 15px;
+        }
+
+        .back-btn {
+            text-decoration: none;
+            color: #2563eb;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* --------------------------------
+           PROFILE CARD
+        -------------------------------- */
+
+        .profile-card {
+            background: white;
+            border-radius: 18px;
+            padding: 35px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+        }
+
+        /* --------------------------------
+           PROFILE IMAGE
+        -------------------------------- */
+
+        .profile-image-section {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            padding-bottom: 30px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .profile-image {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #eef2ff;
+        }
+
+        .profile-placeholder {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            background: #2563eb;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 42px;
+            font-weight: bold;
+        }
+
+        .image-info h2 {
+            font-size: 20px;
+            margin-bottom: 7px;
+        }
+
+        .image-info p {
+            color: #6b7280;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .file-input {
+            font-size: 14px;
+        }
+
+        /* --------------------------------
+           FORM
+        -------------------------------- */
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 22px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #374151;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 9px;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus {
+            border-color: #2563eb;
+        }
+
+        .role-display {
+            padding: 13px 14px;
+            background: #f3f4f6;
+            border-radius: 9px;
+            color: #6b7280;
+            font-size: 15px;
+        }
+
+        /* --------------------------------
+           BUTTONS
+        -------------------------------- */
+
+        .form-actions {
+            margin-top: 30px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .save-btn {
+            border: none;
+            background: #2563eb;
+            color: white;
+            padding: 13px 25px;
+            border-radius: 9px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .save-btn:hover {
+            background: #1d4ed8;
+        }
+
+        /* --------------------------------
+           FLASH MESSAGES
+        -------------------------------- */
+
+        .flash-container {
+            margin-bottom: 20px;
+        }
+
+        .flash-message {
+            padding: 13px 16px;
+            border-radius: 9px;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .flash-success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .flash-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* --------------------------------
+           RESPONSIVE
+        -------------------------------- */
+
+        @media (max-width: 700px) {
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .profile-card {
+                padding: 25px 20px;
+            }
+
+            .profile-image-section {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group.full-width {
+                grid-column: auto;
+            }
+
+            .form-actions {
+                justify-content: stretch;
+            }
+
+            .save-btn {
+                width: 100%;
+            }
+        }
+
+        .change-password-btn {
+        display: inline-block;
+        margin-top: 15px;
+        padding: 11px 18px;
+        border-radius: 8px;
+        background: #f3f4f6;
+        color: #374151;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .change-password-btn:hover {
+        background: #e5e7eb;
+    }
+
+    .settings-btn {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 11px 18px;
+    border-radius: 8px;
+    background: #f3f4f6;
+    color: #374151;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.settings-btn:hover {
+    background: #e5e7eb;
+}
+    </style>
+</head>
+
+<body>
+
+<div class="page-container">
+
+    <!-- HEADER -->
+
+    <div class="page-header">
+
+        <div>
+            <h1>My Profile</h1>
+            <p>Manage your personal information and profile.</p>
+        </div>
+
+        <a
+            href="{{ url_for('dashboard.user_dashboard') }}"
+            class="back-btn"
+        >
+            ← Back to Dashboard
+        </a>
+
+    </div>
+
+
+    <!-- FLASH MESSAGES -->
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+
+        {% if messages %}
+
+            <div class="flash-container">
+
+                {% for category, message in messages %}
+
+                    <div
+                        class="flash-message
+                        {% if category == 'success' %}
+                            flash-success
+                        {% else %}
+                            flash-error
+                        {% endif %}"
+                    >
+                        {{ message }}
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% endif %}
+
+    {% endwith %}
+
+
+    <!-- PROFILE CARD -->
+
+    <div class="profile-card">
+
+        <form
+            method="POST"
+            enctype="multipart/form-data"
+        >
+
+            <!-- PROFILE IMAGE -->
+
+            <div class="profile-image-section">
+
+                {% if user.profile_image %}
+
+                    <img
+                        src="{{ url_for('static', filename=user.profile_image) }}"
+                        alt="Profile picture"
+                        class="profile-image"
+                    >
+
+                {% else %}
+
+                    <div class="profile-placeholder">
+                        {{ user.name[0]|upper }}
+                    </div>
+
+                {% endif %}
+
+
+                <div class="image-info">
+
+                    <h2>{{ user.name }}</h2>
+
+                    <p>
+                        Upload a profile picture to personalize your account.
+                    </p>
+
+                    <input
+                        type="file"
+                        name="profile_image"
+                        class="file-input"
+                        accept=".jpg,.jpeg,.png,.webp"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- FORM FIELDS -->
+
+            <div class="form-grid">
+
+                <div class="form-group">
+
+                    <label for="name">
+                        Full Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        value="{{ user.name }}"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="email">
+                        Email Address
+                    </label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        value="{{ user.email }}"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="phone">
+                        Phone Number
+                    </label>
+
+                    <input
+                        type="tel"
+                        id="phone"
+                        name="phone"
+                        value="{{ user.phone or '' }}"
+                        placeholder="Enter your phone number"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Account Type
+                    </label>
+
+                    <div class="role-display">
+                        Customer
+                    </div>
+
+                </div>
+
+            </div>
+
+            <a
+                href="{{ url_for('dashboard.change_password') }}"
+                class="change-password-btn"
+            >
+                🔒 Change Password
+            </a>
+
+            <a
+                href="{{ url_for('dashboard.notification_preferences') }}"
+                class="settings-btn"
+            >
+                🔔 Notification Preferences
+            </a>
+
+            <!-- SAVE -->
+
+            <div class="form-actions">
+
+                <button
+                    type="submit"
+                    class="save-btn"
+                >
+                    Save Changes
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

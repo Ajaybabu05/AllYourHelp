@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Manage Availability - AllYourHelp
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for(
+            'static',
+            filename='css/dashboard.css'
+        ) }}"
+    >
+
+</head>
+
+<body>
+
+<header class="dashboard-header">
+
+    <div class="dashboard-header-inner">
+
+        <div class="dashboard-logo">
+            AllYourHelp
+        </div>
+
+        <div class="dashboard-user">
+
+            <span>
+                {{ user.name }}
+            </span>
+
+            <a
+                href="{{ url_for('auth.logout') }}"
+                class="logout-button"
+            >
+                Logout
+            </a>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+<main class="dashboard-container">
+
+    <section class="welcome-section">
+
+        <h1>
+            Manage Availability
+        </h1>
+
+        <p>
+            Add the time slots when customers can book your services.
+        </p>
+
+        <p>
+            You can add availability for the next 7 days.
+        </p>
+
+    </section>
+
+
+    <!-- Flash Messages -->
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+
+        {% if messages %}
+
+            {% for category, message in messages %}
+
+                <div class="flash-message {{ category }}">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+    {% endwith %}
+
+
+    <!-- Add Slot -->
+
+    <section class="professional-summary">
+
+        <h2>
+            Add Availability Slot
+        </h2>
+
+        <form
+            method="POST"
+            action="{{ url_for('dashboard.manage_availability') }}"
+        >
+
+            <div>
+
+                <label for="slot_date">
+                    Date
+                </label>
+
+                <input
+                    type="date"
+                    id="slot_date"
+                    name="slot_date"
+                    min="{{ today.strftime('%Y-%m-%d') }}"
+                    max="{{ last_day.strftime('%Y-%m-%d') }}"
+                    required
+                >
+
+            </div>
+
+
+            <div>
+
+                <label for="start_time">
+                    Start Time
+                </label>
+
+                <input
+                    type="time"
+                    id="start_time"
+                    name="start_time"
+                    required
+                >
+
+            </div>
+
+
+            <div>
+
+                <label for="end_time">
+                    End Time
+                </label>
+
+                <input
+                    type="time"
+                    id="end_time"
+                    name="end_time"
+                    required
+                >
+
+            </div>
+
+
+            <button type="submit">
+                Add Slot
+            </button>
+
+        </form>
+
+    </section>
+
+
+    <!-- Existing Slots -->
+
+    <section class="requests-section">
+
+        <div class="section-heading">
+
+            <h2>
+                Your Availability
+            </h2>
+
+            <span>
+                {{ slots|length }} slot(s)
+            </span>
+
+        </div>
+
+
+        {% if slots %}
+
+            <div class="requests-list">
+
+                {% for slot in slots %}
+
+                    <div class="request-card">
+
+                        <h3>
+                            {{ slot.slot_date.strftime('%A, %d %B %Y') }}
+                        </h3>
+
+
+                        <p>
+
+                            <strong>
+                                Time:
+                            </strong>
+
+                            {{ slot.start_time.strftime('%I:%M %p') }}
+
+                            -
+
+                            {{ slot.end_time.strftime('%I:%M %p') }}
+
+                        </p>
+
+
+                        {% if slot.is_booked %}
+
+                            <p>
+                                <strong>
+                                    Status:
+                                </strong>
+
+                                Booked
+                            </p>
+
+                        {% else %}
+
+                            <p>
+                                <strong>
+                                    Status:
+                                </strong>
+
+                                Available
+                            </p>
+
+
+                            <form
+                                method="POST"
+                                action="{{ url_for(
+                                    'dashboard.delete_availability',
+                                    slot_id=slot.id
+                                ) }}"
+                            >
+
+                                <button type="submit">
+                                    Remove Slot
+                                </button>
+
+                            </form>
+
+                        {% endif %}
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="empty-requests">
+
+                <div class="empty-icon">
+                    📅
+                </div>
+
+                <h3>
+                    No availability slots
+                </h3>
+
+                <p>
+                    Add your available dates and times above.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+
+    <section>
+
+        <a
+            href="{{ url_for('dashboard.professional_dashboard') }}"
+        >
+            ← Back to Professional Dashboard
+        </a>
+
+    </section>
+
+</main>
+
+</body>
+
+</html>

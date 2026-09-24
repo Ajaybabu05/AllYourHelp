@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Professional Details - AllYourHelp
+    </title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f5f7fb;
+            color: #1f2937;
+        }
+
+        /* HEADER */
+
+        .header {
+            height: 70px;
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2563eb;
+        }
+
+        .admin-label {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        /* MAIN */
+
+        .container {
+            max-width: 1250px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 25px;
+            text-decoration: none;
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        .page-header {
+            margin-bottom: 25px;
+        }
+
+        .page-header h1 {
+            font-size: 30px;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+
+        .page-header p {
+            color: #6b7280;
+            font-size: 15px;
+        }
+
+        /* PROFILE CARD */
+
+        .profile-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .profile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .profile-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 7px;
+        }
+
+        .profile-email {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .verification-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .verified {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .not-verified {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .profile-info {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-top: 25px;
+        }
+
+        .info-item {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .info-label {
+            display: block;
+            color: #6b7280;
+            font-size: 12px;
+            margin-bottom: 6px;
+        }
+
+        .info-value {
+            color: #111827;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* PERFORMANCE */
+
+        .section-title {
+            font-size: 20px;
+            color: #111827;
+            margin-bottom: 15px;
+        }
+
+        .performance-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .performance-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .performance-label {
+            color: #6b7280;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .performance-value {
+            color: #111827;
+            font-size: 25px;
+            font-weight: 700;
+        }
+
+        .performance-subtext {
+            color: #9ca3af;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        /* TWO COLUMN */
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .section-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 22px;
+        }
+
+        /* SERVICES */
+
+        .services-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .service-tag {
+            background: #eff6ff;
+            color: #1d4ed8;
+            padding: 7px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .no-services {
+            color: #9ca3af;
+            font-size: 14px;
+        }
+
+        /* BOOKINGS */
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f9fafb;
+            padding: 12px;
+            text-align: left;
+            font-size: 12px;
+            color: #6b7280;
+            text-transform: uppercase;
+            border-bottom: 1px solid #e5e7eb;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 13px 12px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 13px;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status.completed {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status.cancelled {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status.pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status.confirmed {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        /* REVIEWS */
+
+        .review {
+            padding: 15px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .review:last-child {
+            border-bottom: none;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 7px;
+        }
+
+        .review-user {
+            font-weight: 600;
+            color: #111827;
+            font-size: 13px;
+        }
+
+        .review-rating {
+            font-size: 13px;
+        }
+
+        .review-comment {
+            color: #6b7280;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .no-reviews {
+            color: #9ca3af;
+            font-size: 14px;
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 900px) {
+
+            .performance-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .profile-info {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+
+            .header {
+                padding: 0 20px;
+            }
+
+            .container {
+                margin-top: 25px;
+            }
+
+            .performance-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-info {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-header {
+                flex-direction: column;
+            }
+        }
+
+        /* PERFORMANCE CHARTS */
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 22px;
+        }
+
+        .chart-header {
+            margin-bottom: 18px;
+        }
+
+        .chart-header h3 {
+            font-size: 18px;
+            color: #111827;
+            margin-bottom: 5px;
+        }
+
+        .chart-header p {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        .chart-small {
+            height: 300px;
+        }
+
+        @media (max-width: 900px) {
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+    
+
+</head>
+
+
+<body>
+
+
+<header class="header">
+
+    <div class="logo">
+        AllYourHelp
+    </div>
+
+    <div class="admin-label">
+        Admin Panel
+    </div>
+
+</header>
+
+
+<main class="container">
+
+
+    <a
+        href="{{ url_for('admin.professionals') }}"
+        class="back-link"
+    >
+        ← Back to Professionals
+    </a>
+
+
+    <!-- PAGE HEADER -->
+
+    <div class="page-header">
+
+        <h1>
+            Professional Details
+        </h1>
+
+        <p>
+            View professional information and performance.
+        </p>
+
+    </div>
+
+
+    <!-- PROFILE -->
+
+    <div class="profile-card">
+
+        <div class="profile-header">
+
+            <div>
+
+                <div class="profile-name">
+                    {{ professional.user.name }}
+                </div>
+
+                <div class="profile-email">
+                    {{ professional.user.email }}
+                </div>
+
+            </div>
+
+
+            {% if professional.is_verified %}
+
+                <span class="verification-badge verified">
+                    ✓ Verified
+                </span>
+
+            {% else %}
+
+                <span class="verification-badge not-verified">
+                    Not Verified
+                </span>
+
+            {% endif %}
+
+        </div>
+
+
+        <div class="profile-info">
+
+            <div class="info-item">
+
+                <span class="info-label">
+                    Location
+                </span>
+
+                <span class="info-value">
+
+                    {% if professional.location %}
+                        {{ professional.location }}
+                    {% else %}
+                        —
+                    {% endif %}
+
+                </span>
+
+            </div>
+
+
+            <div class="info-item">
+
+                <span class="info-label">
+                    Experience
+                </span>
+
+                <span class="info-value">
+
+                    {% if professional.experience is not none %}
+                        {{ professional.experience }} year(s)
+                    {% else %}
+                        —
+                    {% endif %}
+
+                </span>
+
+            </div>
+
+
+            <div class="info-item">
+
+                <span class="info-label">
+                    Account Status
+                </span>
+
+                <span class="info-value">
+
+                    {% if professional.user.is_active %}
+                        Active
+                    {% else %}
+                        Inactive
+                    {% endif %}
+
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- PERFORMANCE -->
+
+    <h2 class="section-title">
+        Performance Overview
+    </h2>
+
+
+    <div class="performance-grid">
+
+
+        <div class="performance-card">
+
+            <div class="performance-label">
+                Total Bookings
+            </div>
+
+            <div class="performance-value">
+                {{ total_bookings }}
+            </div>
+
+        </div>
+
+
+        <div class="performance-card">
+
+            <div class="performance-label">
+                Completed
+            </div>
+
+            <div class="performance-value">
+                {{ completed_bookings }}
+            </div>
+
+        </div>
+
+
+        <div class="performance-card">
+
+            <div class="performance-label">
+                Cancelled
+            </div>
+
+            <div class="performance-value">
+                {{ cancelled_bookings }}
+            </div>
+
+        </div>
+
+
+        <div class="performance-card">
+
+            <div class="performance-label">
+                Active Bookings
+            </div>
+
+            <div class="performance-value">
+                {{ pending_bookings + confirmed_bookings }}
+            </div>
+
+            <div class="performance-subtext">
+                Pending + Confirmed
+            </div>
+
+        </div>
+
+
+        <div class="performance-card">
+
+            <div class="performance-label">
+                Total Revenue
+            </div>
+
+            <div class="performance-value">
+                ₹{{ "%.2f"|format(total_revenue) }}
+            </div>
+
+        </div>
+
+
+        <div class="performance-card">
+
+            <div class="performance-label">
+                Refunded Amount
+            </div>
+
+            <div class="performance-value">
+                ₹{{ "%.2f"|format(refunded_amount) }}
+            </div>
+
+        </div>
+
+
+        <div class="performance-card">
+
+            <div class="performance-label">
+                Average Rating
+            </div>
+
+            <div class="performance-value">
+                ⭐ {{ "%.1f"|format(average_rating) }}
+            </div>
+
+        </div>
+
+
+        <div class="performance-card">
+
+            <div class="performance-label">
+                Reviews
+            </div>
+
+            <div class="performance-value">
+                {{ total_reviews }}
+            </div>
+
+        </div>
+
+
+    </div>
+
+    <!-- PERFORMANCE CHARTS -->
+
+        <h2 class="section-title">
+            Performance Analytics
+        </h2>
+
+        <div class="charts-grid">
+
+            <!-- BOOKING STATUS -->
+
+            <div class="chart-card">
+
+                <div class="chart-header">
+
+                    <h3>
+                        Booking Status
+                    </h3>
+
+                    <p>
+                        Distribution of this professional's bookings.
+                    </p>
+
+                </div>
+
+                <div class="chart-container chart-small">
+
+                    <canvas id="bookingStatusChart"></canvas>
+
+                </div>
+
+            </div>
+
+
+            <!-- MONTHLY REVENUE -->
+
+            <div class="chart-card">
+
+                <div class="chart-header">
+
+                    <h3>
+                        Monthly Revenue
+                    </h3>
+
+                    <p>
+                        Revenue generated from paid bookings.
+                    </p>
+
+                </div>
+
+                <div class="chart-container">
+
+                    <canvas id="revenueChart"></canvas>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+    <!-- SERVICES + REVIEWS -->
+
+    <div class="two-column">
+
+
+        <!-- SERVICES -->
+
+        <div class="section-card">
+
+            <h2 class="section-title">
+                Services Offered
+            </h2>
+
+
+            {% if services %}
+
+                <div class="services-list">
+
+                    {% for service in services %}
+
+                        <span class="service-tag">
+                            {{ service.name }}
+                        </span>
+
+                    {% endfor %}
+
+                </div>
+
+            {% else %}
+
+                <span class="no-services">
+                    No services assigned.
+                </span>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- REVIEWS -->
+
+        <div class="section-card">
+
+            <h2 class="section-title">
+                Recent Reviews
+            </h2>
+
+
+            {% if reviews %}
+
+                {% for review in reviews[:5] %}
+
+                    <div class="review">
+
+                        <div class="review-header">
+
+                            <span class="review-user">
+
+                                {% if review.user %}
+                                    {{ review.user.name }}
+                                {% else %}
+                                    Customer
+                                {% endif %}
+
+                            </span>
+
+                            <span class="review-rating">
+                                ⭐ {{ review.rating }}/5
+                            </span>
+
+                        </div>
+
+
+                        {% if review.comment %}
+
+                            <div class="review-comment">
+                                {{ review.comment }}
+                            </div>
+
+                        {% else %}
+
+                            <div class="review-comment">
+                                No comment provided.
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+                {% endfor %}
+
+            {% else %}
+
+                <span class="no-reviews">
+                    No reviews yet.
+                </span>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <!-- BOOKING HISTORY -->
+
+    <div class="section-card">
+
+        <h2 class="section-title">
+            Booking History
+        </h2>
+
+
+        {% if bookings %}
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Booking
+                            </th>
+
+                            <th>
+                                Customer
+                            </th>
+
+                            <th>
+                                Service
+                            </th>
+
+                            <th>
+                                Amount
+                            </th>
+
+                            <th>
+                                Payment
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Date
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for booking in bookings %}
+
+                            <tr>
+
+                                <td>
+                                    #{{ booking.id }}
+                                </td>
+
+
+                                <td>
+
+                                    {% if booking.user %}
+                                        {{ booking.user.name }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+
+                                </td>
+
+
+                                <td>
+
+                                    {% if booking.service %}
+                                        {{ booking.service.name }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+
+                                </td>
+
+
+                                <td>
+                                    ₹{{ "%.2f"|format(booking.payment_amount or 0) }}
+                                </td>
+
+
+                                <td>
+
+                                    {{ booking.payment_status|replace("_", " ")|title }}
+
+                                </td>
+
+
+                                <td>
+
+                                    <span
+                                        class="status {{ booking.status }}"
+                                    >
+                                        {{ booking.status|title }}
+                                    </span>
+
+                                </td>
+
+
+                                <td>
+
+                                    {% if booking.created_at %}
+                                        {{ booking.created_at.strftime("%d %b %Y") }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        {% else %}
+
+            <div class="no-reviews">
+                No bookings found for this professional.
+            </div>
+
+        {% endif %}
+
+    </div>
+
+
+</main>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    console.log("Chart.js version:", Chart.version);
+
+
+    /* =========================================
+       BOOKING STATUS CHART
+       ========================================= */
+
+    const bookingStatusData =
+        {{ booking_status_data | tojson }};
+
+    console.log(
+        "Booking status data:",
+        bookingStatusData
+    );
+
+
+    const bookingStatusLabels =
+        Object.keys(bookingStatusData);
+
+    const bookingStatusValues =
+        Object.values(bookingStatusData);
+
+
+    const bookingStatusCanvas =
+        document.getElementById("bookingStatusChart");
+
+
+    if (bookingStatusCanvas) {
+
+        new Chart(
+            bookingStatusCanvas,
+            {
+                type: "doughnut",
+
+                data: {
+
+                    labels: bookingStatusLabels,
+
+                    datasets: [
+                        {
+                            data: bookingStatusValues,
+
+                            borderWidth: 2
+                        }
+                    ]
+
+                },
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    plugins: {
+
+                        legend: {
+                            position: "bottom"
+                        },
+
+                        tooltip: {
+
+                            callbacks: {
+
+                                label: function(context) {
+
+                                    return (
+                                        context.label +
+                                        ": " +
+                                        context.raw
+                                    );
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+        );
+
+    }
+
+
+    /* =========================================
+       MONTHLY REVENUE CHART
+       ========================================= */
+
+    const revenueLabels =
+        {{ revenue_labels | tojson }};
+
+
+    const revenueValues =
+        {{ revenue_values | tojson }};
+
+
+    console.log(
+        "Revenue labels:",
+        revenueLabels
+    );
+
+
+    console.log(
+        "Revenue values:",
+        revenueValues
+    );
+
+
+    const revenueCanvas =
+        document.getElementById("revenueChart");
+
+
+    if (revenueCanvas) {
+
+        new Chart(
+            revenueCanvas,
+            {
+                type: "line",
+
+                data: {
+
+                    labels: revenueLabels,
+
+                    datasets: [
+                        {
+
+                            label: "Revenue",
+
+                            data: revenueValues,
+
+                            tension: 0.3,
+
+                            fill: false,
+
+                            borderWidth: 3,
+
+                            pointRadius: 5
+
+                        }
+                    ]
+
+                },
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    scales: {
+
+                        y: {
+
+                            beginAtZero: true,
+
+                            ticks: {
+
+                                callback: function(value) {
+
+                                    return "₹" + value;
+
+                                }
+
+                            }
+
+                        }
+
+                    },
+
+                    plugins: {
+
+                        legend: {
+
+                            display: false
+
+                        },
+
+                        tooltip: {
+
+                            callbacks: {
+
+                                label: function(context) {
+
+                                    return (
+                                        "Revenue: ₹" +
+                                        context.parsed.y
+                                    );
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        );
+
+    }
+
+});
+
+</script>
+
+
+</body>
+
+</html>
