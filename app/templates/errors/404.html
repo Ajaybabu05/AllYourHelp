@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Not Found - AllYourHelp</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/errors.css') }}">
+</head>
+<body>
+    <main class="error-page">
+        <div class="error-card">
+            <div class="error-code">404</div>
+            <h1>Page not found</h1>
+            <p>Sorry, we couldn't find the page you are looking for. It may have been moved, removed, or the address may be incorrect.</p>
+            <div class="error-actions">
+                <a href="{{ url_for('home') }}" class="primary-btn">Go to Home</a>
+                <button type="button" class="secondary-btn" onclick="history.back()">Go Back</button>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
