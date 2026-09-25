@@ -387,6 +387,7 @@
 
                     <form method="POST"
                           action="{{ url_for('dashboard.accept_service_request', request_id=booking.id) }}">
+                          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                         <button type="submit"
                                 class="booking-action-btn accept-btn">
@@ -400,6 +401,7 @@
 
                     <form method="POST"
                           action="{{ url_for('dashboard.reject_service_request', request_id=booking.id) }}">
+                          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                         <button type="submit"
                                 class="booking-action-btn reject-btn">
@@ -415,7 +417,7 @@
 
                     <form method="POST"
                           action="{{ url_for('dashboard.complete_request', request_id=booking.id) }}">
-
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <button type="submit"
                                 class="booking-action-btn complete-btn">
 

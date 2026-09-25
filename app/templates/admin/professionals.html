@@ -859,7 +859,7 @@
                                             method="POST"
                                             action="{{ url_for('admin.toggle_professional_verification', professional_id=professional.id) }}"
                                         >
-
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                             {% if professional.is_verified %}
 
                                                 <button

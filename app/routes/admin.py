@@ -4,7 +4,8 @@ from flask import (
     redirect,
     url_for,
     abort,
-    flash
+    flash,
+    request
 )
 from flask_login import login_required, current_user
 from datetime import datetime
@@ -19,7 +20,7 @@ from ..models.service_request import ServiceRequest
 from app.models.notification import Notification
 from ..models import Review
 from app.routes.dashboard import create_notification
-
+from ..utils.admin_activity import log_admin_activity
 
 # ============================================================
 # ADMIN BLUEPRINT
@@ -37,6 +38,12 @@ def dashboard():
 
     if current_user.role != "admin":
         abort(403)
+
+    log_admin_activity(
+        action="view_dashboard",
+        description="Admin viewed the admin dashboard",
+        target_type="dashboard"
+    )
 
     # Existing statistics
     total_users = User.query.filter_by(

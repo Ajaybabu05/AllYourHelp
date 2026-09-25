@@ -647,7 +647,7 @@
                                             action="{{ url_for('admin.toggle_user_status', user_id=user.id) }}"
                                             class="action-form"
                                         >
-
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                             {% if user.is_active %}
 
                                                 <button

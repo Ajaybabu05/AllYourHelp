@@ -125,7 +125,7 @@
         method="POST"
         action="{{ url_for('admin.edit_service', service_id=service.id) }}"
     >
-
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="form-group">
 
             <label for="name">

@@ -104,7 +104,7 @@
             method="POST"
             action="{{ url_for('dashboard.manage_availability') }}"
         >
-
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div>
 
                 <label for="slot_date">
@@ -237,7 +237,7 @@
                                     slot_id=slot.id
                                 ) }}"
                             >
-
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <button type="submit">
                                     Remove Slot
                                 </button>

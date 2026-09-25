@@ -56,9 +56,14 @@ class Config:
         ).lower() == "true"
     )
 
+    # Keep the session cookie restricted to the application host.
+    SESSION_COOKIE_DOMAIN = None
+    SESSION_COOKIE_PATH = "/"
+
     REMEMBER_COOKIE_HTTPONLY = True
     REMEMBER_COOKIE_SAMESITE = "Lax"
     REMEMBER_COOKIE_SECURE = SESSION_COOKIE_SECURE
+    REMEMBER_COOKIE_DURATION = timedelta(days=14)
 
     # Limit how long an inactive session remains valid.
     PERMANENT_SESSION_LIFETIME = timedelta(

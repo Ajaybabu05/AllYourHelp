@@ -408,7 +408,7 @@
                 method="POST"
                 id="servicesForm"
             >
-
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 {% for category in categories %}
 
                     {% set active_category_services = category.services

@@ -1616,7 +1616,7 @@ body {
                     request_id=booking.id
                 ) }}"
             >
-
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <div class="star-rating">
 
                     <input

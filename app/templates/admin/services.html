@@ -184,7 +184,7 @@
                         action="{{ url_for('admin.toggle_service_status', service_id=service.id) }}"
                         style="display: inline;"
                     >
-
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         {% if service.is_active %}
 
                             <button

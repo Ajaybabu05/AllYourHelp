@@ -638,7 +638,7 @@
                                             method="POST"
                                             action="{{ url_for('admin.toggle_category_status', category_id=category.id) }}"
                                         >
-
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                                             {% if category.is_active %}
 

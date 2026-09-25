@@ -363,7 +363,7 @@
                                 ) }}"
                                 class="favorite-form"
                             >
-
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <button
                                     type="submit"
                                     class="favorite-button favorite-saved"
@@ -383,7 +383,7 @@
                                 ) }}"
                                 class="favorite-form"
                             >
-
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <button
                                     type="submit"
                                     class="favorite-button"

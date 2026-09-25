@@ -360,7 +360,7 @@
             action="{{ url_for('admin.reports') }}"
             class="filter-form"
         >
-
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="filter-group">
 
                 <label for="date_from">

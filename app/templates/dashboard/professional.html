@@ -730,7 +730,7 @@
                                         request_id=service_request.id
                                     ) }}"
                                 >
-
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <button
                                         type="submit"
                                         class="accept-button"
@@ -748,7 +748,7 @@
                                         request_id=service_request.id
                                     ) }}"
                                 >
-
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <button
                                         type="submit"
                                         class="reject-button"
@@ -771,7 +771,7 @@
                                         request_id=service_request.id
                                     ) }}"
                                 >
-
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <button
                                         type="submit"
                                         class="complete-button"

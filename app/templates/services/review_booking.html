@@ -327,7 +327,7 @@
                   'services.confirm_booking',
                   professional_id=professional.id
               ) }}">
-
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <!-- Hidden values -->
 
             <input type="hidden"

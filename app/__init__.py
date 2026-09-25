@@ -2,7 +2,7 @@ from flask import Flask, render_template, request
 from flask_wtf.csrf import generate_csrf
 
 from .config import Config
-from .extensions import db, migrate, login_manager, mail, csrf
+from .extensions import db, migrate, login_manager, mail, csrf, limiter
 
 
 def create_app():
@@ -17,6 +17,8 @@ def create_app():
     migrate.init_app(app, db)
     login_manager.init_app(app)
     mail.init_app(app)
+    csrf.init_app(app)
+    limiter.init_app(app)
 
     # --------------------------------------------------
     # CSRF protection
@@ -103,6 +105,7 @@ def create_app():
                 "Strict-Transport-Security",
                 "max-age=31536000; includeSubDomains"
             )
+        response.headers["X-Permitted-Cross-Domain-Policies"] = "none"
 
         return response
 
@@ -154,9 +157,15 @@ def create_app():
     def page_not_found(error):
         return render_template("errors/404.html"), 404
 
+    @app.errorhandler(429)
+    def too_many_requests(error):
+            return render_template("errors/429.html"), 429
+
     @app.errorhandler(500)
     def internal_server_error(error):
         db.session.rollback()
         return render_template("errors/500.html"), 500
+
+    
 
     return app

@@ -9,3 +9,4 @@ from .professional_service_request import ProfessionalServiceRequest
 from .notification_preference import NotificationPreference
 from .notification import Notification
 from .favorite import Favorite
+from .admin_activity_log import AdminActivityLog

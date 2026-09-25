@@ -438,6 +438,7 @@
 
                                             <form method="POST"
                                                 action="{{ url_for('admin.approve_service_request', request_id=service_request.id) }}">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                                 <button type="submit" class="btn approve-btn">
                                                     Approve
                                                 </button>
@@ -445,6 +446,7 @@
 
                                             <form method="POST"
                                                 action="{{ url_for('admin.reject_service_request', request_id=service_request.id) }}">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                                 <button type="submit" class="btn reject-btn">
                                                     Reject
                                                 </button>

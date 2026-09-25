@@ -5,7 +5,7 @@ from ..models.professional_profile import ProfessionalProfile
 from ..models.notification import Notification
 from ..utils.email import send_email
 from flask import current_app
-from ..extensions import db
+from ..extensions import db, limiter
 from ..models.user import User
 from datetime import datetime
 
@@ -44,6 +44,7 @@ def verify_email_token(token, max_age=86400):
 
 
 @auth.route("/register", methods=["GET", "POST"])
+@limiter.limit("10 per hour", methods=["POST"])
 def register():
 
     if request.method == "POST":
@@ -262,6 +263,7 @@ def verify_email(token):
     return redirect(url_for("auth.login"))
 
 @auth.route("/resend-verification", methods=["GET", "POST"])
+@limiter.limit("5 per hour", methods=["POST"])
 def resend_verification():
 
     if request.method == "POST":
@@ -341,6 +343,7 @@ def resend_verification():
     return render_template("auth/resend_verification.html")
 
 @auth.route("/login", methods=["GET", "POST"])
+@limiter.limit("5 per minute", methods=["POST"])
 def login():
 
     if request.method == "POST":
@@ -396,6 +399,7 @@ def login():
     return render_template("auth/login.html")
 
 @auth.route("/forgot-password", methods=["GET", "POST"])
+@limiter.limit("5 per hour", methods=["POST"])
 def forgot_password():
 
     if request.method == "POST":
@@ -471,6 +475,7 @@ def forgot_password():
     )
 
 @auth.route("/reset-password/<token>", methods=["GET", "POST"])
+@limiter.limit("5 per hour", methods=["POST"])
 def reset_password(token):
 
     user = verify_reset_token(token)
