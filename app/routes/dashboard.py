@@ -24,9 +24,11 @@ from ..models.notification_preference import NotificationPreference
 from ..utils.email import send_email
 from ..models import Favorite
 from ..models.notification import Notification
+from ..models.payment import Payment
 from sqlalchemy import func
 import os
 from werkzeug.utils import secure_filename
+import razorpay
 
 
 dashboard = Blueprint(
@@ -2128,7 +2130,23 @@ def booking_payment():
                 professional_id=professional.id
             )
         )
+    amount = service.price or 0
 
+    razorpay_client = razorpay.Client(
+        auth=(
+            current_app.config["RAZORPAY_KEY_ID"],
+            current_app.config["RAZORPAY_KEY_SECRET"]
+        )
+    )
+
+    razorpay_order = razorpay_client.order.create({
+        "amount": int(float(amount) * 100),
+    "currency": "INR",
+    "receipt": f"booking_{pending_booking.get('slot_id')}",
+    "payment_capture": 1
+    })
+
+    session["razorpay_order_id"] = razorpay_order["id"]
     # --------------------------------
     # SHOW PAYMENT PAGE
     # --------------------------------
@@ -2138,7 +2156,9 @@ def booking_payment():
         service=service,
         professional=professional,
         slot=slot,
-        pending_booking=pending_booking
+        pending_booking=pending_booking,
+        razorpay_order=razorpay_order,
+        razorpay_key_id=current_app.config["RAZORPAY_KEY_ID"]
     )
 @dashboard.route(
     "/bookings/process-payment",
@@ -2341,6 +2361,20 @@ def process_payment():
     slot.is_booked = True
     db.session.add(service_request)
     db.session.flush()
+
+    payment = Payment(
+        service_request_id=service_request.id,
+        user_id=service_request.user_id,
+        professional_id=service_request.professional_id,
+        amount=amount,
+        currency="INR",
+        status="paid",
+        gateway="test",
+        gateway_payment_id=service_request.payment_id,
+        paid_at=datetime.utcnow()
+    )
+
+    db.session.add(payment)
 
     professional = db.session.get(
         ProfessionalProfile,
@@ -3006,3 +3040,402 @@ def favorites():
         user=current_user,
         favorites=favorites
     )
+@dashboard.route(
+    "/bookings/verify-payment",
+    methods=["POST"]
+)
+@login_required
+def verify_payment():
+
+    pending_booking = session.get("pending_booking")
+
+    if not pending_booking:
+        return {
+            "success": False,
+            "message": "No pending booking found."
+        }, 400
+
+    if pending_booking.get("user_id") != current_user.id:
+        session.pop("pending_booking", None)
+        session.pop("razorpay_order_id", None)
+
+        return {
+            "success": False,
+            "message": "Invalid booking information."
+        }, 403
+
+    razorpay_payment_id = request.form.get(
+        "razorpay_payment_id"
+    )
+
+    razorpay_order_id = request.form.get(
+        "razorpay_order_id"
+    )
+
+    razorpay_signature = request.form.get(
+        "razorpay_signature"
+    )
+
+    if not all([
+        razorpay_payment_id,
+        razorpay_order_id,
+        razorpay_signature
+    ]):
+        return {
+            "success": False,
+            "message": "Incomplete payment information."
+        }, 400
+
+    # --------------------------------------------------
+    # Verify that the order belongs to our server session
+    # --------------------------------------------------
+
+    expected_order_id = session.get(
+        "razorpay_order_id"
+    )
+
+    if not expected_order_id:
+        return {
+            "success": False,
+            "message": "Payment order information is missing."
+        }, 400
+
+    if razorpay_order_id != expected_order_id:
+        return {
+            "success": False,
+            "message": "Invalid payment order."
+        }, 400
+
+    # --------------------------------------------------
+    # Razorpay client
+    # --------------------------------------------------
+
+    razorpay_client = razorpay.Client(
+        auth=(
+            current_app.config["RAZORPAY_KEY_ID"],
+            current_app.config["RAZORPAY_KEY_SECRET"]
+        )
+    )
+
+    # --------------------------------------------------
+    # Verify Razorpay signature
+    # --------------------------------------------------
+
+    try:
+
+        razorpay_client.utility.verify_payment_signature({
+            "razorpay_order_id": razorpay_order_id,
+            "razorpay_payment_id": razorpay_payment_id,
+            "razorpay_signature": razorpay_signature
+        })
+
+    except razorpay.errors.SignatureVerificationError:
+
+        return {
+            "success": False,
+            "message": "Payment verification failed."
+        }, 400
+
+    # --------------------------------------------------
+    # Fetch payment from Razorpay
+    # --------------------------------------------------
+
+    try:
+
+        razorpay_payment = razorpay_client.payment.fetch(
+            razorpay_payment_id
+        )
+
+    except Exception:
+
+        return {
+            "success": False,
+            "message": "Unable to verify payment status."
+        }, 400
+
+    # --------------------------------------------------
+    # Verify payment belongs to the expected order
+    # --------------------------------------------------
+
+    if razorpay_payment.get("order_id") != expected_order_id:
+
+        return {
+            "success": False,
+            "message": "Payment does not belong to this booking."
+        }, 400
+
+    # --------------------------------------------------
+    # Verify payment amount
+    # --------------------------------------------------
+
+    service = Service.query.get(
+        pending_booking.get("service_id")
+    )
+
+    professional = ProfessionalProfile.query.get(
+        pending_booking.get("professional_id")
+    )
+
+    slot = AvailabilitySlot.query.get(
+        pending_booking.get("slot_id")
+    )
+
+    if not service or not professional or not slot:
+
+        return {
+            "success": False,
+            "message": "Booking information is no longer available."
+        }, 400
+
+    amount = service.price or 0
+
+    expected_amount = int(
+        float(amount) * 100
+    )
+
+    if razorpay_payment.get("amount") != expected_amount:
+
+        return {
+            "success": False,
+            "message": "Payment amount does not match the booking amount."
+        }, 400
+
+    # --------------------------------------------------
+    # Verify payment status
+    # --------------------------------------------------
+
+    if razorpay_payment.get("status") != "captured":
+
+        return {
+            "success": False,
+            "message": "Payment has not been captured."
+        }, 400
+
+    # --------------------------------------------------
+    # Prevent double booking
+    # --------------------------------------------------
+
+    if slot.is_booked:
+
+        return {
+            "success": False,
+            "message": "This time slot has already been booked."
+        }, 400
+
+    # --------------------------------------------------
+    # Create ServiceRequest
+    # --------------------------------------------------
+
+    service_request = ServiceRequest(
+        user_id=current_user.id,
+        professional_id=professional.id,
+        service_id=service.id,
+        preferred_date=slot.slot_date,
+        preferred_time=slot.start_time,
+        availability_slot_id=slot.id,
+        slot_id=slot.id,
+        description=pending_booking.get(
+            "description",
+            ""
+        ),
+        location=pending_booking.get(
+            "location"
+        ),
+        additional_details=pending_booking.get(
+            "additional_details"
+        ),
+        status="confirmed",
+        payment_status="paid",
+        payment_id=razorpay_payment_id,
+        payment_amount=amount,
+        refund_status="not_required"
+    )
+
+    db.session.add(service_request)
+
+    # We need the ServiceRequest ID before creating Payment
+    db.session.flush()
+
+    # --------------------------------------------------
+    # Mark slot as booked
+    # --------------------------------------------------
+
+    slot.is_booked = True
+
+    # --------------------------------------------------
+    # Create Payment record
+    # --------------------------------------------------
+
+    payment = Payment(
+        service_request_id=service_request.id,
+        user_id=current_user.id,
+        professional_id=professional.id,
+        amount=amount,
+        currency="INR",
+        status="paid",
+        gateway="razorpay",
+        gateway_order_id=razorpay_order_id,
+        gateway_payment_id=razorpay_payment_id,
+        gateway_signature=razorpay_signature,
+        paid_at=datetime.utcnow()
+    )
+
+    db.session.add(payment)
+
+    # --------------------------------------------------
+    # Save everything
+    # --------------------------------------------------
+
+    try:
+
+        db.session.commit()
+
+    except Exception:
+
+        db.session.rollback()
+
+        return {
+            "success": False,
+            "message": "Payment was verified, but the booking could not be saved."
+        }, 500
+
+    # --------------------------------------------------
+    # Clear temporary booking information
+    # --------------------------------------------------
+
+    session.pop(
+        "pending_booking",
+        None
+    )
+
+    session.pop(
+        "razorpay_order_id",
+        None
+    )
+
+    # --------------------------------------------------
+    # Success
+    # --------------------------------------------------
+
+    return {
+        "success": True,
+        "message": "Payment verified and booking confirmed.",
+        "redirect_url": url_for(
+            "services.booking_success",
+            request_id=service_request.id
+        )
+    }
+@dashboard.route(
+    "/bookings/payment-failed",
+    methods=["POST"]
+)
+@login_required
+def payment_failed():
+
+    pending_booking = session.get("pending_booking")
+
+    if not pending_booking:
+        return {
+            "success": False,
+            "message": "No pending booking found."
+        }, 400
+
+    if pending_booking.get("user_id") != current_user.id:
+        return {
+            "success": False,
+            "message": "Invalid booking information."
+        }, 403
+
+    razorpay_order_id = request.form.get(
+        "razorpay_order_id"
+    )
+
+    razorpay_payment_id = request.form.get(
+        "razorpay_payment_id"
+    )
+
+    error_description = request.form.get(
+        "error_description"
+    )
+
+    # Verify that this failure belongs to the
+    # Razorpay order created for the current session.
+    expected_order_id = session.get(
+        "razorpay_order_id"
+    )
+
+    if not expected_order_id:
+        return {
+            "success": False,
+            "message": "Payment session has expired. Please try again."
+        }, 400
+
+    if razorpay_order_id != expected_order_id:
+        return {
+            "success": False,
+            "message": "Invalid payment order."
+        }, 400
+
+    if not razorpay_order_id:
+        return {
+            "success": False,
+            "message": "Payment order information is missing."
+        }, 400
+
+    service = Service.query.get(
+        pending_booking.get("service_id")
+    )
+
+    professional = ProfessionalProfile.query.get(
+        pending_booking.get("professional_id")
+    )
+
+    if not service or not professional:
+        return {
+            "success": False,
+            "message": "Booking information is no longer available."
+        }, 400
+
+    amount = service.price or 0
+
+    # Prevent duplicate failure records
+    existing_payment = Payment.query.filter_by(
+        gateway_order_id=razorpay_order_id
+    ).first()
+
+    if existing_payment:
+        return {
+            "success": True,
+            "message": "Payment failure was already recorded."
+        }
+
+    payment = Payment(
+        service_request_id=None,
+        user_id=current_user.id,
+        professional_id=professional.id,
+        amount=amount,
+        currency="INR",
+        status="failed",
+        gateway="razorpay",
+        gateway_order_id=razorpay_order_id,
+        gateway_payment_id=razorpay_payment_id,
+        failure_reason=error_description
+    )
+
+    db.session.add(payment)
+
+    try:
+
+        db.session.commit()
+
+    except Exception:
+        db.session.rollback()
+
+        return {
+            "success": False,
+            "message": "Failed to record payment information."
+        }, 500
+    return {
+        "success": True,
+        "message": "Payment failure recorded."
+    }

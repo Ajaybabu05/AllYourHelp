@@ -341,27 +341,237 @@
             </a>
 
 
-            <form
-                method="POST"
-                action="{{ url_for(
-                    'dashboard.process_payment'
-                ) }}"
+            <button
+                type="button"
+                id="razorpay-button"
+                class="btn primary"
             >
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <button
-                    type="submit"
-                    class="btn primary"
-                >
-                    Pay ₹{{ "%.2f"|format(service.price or 0) }}
-                </button>
-
-            </form>
+                Pay ₹{{ "%.2f"|format(service.price or 0) }}
+            </button>
 
         </div>
 
     </div>
 
 </div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+
+    const razorpayButton = document.getElementById(
+        "razorpay-button"
+    );
+
+    razorpayButton.addEventListener(
+        "click",
+        function () {
+            console.log("PAY BUTTON CLICKED");
+            let paymentFailed = false;
+            const options = {
+
+                key: "{{ razorpay_key_id }}",
+
+                amount: "{{ razorpay_order.amount }}",
+
+                currency: "{{ razorpay_order.currency }}",
+
+                name: "AllYourHelp",
+
+                description: "{{ service.name }}",
+
+                order_id: "{{ razorpay_order.id }}",
+
+                handler: function (response) {
+
+                const formData = new FormData();
+
+                formData.append(
+                    "razorpay_payment_id",
+                    response.razorpay_payment_id
+                );
+
+                formData.append(
+                    "razorpay_order_id",
+                    response.razorpay_order_id
+                );
+
+                formData.append(
+                    "razorpay_signature",
+                    response.razorpay_signature
+                );
+
+                formData.append(
+                    "csrf_token",
+                    "{{ csrf_token() }}"
+                );
+
+                fetch(
+                    "{{ url_for('dashboard.verify_payment') }}",
+                    {
+                        method: "POST",
+                        body: formData
+                    }
+                )
+                .then(response => response.json())
+                .then(data => {
+
+                    if (data.success) {
+
+                        alert(
+                            "Payment verified successfully!"
+                        );
+
+                        console.log(data);
+
+                    } else {
+
+                        alert(
+                            data.message || "Payment verification failed."
+                        );
+
+                    }
+
+                })
+                .catch(error => {
+
+                    console.error(
+                        "Payment verification error:",
+                        error
+                    );
+
+                    alert(
+                        "Something went wrong while verifying the payment."
+                    );
+
+                });
+
+                },
+
+                prefill: {
+                    name: "{{ current_user.name }}",
+                    email: "{{ current_user.email }}"
+                },
+
+                theme: {
+                    color: "#2563eb"
+                },
+
+                modal: {
+                ondismiss: function () {
+
+                    console.log(
+                        "Razorpay checkout was closed by the user."
+                    );
+
+                    // Do not show cancellation notification
+                    // if a payment failure was already handled.
+                    if (paymentFailed) {
+                        return;
+                    }
+
+                    alert(
+                        "Payment was cancelled. Your booking has not been confirmed."
+                    );
+
+                }
+            }
+
+            };
+
+            const razorpay = new Razorpay(options);
+
+            razorpay.on(
+                "payment.failed",
+                function (response) {
+
+                    // Prevent duplicate failure handling
+                    if (paymentFailed) {
+                        return;
+                    }
+
+                    paymentFailed = true;
+
+                    console.log(
+                        "Razorpay payment failed:",
+                        response
+                    );
+
+                    const error = response.error || {};
+
+                    const formData = new FormData();
+
+                    formData.append(
+                        "razorpay_order_id",
+                        error.metadata?.order_id || "{{ razorpay_order.id }}"
+                    );
+
+                    formData.append(
+                        "razorpay_payment_id",
+                        error.metadata?.payment_id || ""
+                    );
+
+                    formData.append(
+                        "error_description",
+                        error.description || "Payment failed"
+                    );
+
+                    formData.append(
+                        "csrf_token",
+                        "{{ csrf_token() }}"
+                    );
+
+                    fetch(
+                        "{{ url_for('dashboard.payment_failed') }}",
+                        {
+                            method: "POST",
+                            body: formData
+                        }
+                    )
+                    .then(response => response.json())
+                    .then(data => {
+
+                        console.log(
+                            "Payment failure recording response:",
+                            data
+                        );
+
+                        if (data.success) {
+
+                            alert(
+                                "Payment failed. No booking was created. You can try again."
+                            );
+
+                        } else {
+
+                            alert(
+                                data.message || "Payment failed."
+                            );
+
+                        }
+
+                    })
+                    .catch(error => {
+
+                        console.error(
+                            "Payment failure recording error:",
+                            error
+                        );
+
+                        alert(
+                            "Payment failed. Your booking has not been confirmed."
+                        );
+
+                    });
+
+                }
+            );
+
+            razorpay.open();
+        }
+    );
+
+</script>
 
 </body>
 

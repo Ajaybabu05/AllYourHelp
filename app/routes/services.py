@@ -23,6 +23,7 @@ from ..models.service import Service
 from ..models.service_request import ServiceRequest
 from ..models.professional_profile import ProfessionalProfile
 from ..models.availability_slot import AvailabilitySlot
+from ..models.payment import Payment
 
 services = Blueprint(
     "services",

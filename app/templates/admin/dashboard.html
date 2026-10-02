@@ -822,7 +822,22 @@
             </span>
         </a>
 
+        <a
+            href="{{ url_for('admin.categories') }}"
+            class="action-card"
+        >
+            <div class="action-icon">📂</div>
 
+            <h3>Service Categories</h3>
+
+            <p>
+                Create, edit and manage service categories.
+            </p>
+
+            <span class="action-arrow">
+                Manage Categories →
+            </span>
+        </a>
         <a
             href="{{ url_for('admin.bookings') }}"
             class="action-card"
@@ -862,6 +877,27 @@
 
             <span class="action-arrow">
                 View Reports →
+            </span>
+
+        </a>
+
+        <a
+            href="{{ url_for('admin.activity_logs') }}"
+            class="action-card"
+        >
+
+            <div class="action-icon">📝</div>
+
+            <h3>
+                Activity Logs
+            </h3>
+
+            <p>
+                View and review actions performed by administrators.
+            </p>
+
+            <span class="action-arrow">
+                View Activity Logs →
             </span>
 
         </a>

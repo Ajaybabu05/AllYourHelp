@@ -19,6 +19,7 @@ from ..models.service_category import ServiceCategory
 from ..models.service_request import ServiceRequest
 from app.models.notification import Notification
 from ..models import Review
+from ..models.admin_activity_log import AdminActivityLog
 from app.routes.dashboard import create_notification
 from ..utils.admin_activity import log_admin_activity
 
@@ -197,6 +198,137 @@ def dashboard():
         unread_notifications=unread_notifications
         )
 
+@admin.route("/activity-logs")
+@login_required
+def activity_logs():
+
+    if current_user.role != "admin":
+        abort(403)
+
+    # Get filter values
+    action = request.args.get("action", "").strip()
+    target_type = request.args.get("target_type", "").strip()
+    admin_id = request.args.get("admin_id", "").strip()
+    search = request.args.get("search", "").strip()
+    start_date = request.args.get("start_date", "").strip()
+    end_date = request.args.get("end_date", "").strip()
+
+    # Base query
+    query = AdminActivityLog.query
+
+    # Filter by action
+    if action:
+        query = query.filter(
+            AdminActivityLog.action == action
+        )
+
+    # Filter by target type
+    if target_type:
+        query = query.filter(
+            AdminActivityLog.target_type == target_type
+        )
+
+    # Filter by admin
+    if admin_id:
+        try:
+            query = query.filter(
+                AdminActivityLog.admin_id == int(admin_id)
+            )
+        except ValueError:
+            pass
+
+    # Search description
+    if search:
+        query = query.filter(
+            AdminActivityLog.description.ilike(
+                f"%{search}%"
+            )
+        )
+
+    # Filter by start date
+    if start_date:
+        try:
+            start_date_obj = datetime.strptime(
+                start_date,
+                "%Y-%m-%d"
+            )
+
+            query = query.filter(
+                AdminActivityLog.created_at >= start_date_obj
+            )
+
+        except ValueError:
+            pass
+
+    # Filter by end date
+    if end_date:
+        try:
+            end_date_obj = datetime.strptime(
+                end_date,
+                "%Y-%m-%d"
+            )
+
+            # Include the entire selected end date
+            from datetime import timedelta
+
+            end_date_obj = end_date_obj + timedelta(days=1)
+
+            query = query.filter(
+                AdminActivityLog.created_at < end_date_obj
+            )
+
+        except ValueError:
+            pass
+
+    # Pagination
+    page = request.args.get("page", 1, type=int)
+
+    pagination = query.order_by(
+        AdminActivityLog.created_at.desc()
+    ).paginate(
+        page=page,
+        per_page=20,
+        error_out=False
+    )
+
+    logs = pagination.items
+
+    # Dropdown options
+    actions = db.session.query(
+        AdminActivityLog.action
+    ).distinct().order_by(
+        AdminActivityLog.action
+    ).all()
+
+    target_types = db.session.query(
+        AdminActivityLog.target_type
+    ).filter(
+        AdminActivityLog.target_type.isnot(None)
+    ).distinct().order_by(
+        AdminActivityLog.target_type
+    ).all()
+
+    admins = User.query.filter_by(
+        role="admin"
+    ).order_by(
+        User.name
+    ).all()
+
+    return render_template(
+        "admin/activity_logs.html",
+        logs=logs,
+        pagination=pagination,
+        actions=[item[0] for item in actions],
+        target_types=[item[0] for item in target_types],
+        admins=admins,
+        selected_action=action,
+        selected_target_type=target_type,
+        selected_admin_id=admin_id,
+        search=search,
+        start_date=start_date,
+        end_date=end_date
+    )
+
 @admin.route("/users")
 @login_required
 def users():
@@ -338,7 +470,20 @@ def toggle_professional_verification(professional_id):
 
     db.session.commit()
 
+    # Log the admin action
     if professional.is_verified:
+
+        log_admin_activity(
+            action="verify_professional",
+            description=(
+                f"Admin verified professional "
+                f"{professional.user.name} "
+                f"(User ID: {professional.user.id}, "
+                f"Profile ID: {professional.id})."
+            ),
+            target_type="professional",
+            target_id=professional.id
+        )
 
         flash(
             f"{professional.user.name} has been verified successfully.",
@@ -346,6 +491,18 @@ def toggle_professional_verification(professional_id):
         )
 
     else:
+
+        log_admin_activity(
+            action="unverify_professional",
+            description=(
+                f"Admin removed verification from professional "
+                f"{professional.user.name} "
+                f"(User ID: {professional.user.id}, "
+                f"Profile ID: {professional.id})."
+            ),
+            target_type="professional",
+            target_id=professional.id
+        )
 
         flash(
             f"{professional.user.name} is no longer verified.",
@@ -430,6 +587,17 @@ def create_category():
 
         db.session.add(category)
         db.session.commit()
+
+        # Log the admin action
+        log_admin_activity(
+            action="create_category",
+            description=(
+                f"Admin created service category "
+                f"'{category.name}' (ID: {category.id})."
+            ),
+            target_type="category",
+            target_id=category.id
+        )
 
         flash(
             f"{category.name} category has been created.",
@@ -535,6 +703,17 @@ def edit_category(category_id):
 
         db.session.commit()
 
+        # Log the admin action
+        log_admin_activity(
+            action="edit_category",
+            description=(
+                f"Admin edited service category "
+                f"'{category.name}' (ID: {category.id})."
+            ),
+            target_type="category",
+            target_id=category.id
+        )
+
         flash(
             f"{category.name} has been updated.",
             "success"
@@ -569,6 +748,28 @@ def toggle_category_status(category_id):
     category.is_active = not category.is_active
 
     db.session.commit()
+
+    # Log the admin action
+    if category.is_active:
+        log_admin_activity(
+            action="activate_category",
+            description=(
+                f"Admin activated category "
+                f"'{category.name}' (ID: {category.id})."
+            ),
+            target_type="category",
+            target_id=category.id
+        )
+    else:
+        log_admin_activity(
+            action="deactivate_category",
+            description=(
+                f"Admin deactivated category "
+                f"'{category.name}' (ID: {category.id})."
+            ),
+            target_type="service",
+            target_id=category.id
+        )
 
     if category.is_active:
 
@@ -615,17 +816,38 @@ def toggle_user_status(user_id):
 
     db.session.commit()
 
+    # Log the admin action
     if user.is_active:
+        log_admin_activity(
+            action="activate_user",
+            description=(
+                f"Admin activated the account of user "
+                f"{user.name} (ID: {user.id})."
+            ),
+            target_type="user",
+            target_id=user.id
+        )
+
         flash(
             f"{user.name}'s account has been activated.",
             "success"
         )
+
     else:
+        log_admin_activity(
+            action="deactivate_user",
+            description=(
+                f"Admin deactivated the account of user "
+                f"{user.name} (ID: {user.id})."
+            ),
+            target_type="user",
+            target_id=user.id
+        )
+
         flash(
             f"{user.name}'s account has been deactivated.",
             "success"
         )
-
     return redirect(url_for("admin.users"))
 
 @admin.route("/services")
@@ -728,8 +950,19 @@ def create_service():
         db.session.add(service)
         db.session.commit()
 
+        # Log the admin action
+        log_admin_activity(
+            action="create_service",
+            description=(
+                f"Admin created service "
+                f"'{service.name}' (ID: {service.id})."
+            ),
+            target_type="service",
+            target_id=service.id
+        )
+
         flash(
-            f"{service.name} has been created successfully.",
+            f"{service.name} has been created.",
             "success"
         )
 
@@ -840,8 +1073,19 @@ def edit_service(service_id):
 
         db.session.commit()
 
+        # Log the admin action
+        log_admin_activity(
+            action="edit_service",
+            description=(
+                f"Admin edited service "
+                f"'{service.name}' (ID: {service.id})."
+            ),
+            target_type="service",
+            target_id=service.id
+        )
+
         flash(
-            f"{service.name} has been updated successfully.",
+            f"{service.name} has been updated.",
             "success"
         )
 
@@ -873,6 +1117,28 @@ def toggle_service_status(service_id):
     service.is_active = not service.is_active
 
     db.session.commit()
+
+    # Log the admin action
+    if service.is_active:
+        log_admin_activity(
+            action="activate_service",
+            description=(
+                f"Admin activated service "
+                f"'{service.name}' (ID: {service.id})."
+            ),
+            target_type="service",
+            target_id=service.id
+        )
+    else:
+        log_admin_activity(
+            action="deactivate_service",
+            description=(
+                f"Admin deactivated service "
+                f"'{service.name}' (ID: {service.id})."
+            ),
+            target_type="service",
+            target_id=service.id
+        )
 
     if service.is_active:
         flash(
@@ -1003,6 +1269,21 @@ def approve_service_request(request_id):
 
     # Mark request as approved
     service_request.status = "approved"
+    db.session.commit()
+    # Log the admin action
+    log_admin_activity(
+        action="approve_service_request",
+        description=(
+            f"Admin approved service request "
+            f"(Request ID: {service_request.id}) "
+            f"for professional "
+            f"{service_request.professional.user.name} "
+            f"and service "
+            f"'{service_request.service.name}'."
+        ),
+        target_type="service_request",
+        target_id=service_request.id
+    )
 
     create_notification(
         user_id=professional.user_id,
@@ -1014,7 +1295,6 @@ def approve_service_request(request_id):
         notification_type="service_request_approved",
         professional_service_request_id=service_request.id
     )
-    db.session.commit()
 
     flash(
         f"{service.name} has been approved for "
@@ -1065,6 +1345,21 @@ def reject_service_request(request_id):
 
     # Mark request as rejected
     service_request.status = "rejected"
+    db.session.commit()
+    # Log the admin action
+    log_admin_activity(
+        action="reject_service_request",
+        description=(
+            f"Admin rejected service request "
+            f"(Request ID: {service_request.id}) "
+            f"for professional "
+            f"{service_request.professional.user.name} "
+            f"and service "
+            f"'{service_request.service.name}'."
+        ),
+        target_type="service_request",
+        target_id=service_request.id
+    )
 
     if service_request.professional:
         create_notification(
@@ -1077,8 +1372,6 @@ def reject_service_request(request_id):
             notification_type="service_request_rejected",
             professional_service_request_id=service_request.id
         )
-
-    db.session.commit()
 
     if service:
 
