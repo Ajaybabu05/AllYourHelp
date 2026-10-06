@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Admin Settings - AllYourHelp</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f5f7fb;
+            color: #1f2937;
+        }
+
+        .header {
+            height: 70px;
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 40px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2563eb;
+        }
+
+        .admin-label {
+            color: #6b7280;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .page-header {
+            margin-bottom: 25px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .page-header h1 {
+            margin: 0 0 8px;
+            font-size: 32px;
+            color: #111827;
+        }
+
+        .page-header p {
+            margin: 0;
+            color: #6b7280;
+            line-height: 1.5;
+        }
+
+        /* FLASH */
+
+        .flash-container {
+            position: fixed;
+            top: 25px;
+            right: 25px;
+
+            width: min(380px, calc(100% - 40px));
+
+            z-index: 9999;
+        }
+
+        .flash {
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+
+            font-size: 14px;
+            font-weight: 600;
+
+            box-shadow:
+                0 4px 15px rgba(0, 0, 0, 0.12);
+
+            opacity: 1;
+
+            transform: translateY(0);
+
+            transition:
+                opacity 0.4s ease,
+                transform 0.4s ease;
+        }
+
+        .flash.success {
+            background: #dff5e5;
+            color: #176b2c;
+            border-left: 4px solid #22c55e;
+        }
+
+        .flash.error {
+            background: #fde2e2;
+            color: #a51d1d;
+            border-left: 4px solid #ef4444;
+        }
+
+        .flash.warning {
+            background: #fff4d6;
+            color: #92400e;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .flash.info {
+            background: #dbeafe;
+            color: #1e40af;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .flash.hide {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        /* SETTINGS CARD */
+
+        .settings-card {
+            background: #ffffff;
+
+            border: 1px solid #e5e7eb;
+
+            border-radius: 12px;
+
+            padding: 30px;
+
+            box-shadow:
+                0 4px 12px rgba(0, 0, 0, 0.04);
+        }
+
+        .section {
+            margin-bottom: 35px;
+        }
+
+        .section:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            margin: 0 0 6px;
+
+            font-size: 20px;
+
+            color: #111827;
+        }
+
+        .section-description {
+            margin: 0 0 22px;
+
+            color: #6b7280;
+
+            font-size: 14px;
+
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+
+            margin-bottom: 7px;
+
+            font-size: 14px;
+
+            font-weight: 600;
+
+            color: #374151;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="number"] {
+            width: 100%;
+
+            padding: 12px 14px;
+
+            border: 1px solid #d1d5db;
+
+            border-radius: 7px;
+
+            font-size: 14px;
+
+            outline: none;
+
+            transition: border-color 0.2s ease,
+                        box-shadow 0.2s ease;
+        }
+
+        input:focus {
+            border-color: #2563eb;
+
+            box-shadow:
+                0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .help-text {
+            display: block;
+
+            margin-top: 6px;
+
+            color: #6b7280;
+
+            font-size: 12px;
+        }
+
+        /* TOGGLE ROWS */
+
+        .toggle-row {
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 20px;
+
+            padding: 16px 0;
+
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .toggle-row:last-child {
+            border-bottom: none;
+        }
+
+        .toggle-info {
+            flex: 1;
+        }
+
+        .toggle-title {
+            display: block;
+
+            margin-bottom: 4px;
+
+            font-size: 15px;
+
+            font-weight: 600;
+
+            color: #111827;
+        }
+
+        .toggle-description {
+            font-size: 13px;
+
+            color: #6b7280;
+
+            line-height: 1.4;
+        }
+
+        .toggle {
+            position: relative;
+
+            width: 48px;
+
+            height: 26px;
+
+            flex-shrink: 0;
+        }
+
+        .toggle input {
+            opacity: 0;
+
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+
+            cursor: pointer;
+
+            inset: 0;
+
+            background: #d1d5db;
+
+            border-radius: 30px;
+
+            transition: 0.2s;
+        }
+
+        .slider::before {
+            content: "";
+
+            position: absolute;
+
+            height: 20px;
+            width: 20px;
+
+            left: 3px;
+            top: 3px;
+
+            background: white;
+
+            border-radius: 50%;
+
+            transition: 0.2s;
+
+            box-shadow:
+                0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle input:checked + .slider {
+            background: #2563eb;
+        }
+
+        .toggle input:checked + .slider::before {
+            transform: translateX(22px);
+        }
+
+        /* SAVE BUTTON */
+
+        .form-actions {
+            margin-top: 30px;
+
+            padding-top: 25px;
+
+            border-top: 1px solid #e5e7eb;
+
+            display: flex;
+
+            justify-content: flex-end;
+        }
+
+        .save-btn {
+            border: none;
+
+            background: #2563eb;
+
+            color: white;
+
+            padding: 12px 24px;
+
+            border-radius: 7px;
+
+            font-size: 14px;
+
+            font-weight: 600;
+
+            cursor: pointer;
+
+            transition: background 0.2s ease;
+        }
+
+        .save-btn:hover {
+            background: #1d4ed8;
+        }
+
+        @media (max-width: 600px) {
+
+            .header {
+                padding: 0 20px;
+            }
+
+            .container {
+                margin-top: 25px;
+            }
+
+            .settings-card {
+                padding: 20px;
+            }
+
+            .page-header h1 {
+                font-size: 26px;
+            }
+
+            .toggle-row {
+                align-items: flex-start;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<header class="header">
+
+    <div class="logo">
+        AllYourHelp
+    </div>
+
+    <div class="admin-label">
+        Admin Panel
+    </div>
+
+</header>
+
+
+<!-- FLASH MESSAGES -->
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+
+    {% if messages %}
+
+        <div class="flash-container">
+
+            {% for category, message in messages %}
+
+                <div class="flash {{ category }}">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% endif %}
+
+{% endwith %}
+
+
+<main class="container">
+
+    <a
+        href="{{ url_for('admin.dashboard') }}"
+        class="back-link"
+    >
+        ← Admin Dashboard
+    </a>
+
+
+    <div class="page-header">
+
+        <h1>
+            Admin Settings
+        </h1>
+
+        <p>
+            Manage the main configuration of your AllYourHelp application.
+        </p>
+
+    </div>
+
+
+    <form
+        method="POST"
+        action="{{ url_for('admin.settings') }}"
+    >
+
+        <input
+            type="hidden"
+            name="csrf_token"
+            value="{{ csrf_token() }}"
+        >
+
+
+        <div class="settings-card">
+
+
+            <!-- GENERAL SETTINGS -->
+
+            <section class="section">
+
+                <h2 class="section-title">
+                    General Settings
+                </h2>
+
+                <p class="section-description">
+                    Basic information about your application.
+                </p>
+
+
+                <div class="form-group">
+
+                    <label for="site_name">
+                        Application Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="site_name"
+                        name="site_name"
+                        value="{{ settings.site_name }}"
+                        maxlength="100"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="support_email">
+                        Support Email
+                    </label>
+
+                    <input
+                        type="email"
+                        id="support_email"
+                        name="support_email"
+                        value="{{ settings.support_email or '' }}"
+                        placeholder="support@example.com"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="support_phone">
+                        Support Phone
+                    </label>
+
+                    <input
+                        type="tel"
+                        id="support_phone"
+                        name="support_phone"
+                        value="{{ settings.support_phone or '' }}"
+                        placeholder="+91 9876543210"
+                    >
+
+                </div>
+
+            </section>
+
+
+            <!-- PLATFORM SETTINGS -->
+
+            <section class="section">
+
+                <h2 class="section-title">
+                    Platform Settings
+                </h2>
+
+                <p class="section-description">
+                    Control the main services provided by the platform.
+                </p>
+
+
+                <div class="form-group">
+
+                    <label for="platform_fee_percentage">
+                        Platform Fee Percentage
+                    </label>
+
+                    <input
+                        type="number"
+                        id="platform_fee_percentage"
+                        name="platform_fee_percentage"
+                        value="{{ settings.platform_fee_percentage }}"
+                        min="0"
+                        max="100"
+                        step="0.01"
+                    >
+
+                    <span class="help-text">
+                        Percentage of each payment that will belong to the platform.
+                        This setting will be connected to payment calculations later.
+                    </span>
+
+                </div>
+
+
+                <div class="toggle-row">
+
+                    <div class="toggle-info">
+
+                        <span class="toggle-title">
+                            Enable Bookings
+                        </span>
+
+                        <div class="toggle-description">
+                            Allow customers to create new service bookings.
+                        </div>
+
+                    </div>
+
+
+                    <label class="toggle">
+
+                        <input
+                            type="checkbox"
+                            name="bookings_enabled"
+                            {% if settings.bookings_enabled %}
+                                checked
+                            {% endif %}
+                        >
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                </div>
+
+
+                <div class="toggle-row">
+
+                    <div class="toggle-info">
+
+                        <span class="toggle-title">
+                            Enable Payments
+                        </span>
+
+                        <div class="toggle-description">
+                            Allow customers to make payments through the platform.
+                        </div>
+
+                    </div>
+
+
+                    <label class="toggle">
+
+                        <input
+                            type="checkbox"
+                            name="payments_enabled"
+                            {% if settings.payments_enabled %}
+                                checked
+                            {% endif %}
+                        >
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                </div>
+
+
+                <div class="toggle-row">
+
+                    <div class="toggle-info">
+
+                        <span class="toggle-title">
+                            Enable Email Notifications
+                        </span>
+
+                        <div class="toggle-description">
+                            Allow application email notifications to be sent.
+                        </div>
+
+                    </div>
+
+
+                    <label class="toggle">
+
+                        <input
+                            type="checkbox"
+                            name="email_notifications_enabled"
+                            {% if settings.email_notifications_enabled %}
+                                checked
+                            {% endif %}
+                        >
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                </div>
+
+            </section>
+
+
+            <!-- SYSTEM SETTINGS -->
+
+            <section class="section">
+
+                <h2 class="section-title">
+                    System Settings
+                </h2>
+
+                <p class="section-description">
+                    Control the availability of the application.
+                </p>
+
+
+                <div class="toggle-row">
+
+                    <div class="toggle-info">
+
+                        <span class="toggle-title">
+                            Maintenance Mode
+                        </span>
+
+                        <div class="toggle-description">
+                            Enable this when the application needs to be temporarily
+                            unavailable for maintenance.
+                        </div>
+
+                    </div>
+
+
+                    <label class="toggle">
+
+                        <input
+                            type="checkbox"
+                            name="maintenance_mode"
+                            {% if settings.maintenance_mode %}
+                                checked
+                            {% endif %}
+                        >
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                </div>
+
+            </section>
+
+
+            <div class="form-actions">
+
+                <button
+                    type="submit"
+                    class="save-btn"
+                >
+                    Save Settings
+                </button>
+
+            </div>
+
+
+        </div>
+
+    </form>
+
+</main>
+
+
+<script src="{{ url_for('static', filename='js/flash.js') }}"></script>
+
+</body>
+
+</html>

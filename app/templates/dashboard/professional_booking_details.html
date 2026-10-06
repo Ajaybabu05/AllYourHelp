@@ -15,6 +15,8 @@
 
 <body>
 
+    {% include "includes/flash_messages.html" %}
+
 <div class="dashboard-container">
 
     <!-- HEADER -->
@@ -437,6 +439,8 @@
     </main>
 
 </div>
+
+<script src="{{ url_for('static', filename='js/flash.js') }}"></script>
 
 
 </body>

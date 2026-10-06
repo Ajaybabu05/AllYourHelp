@@ -34,3 +34,23 @@ if (menuToggle && navLinks) {
     });
 
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const flashMessages = document.querySelectorAll(".flash");
+
+    flashMessages.forEach(function (message) {
+
+        setTimeout(function () {
+
+            message.classList.add("hide");
+
+            setTimeout(function () {
+                message.remove();
+            }, 400);
+
+        }, 2600);
+
+    });
+
+});

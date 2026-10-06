@@ -185,12 +185,164 @@
             background: #b91c1c;
         }
 
+        .refund-info {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 12px;
+            background: #e8f7fa;
+            border: 1px solid #b6effb;
+        }
+
+        .refund-info h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        .refund-info p {
+            margin: 8px 0;
+            color: #444;
+        }
+        .review-section {
+        margin-top: 30px;
+        padding: 25px;
+        background: #f8f9fc;
+        border-radius: 12px;
+    }
+
+    .review-section h3 {
+        margin-top: 0;
+        margin-bottom: 10px;
+    }
+
+    .review-section p {
+        color: #666;
+        margin-bottom: 20px;
+    }
+
+    .rating-input {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+        gap: 5px;
+        margin-bottom: 20px;
+    }
+
+    .rating-input input {
+        display: none;
+    }
+
+    .rating-input label {
+        font-size: 32px;
+        color: #d1d5db;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .rating-input label:hover,
+    .rating-input label:hover ~ label,
+    .rating-input input:checked ~ label {
+        color: #f59e0b;
+    }
+
+    .review-textarea {
+        width: 100%;
+        min-height: 120px;
+        padding: 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        resize: vertical;
+        font-family: Arial, sans-serif;
+        font-size: 15px;
+    }
+
+    .review-textarea:focus {
+        outline: none;
+        border-color: #2563eb;
+    }
+
+    .review-submit {
+        margin-top: 15px;
+        background: #2563eb;
+        color: white;
+    }
+
+    .review-submit:hover {
+        background: #1d4ed8;
+    }
+
+    /* ==================== FLASH MESSAGES ==================== */
+
+.flash-container {
+    position: fixed;
+    top: 25px;
+    right: 25px;
+    width: min(380px, calc(100% - 40px));
+    z-index: 9999;
+}
+
+.flash {
+    padding: 14px 18px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+
+    opacity: 1;
+    transform: translateY(0);
+
+    transition:
+        opacity 0.4s ease,
+        transform 0.4s ease;
+}
+
+.flash.success {
+    background: #dff5e5;
+    color: #176b2c;
+    border-left: 4px solid #22c55e;
+}
+
+.flash.error {
+    background: #fde2e2;
+    color: #a51d1d;
+    border-left: 4px solid #ef4444;
+}
+
+.flash.warning {
+    background: #fff4d6;
+    color: #92400e;
+    border-left: 4px solid #f59e0b;
+}
+
+.flash.info {
+    background: #dbeafe;
+    color: #1e40af;
+    border-left: 4px solid #3b82f6;
+}
+
+.flash.hide {
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
+@media (max-width: 600px) {
+
+    .flash-container {
+        top: 15px;
+        right: 15px;
+        width: calc(100% - 30px);
+    }
+
+}
+
     </style>
 
 </head>
 
 
 <body>
+
+    {% include "includes/flash_messages.html" %}
 
 <div class="page">
 
@@ -348,6 +500,52 @@
 
             </div>
 
+            {% if service_request.payment %}
+
+            <div class="detail">
+
+                <span class="label">
+                    Payment Amount
+                </span>
+
+                <span class="value">
+                    ₹{{ "%.2f"|format(service_request.payment.amount or 0) }}
+                </span>
+
+            </div>
+
+
+            <div class="detail">
+
+                <span class="label">
+                    Payment Gateway
+                </span>
+
+                <span class="value">
+                    {{ service_request.payment.gateway or "—" }}
+                </span>
+
+            </div>
+
+
+            {% if service_request.payment.gateway_payment_id %}
+
+            <div class="detail">
+
+                <span class="label">
+                    Payment Reference
+                </span>
+
+                <span class="value">
+                    {{ service_request.payment.gateway_payment_id }}
+                </span>
+
+            </div>
+
+            {% endif %}
+
+            {% endif %}
+
 
             <div class="detail">
 
@@ -364,6 +562,66 @@
             </div>
 
         </div>
+
+        {% if service_request.status == "cancelled" %}
+
+            <div class="refund-info">
+
+                <h3>Cancellation & Refund</h3>
+
+                <p>
+                    <strong>Booking Status:</strong>
+                    Cancelled
+                </p>
+
+                {% if service_request.refund_status == "refunded" %}
+
+                    <p>
+                        <strong>Refund Status:</strong>
+                        <span class="payment-paid">
+                            Refunded
+                        </span>
+                    </p>
+
+                    {% if service_request.refund_amount %}
+
+                    <p>
+                        <strong>Refund Amount:</strong>
+                        ₹{{ "%.2f"|format(service_request.refund_amount) }}
+                    </p>
+
+                    {% endif %}
+
+                    {% if service_request.refund_id %}
+
+                    <p>
+                        <strong>Refund Reference:</strong>
+                        {{ service_request.refund_id }}
+                    </p>
+
+                    {% endif %}
+
+                {% elif service_request.refund_status == "pending" %}
+
+                    <p>
+                        <strong>Refund Status:</strong>
+                        <span class="payment-pending">
+                            Refund Pending
+                        </span>
+                    </p>
+
+                {% else %}
+
+                    <p>
+                        <strong>Refund Status:</strong>
+                        {{ (service_request.refund_status or "Not Required")|capitalize }}
+                    </p>
+
+                {% endif %}
+
+            </div>
+
+            {% endif %}
 
 
         <!-- REQUIREMENT -->
@@ -399,12 +657,128 @@
 
         </div>
 
-                    {% endif %}
+                {% endif %}
+
+                {% if can_review %}
+
+                <div class="review-section">
+
+                    <h3>
+                        Leave a Review
+                    </h3>
+
+                    <p>
+                        Your service has been completed.
+                        Please share your experience with the professional.
+                    </p>
+
+                    <form
+                        method="POST"
+                        action="{{ url_for(
+                            'dashboard.submit_review',
+                            request_id=service_request.id
+                        ) }}"
+                    >
+
+                        <input
+                            type="hidden"
+                            name="csrf_token"
+                            value="{{ csrf_token() }}"
+                        >
+
+                        <label>
+                            <strong>Rating</strong>
+                        </label>
+
+                        <div class="rating-input">
+
+                            <input
+                                type="radio"
+                                id="star5"
+                                name="rating"
+                                value="5"
+                                required
+                            >
+                            <label for="star5">★</label>
+
+                            <input
+                                type="radio"
+                                id="star4"
+                                name="rating"
+                                value="4"
+                            >
+                            <label for="star4">★</label>
+
+                            <input
+                                type="radio"
+                                id="star3"
+                                name="rating"
+                                value="3"
+                            >
+                            <label for="star3">★</label>
+
+                            <input
+                                type="radio"
+                                id="star2"
+                                name="rating"
+                                value="2"
+                            >
+                            <label for="star2">★</label>
+
+                            <input
+                                type="radio"
+                                id="star1"
+                                name="rating"
+                                value="1"
+                            >
+                            <label for="star1">★</label>
+
+                        </div>
 
 
-                    <!-- ACTIONS -->
+                        <label for="review-comment">
+                            <strong>Comment</strong>
+                        </label>
 
-                    <div class="actions">
+                        <textarea
+                            id="review-comment"
+                            name="comment"
+                            class="review-textarea"
+                            placeholder="Share your experience (optional)"
+                        ></textarea>
+
+
+                        <button
+                            type="submit"
+                            class="btn review-submit"
+                        >
+                            Submit Review
+                        </button>
+
+                    </form>
+
+                </div>
+
+                {% elif existing_review %}
+
+                <div class="review-section">
+
+                    <h3>
+                        Review Submitted
+                    </h3>
+
+                    <p>
+                        You have already submitted a review for this service.
+                    </p>
+
+                </div>
+
+                {% endif %}
+
+
+                <!-- ACTIONS -->
+
+                <div class="actions">
 
                 <a
                     href="{{ url_for('dashboard.my_bookings') }}"
@@ -412,6 +786,58 @@
                 >
                     Back to My Bookings
                 </a>
+
+                {% if service_request.payment %}
+
+                <a
+                    href="{{ url_for(
+                        'dashboard.payment_details',
+                        payment_id=service_request.payment.id
+                    ) }}"
+                    class="btn primary"
+                >
+                    View Payment Details
+                </a>
+
+                {% endif %}
+
+                {% if service_request.payment and service_request.payment.refund_amount %}
+
+                <div class="refund-info">
+
+                    <h3>
+                        Refund Information
+                    </h3>
+
+                    <p>
+                        <strong>Refund Amount:</strong>
+                        ₹{{ "%.2f"|format(service_request.payment.refund_amount) }}
+                    </p>
+
+                    {% if service_request.payment.refund_id %}
+
+                    <p>
+                        <strong>Refund ID:</strong>
+                        {{ service_request.payment.refund_id }}
+                    </p>
+
+                    {% endif %}
+
+                    {% if service_request.payment.refunded_at %}
+
+                    <p>
+                        <strong>Refund Date:</strong>
+                        {{ service_request.payment.refunded_at.strftime(
+                            '%d %b %Y, %I:%M %p'
+                        ) }}
+                    </p>
+
+                    {% endif %}
+
+                </div>
+
+                {% endif %}
+
                     {% if service_request.payment_status != "paid"
                     and service_request.status != "cancelled" %}
 

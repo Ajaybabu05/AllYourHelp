@@ -26,6 +26,8 @@
 
 <body>
 
+    {% include "includes/flash_messages.html" %}
+
 
 <!-- =========================================
      HEADER
@@ -42,6 +44,13 @@
         
 
         <div class="dashboard-user">
+
+            <a
+                href="{{ url_for('dashboard.professional_reviews') }}"
+                class="nav-link"
+            >
+                ⭐ My Reviews
+            </a>
 
             <a
                 href="{{ url_for('dashboard.notifications') }}"
@@ -818,6 +827,8 @@
 
 
 </main>
+
+<script src="{{ url_for('static', filename='js/flash.js') }}"></script>
 
 </body>
 

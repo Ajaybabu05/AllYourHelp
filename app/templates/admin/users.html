@@ -420,6 +420,70 @@
             color: #2563eb;
             font-weight: 600;
         }
+        /* ==================== FLASH MESSAGES ==================== */
+
+.flash-container {
+    position: fixed;
+    top: 25px;
+    right: 25px;
+    width: min(380px, calc(100% - 40px));
+    z-index: 9999;
+}
+
+.flash {
+    padding: 14px 18px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+
+    opacity: 1;
+    transform: translateY(0);
+
+    transition:
+        opacity 0.4s ease,
+        transform 0.4s ease;
+}
+
+.flash.success {
+    background: #dff5e5;
+    color: #176b2c;
+    border-left: 4px solid #22c55e;
+}
+
+.flash.error {
+    background: #fde2e2;
+    color: #a51d1d;
+    border-left: 4px solid #ef4444;
+}
+
+.flash.warning {
+    background: #fff4d6;
+    color: #92400e;
+    border-left: 4px solid #f59e0b;
+}
+
+.flash.info {
+    background: #dbeafe;
+    color: #1e40af;
+    border-left: 4px solid #3b82f6;
+}
+
+.flash.hide {
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
+@media (max-width: 600px) {
+
+    .flash-container {
+        top: 15px;
+        right: 15px;
+        width: calc(100% - 30px);
+    }
+
+}
 
     </style>
 
@@ -428,6 +492,7 @@
 
 <body>
 
+    {% include "includes/flash_messages.html" %}
 
 <header class="header">
 
@@ -723,6 +788,7 @@
 
 </main>
 
+    <script src="{{ url_for('static', filename='js/flash.js') }}"></script>
 
 </body>
 

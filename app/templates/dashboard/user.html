@@ -20,6 +20,10 @@
 
 <body>
 
+    <!-- ==================== FLASH MESSAGES ==================== -->
+
+{% include "includes/flash_messages.html" %}
+
 <!-- =========================================================
      NAVBAR
 ========================================================= -->
@@ -61,6 +65,17 @@
 
                 My Bookings
 
+            </a>
+            <a href="{{ url_for('dashboard.payment_history') }}"
+            class="nav-link">
+                Payment History
+            </a>
+
+            <a
+                href="{{ url_for('dashboard.review_history') }}"
+                class="nav-link"
+            >
+                ⭐ My Reviews
             </a>
 
         </nav>
@@ -650,6 +665,8 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 </script>
+
+<script src="{{ url_for('static', filename='js/flash.js') }}"></script>
 
 
 </body>

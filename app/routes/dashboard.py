@@ -363,6 +363,32 @@ def customer_profile():
         "dashboard/customer_profile.html",
         user=current_user
     )
+
+@dashboard.route("/review-history")
+@login_required
+def review_history():
+
+    if current_user.role != "user":
+        abort(403)
+
+    reviews = (
+        Review.query
+        .filter_by(user_id=current_user.id)
+        .order_by(Review.created_at.desc())
+        .all()
+    )
+
+    unread_notifications = Notification.query.filter_by(
+        user_id=current_user.id,
+        is_read=False
+    ).count()
+
+    return render_template(
+        "dashboard/review_history.html",
+        user=current_user,
+        reviews=reviews,
+        unread_notifications=unread_notifications
+    )
 # ============================================================
 # CUSTOMER CHANGE PASSWORD
 # ============================================================
@@ -449,7 +475,7 @@ def change_password():
         )
 
         return redirect(
-            url_for("dashboard.customer_profile")
+            url_for("dashboard.change_password")
         )
 
     return render_template(
@@ -509,7 +535,7 @@ def notification_preferences():
         )
 
         return redirect(
-            url_for("dashboard.customer_profile")
+            url_for("dashboard.notification_preferences")
         )
 
     return render_template(
@@ -617,6 +643,73 @@ def professional_dashboard():
         review_count=review_count,
         average_rating=average_rating,
         upcoming_requests=upcoming_requests,
+        unread_notifications=unread_notifications
+    )
+
+@dashboard.route("/professional/reviews")
+@login_required
+def professional_reviews():
+
+    # Only professionals can access this page
+    if current_user.role != "professional":
+        abort(403)
+
+    # Get professional profile
+    professional = ProfessionalProfile.query.filter_by(
+        user_id=current_user.id
+    ).first()
+
+    if not professional:
+        abort(404)
+
+    # Get all reviews received by this professional
+    reviews = (
+        Review.query
+        .filter_by(professional_id=professional.id)
+        .order_by(Review.created_at.desc())
+        .all()
+    )
+
+    # -----------------------------------------
+    # REVIEW STATISTICS
+    # -----------------------------------------
+
+    review_count = len(reviews)
+
+    average_rating = db.session.query(
+        func.avg(Review.rating)
+    ).filter(
+        Review.professional_id == professional.id
+    ).scalar()
+
+    average_rating = (
+        round(float(average_rating), 1)
+        if average_rating is not None
+        else 0.0
+    )
+
+    # Rating breakdown
+    rating_counts = {}
+
+    for rating in range(5, 0, -1):
+        rating_counts[rating] = Review.query.filter_by(
+            professional_id=professional.id,
+            rating=rating
+        ).count()
+
+    unread_notifications = Notification.query.filter_by(
+        user_id=current_user.id,
+        is_read=False
+    ).count()
+
+    return render_template(
+        "dashboard/professional_reviews.html",
+        user=current_user,
+        professional=professional,
+        reviews=reviews,
+        review_count=review_count,
+        average_rating=average_rating,
+        rating_counts=rating_counts,
         unread_notifications=unread_notifications
     )
 # ============================================================
@@ -941,7 +1034,7 @@ def edit_professional_profile():
 
         return redirect(
             url_for(
-                "dashboard.professional_dashboard"
+                "dashboard.edit_professional_profile"
             )
         )
 
@@ -1654,6 +1747,157 @@ def my_bookings():
         refunded_bookings=refunded_bookings
     )
 
+# ============================================================
+# CUSTOMER PAYMENT HISTORY
+# ============================================================
+
+@dashboard.route("/payment-history")
+@login_required
+def payment_history():
+
+    # --------------------------------------------------------
+    # GET PAYMENTS FOR CURRENT CUSTOMER
+    # --------------------------------------------------------
+
+    payments = (
+        Payment.query
+        .filter(
+            Payment.user_id == current_user.id
+        )
+        .order_by(
+            Payment.created_at.desc()
+        )
+        .all()
+    )
+
+    # --------------------------------------------------------
+    # PAYMENT STATISTICS
+    # --------------------------------------------------------
+
+    total_payments = len(payments)
+
+    paid_payments = sum(
+        1
+        for payment in payments
+        if payment.status == "paid"
+    )
+
+    failed_payments = sum(
+        1
+        for payment in payments
+        if payment.status == "failed"
+    )
+
+    refunded_payments = sum(
+        1
+        for payment in payments
+        if payment.status == "refunded"
+    )
+
+    # --------------------------------------------------------
+    # TOTAL PAID AMOUNT
+    # --------------------------------------------------------
+
+    total_paid_amount = sum(
+        float(payment.amount or 0)
+        for payment in payments
+        if payment.status == "paid"
+    )
+
+    # --------------------------------------------------------
+    # TOTAL REFUNDED AMOUNT
+    # --------------------------------------------------------
+
+    total_refunded_amount = sum(
+        float(payment.refund_amount or 0)
+        for payment in payments
+        if payment.status == "refunded"
+    )
+
+    unread_notifications = Notification.query.filter_by(
+        user_id=current_user.id,
+        is_read=False
+    ).count()
+    # --------------------------------------------------------
+    # RENDER PAYMENT HISTORY PAGE
+    # --------------------------------------------------------
+
+    return render_template(
+        "dashboard/payment_history.html",
+        user=current_user,
+        payments=payments,
+        total_payments=total_payments,
+        paid_payments=paid_payments,
+        failed_payments=failed_payments,
+        refunded_payments=refunded_payments,
+        unread_notifications=unread_notifications,
+        total_paid_amount=round(
+            total_paid_amount,
+            2
+        ),
+        total_refunded_amount=round(
+            total_refunded_amount,
+            2
+        )
+    )
+
+# ============================================================
+# CUSTOMER PAYMENT DETAILS
+# ============================================================
+
+@dashboard.route("/payment-history/<int:payment_id>")
+@login_required
+def payment_details(payment_id):
+
+    # --------------------------------------------------------
+    # GET PAYMENT BELONGING TO CURRENT CUSTOMER
+    # --------------------------------------------------------
+
+    payment = Payment.query.filter(
+        Payment.id == payment_id,
+        Payment.user_id == current_user.id
+    ).first()
+
+    # --------------------------------------------------------
+    # SECURITY CHECK
+    # --------------------------------------------------------
+
+    if not payment:
+        abort(404)
+
+    # --------------------------------------------------------
+    # GET RELATED BOOKING
+    # --------------------------------------------------------
+
+    booking = None
+
+    if payment.service_request_id:
+        booking = ServiceRequest.query.filter(
+            ServiceRequest.id == payment.service_request_id,
+            ServiceRequest.user_id == current_user.id
+        ).first()
+
+    # --------------------------------------------------------
+    # NOTIFICATION COUNT
+    # --------------------------------------------------------
+
+    unread_notifications = Notification.query.filter_by(
+        user_id=current_user.id,
+        is_read=False
+    ).count()
+
+    # --------------------------------------------------------
+    # RENDER PAYMENT DETAILS
+    # --------------------------------------------------------
+
+    return render_template(
+        "dashboard/payment_details.html",
+        user=current_user,
+        payment=payment,
+        booking=booking,
+        unread_notifications=unread_notifications
+    )
+
 @dashboard.route(
     "/bookings/<int:request_id>/review",
     methods=["POST"]
@@ -1809,10 +2053,37 @@ def booking_details(request_id):
     if not service_request:
         abort(404)
 
+    # ---------------------------------------------------------
+    # NOTIFICATION COUNT
+    # ---------------------------------------------------------
+
+    unread_notifications = Notification.query.filter_by(
+        user_id=current_user.id,
+        is_read=False
+    ).count()
+
+    # ---------------------------------------------------------
+    # REVIEW STATUS
+    # ---------------------------------------------------------
+
+    existing_review = Review.query.filter_by(
+        service_request_id=service_request.id
+    ).first()
+
+    can_review = (
+        service_request.status == "completed"
+        and existing_review is None
+    )
+
     return render_template(
         "dashboard/booking_details.html",
-        service_request=service_request
+        service_request=service_request,
+        unread_notifications=unread_notifications,
+        existing_review=existing_review,
+        can_review=can_review
     )
+
+
 @dashboard.route(
     "/bookings/<int:request_id>/cancel",
     methods=["POST"]

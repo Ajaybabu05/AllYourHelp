@@ -1,5 +1,5 @@
 from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, get_flashed_messages
 from flask_login import login_user, logout_user, login_required
 from ..models.professional_profile import ProfessionalProfile
 from ..models.notification import Notification
@@ -583,6 +583,9 @@ def reset_password(token):
 @auth.route("/logout")
 @login_required
 def logout():
+
+    # Remove any old flash messages from the session
+    get_flashed_messages()
 
     logout_user()
 

@@ -392,6 +392,7 @@
 
 <body>
 
+    {% include "includes/flash_messages.html" %}
 
     <!-- =========================
          HEADER
@@ -717,6 +718,7 @@
 
     </main>
 
+    <script src="{{ url_for('static', filename='js/flash.js') }}"></script>
 
 </body>
 

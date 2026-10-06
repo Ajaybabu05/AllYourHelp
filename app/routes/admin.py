@@ -20,6 +20,8 @@ from ..models.service_request import ServiceRequest
 from app.models.notification import Notification
 from ..models import Review
 from ..models.admin_activity_log import AdminActivityLog
+from ..models.admin_settings import AdminSettings
+from decimal import Decimal, InvalidOperation
 from app.routes.dashboard import create_notification
 from ..utils.admin_activity import log_admin_activity
 
@@ -2149,4 +2151,158 @@ def professional_details(user_id):
         booking_status_data=booking_status_data,
         revenue_labels=revenue_labels,
         revenue_values=revenue_values
+    )
+@admin.route("/settings", methods=["GET", "POST"])
+@login_required
+def settings():
+
+    if current_user.role != "admin":
+        abort(403)
+
+    settings = AdminSettings.query.first()
+
+    # Create default settings if none exist
+    if not settings:
+        settings = AdminSettings(
+            site_name="AllYourHelp",
+            support_email="",
+            support_phone="",
+            maintenance_mode=False,
+            bookings_enabled=True,
+            payments_enabled=True,
+            email_notifications_enabled=True,
+            platform_fee_percentage=0
+        )
+
+        db.session.add(settings)
+        db.session.commit()
+
+    if request.method == "POST":
+
+        site_name = request.form.get(
+            "site_name",
+            ""
+        ).strip()
+
+        support_email = request.form.get(
+            "support_email",
+            ""
+        ).strip()
+
+        support_phone = request.form.get(
+            "support_phone",
+            ""
+        ).strip()
+
+        platform_fee = request.form.get(
+            "platform_fee_percentage",
+            "0"
+        ).strip()
+
+        # -----------------------------
+        # BASIC VALIDATION
+        # -----------------------------
+
+        if not site_name:
+            flash(
+                "Application name is required.",
+                "error"
+            )
+
+            return redirect(
+                url_for("admin.settings")
+            )
+
+        try:
+            platform_fee_decimal = Decimal(platform_fee)
+
+        except InvalidOperation:
+
+            flash(
+                "Platform fee must be a valid number.",
+                "error"
+            )
+
+            return redirect(
+                url_for("admin.settings")
+            )
+
+        if platform_fee_decimal < 0 or platform_fee_decimal > 100:
+
+            flash(
+                "Platform fee must be between 0% and 100%.",
+                "error"
+            )
+
+            return redirect(
+                url_for("admin.settings")
+            )
+
+        # -----------------------------
+        # UPDATE SETTINGS
+        # -----------------------------
+
+        settings.site_name = site_name
+
+        settings.support_email = (
+            support_email or None
+        )
+
+        settings.support_phone = (
+            support_phone or None
+        )
+
+        settings.maintenance_mode = (
+            request.form.get("maintenance_mode")
+            == "on"
+        )
+
+        settings.bookings_enabled = (
+            request.form.get("bookings_enabled")
+            == "on"
+        )
+
+        settings.payments_enabled = (
+            request.form.get("payments_enabled")
+            == "on"
+        )
+
+        settings.email_notifications_enabled = (
+            request.form.get(
+                "email_notifications_enabled"
+            )
+            == "on"
+        )
+
+        settings.platform_fee_percentage = (
+            platform_fee_decimal
+        )
+
+        db.session.commit()
+
+        # -----------------------------
+        # ADMIN ACTIVITY LOG
+        # -----------------------------
+
+        log_admin_activity(
+            action="update_settings",
+            description=(
+                "Admin updated application settings"
+            ),
+            target_type="settings",
+            target_id=settings.id
+        )
+
+        flash(
+            "Admin settings updated successfully.",
+            "success"
+        )
+
+        return redirect(
+            url_for("admin.settings")
+        )
+
+    return render_template(
+        "admin/settings.html",
+        settings=settings
     )
