@@ -24,6 +24,7 @@ from ..models.service_request import ServiceRequest
 from ..models.professional_profile import ProfessionalProfile
 from ..models.availability_slot import AvailabilitySlot
 from ..models.payment import Payment
+from ..utils.admin_settings import get_admin_settings
 
 services = Blueprint(
     "services",
@@ -149,6 +150,19 @@ def professional_profile(professional_id):
 )
 @login_required
 def request_service(professional_id):
+
+    settings = get_admin_settings()
+
+    if not settings.bookings_enabled:
+        flash(
+            "Bookings are currently unavailable. Please try again later.",
+            "error"
+        )
+        return redirect(
+            url_for(
+                "dashboard.user_dashboard"
+            )
+        )
 
     professional = ProfessionalProfile.query.get(professional_id)
 
@@ -421,6 +435,19 @@ def review_booking():
 )
 @login_required
 def confirm_booking(professional_id):
+
+    settings = get_admin_settings()
+
+    if not settings.bookings_enabled:
+        flash(
+            "Bookings are currently unavailable. Please try again later.",
+            "error"
+        )
+        return redirect(
+            url_for(
+                "dashboard.user_dashboard"
+            )
+        )
 
     professional = ProfessionalProfile.query.get(
         professional_id
