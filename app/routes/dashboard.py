@@ -25,6 +25,7 @@ from ..utils.email import send_email
 from ..models import Favorite
 from ..models.notification import Notification
 from ..models.payment import Payment
+from ..utils.admin_settings import get_admin_settings
 from sqlalchemy import func
 import os
 from werkzeug.utils import secure_filename
@@ -1989,6 +1990,23 @@ def cancel_booking(request_id):
 @login_required
 def booking_payment():
 
+    settings = get_admin_settings()
+
+    if not settings.bookings_enabled:
+        session.pop("pending_booking", None)
+        session.pop("razorpay_order_id", None)
+
+        flash(
+            "Bookings are currently unavailable. Please try again later.",
+            "error"
+        )
+
+        return redirect(
+            url_for(
+                "dashboard.user_dashboard"
+            )
+        )
+
     # --------------------------------
     # GET PENDING BOOKING FROM SESSION
     # --------------------------------
@@ -3054,6 +3072,17 @@ def verify_payment():
             "success": False,
             "message": "No pending booking found."
         }, 400
+
+    settings = get_admin_settings()
+
+    if not settings.bookings_enabled:
+        session.pop("pending_booking", None)
+        session.pop("razorpay_order_id", None)
+
+        return {
+            "success": False,
+            "message": "Bookings are currently unavailable. Please try again later."
+        }, 403
 
     if pending_booking.get("user_id") != current_user.id:
         session.pop("pending_booking", None)
