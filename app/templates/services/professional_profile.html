@@ -340,15 +340,33 @@
 
                 <div class="profile-action">
 
-                    <a
-                        href="{{ url_for(
-                            'services.request_service',
-                            professional_id=professional.id
-                        ) }}"
-                        class="request-service-button"
-                    >
-                        Request Service
-                    </a>
+                    {% if bookings_enabled %}
+
+                        <a
+                            href="{{ url_for(
+                                'services.request_service',
+                                professional_id=professional.id
+                            ) }}"
+                            class="request-service-button"
+                        >
+                            Request Service
+                        </a>
+
+                    {% else %}
+
+                        <div class="booking-disabled-box">
+
+                            <strong>
+                                Bookings are currently unavailable
+                            </strong>
+
+                            <p>
+                                Please try again later.
+                            </p>
+
+                        </div>
+
+                    {% endif %}
 
 
                     {% if current_user.role == "user" %}

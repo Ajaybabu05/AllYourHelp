@@ -319,6 +319,30 @@
             }
 
         }
+        
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 24px;
+        }
+
+        .chart-card {
+            min-width: 0;
+        }
+
+        .chart-card canvas {
+            display: block;
+            width: 100% !important;
+            height: 300px !important;
+            max-height: 300px;
+        }
+
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
 
     </style>
 
@@ -360,7 +384,6 @@
             action="{{ url_for('admin.reports') }}"
             class="filter-form"
         >
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="filter-group">
 
                 <label for="date_from">
@@ -487,10 +510,40 @@
                 </div>
 
             </div>
+            
+            <div class="summary-card">
+                <div class="summary-card-title">
+                    Customer Payments
+                </div>
+                <div class="summary-number">
+                    ₹{{ "%.2f"|format(total_customer_payments) }}
+                </div>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-card-title">
+                    Platform Fees
+                </div>
+                <div class="summary-number">
+                    ₹{{ "%.2f"|format(total_platform_fees) }}
+                </div>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-card-title">
+                    Professional Earnings
+                </div>
+                <div class="summary-number">
+                    ₹{{ "%.2f"|format(total_professional_earnings) }}
+                </div>
+            </div>
+
 
         </div>
 
     </section>
+
+    
 
 
     <!-- BOOKING ANALYTICS -->
@@ -634,86 +687,152 @@
 
     </section>
 
+    
+<!-- MONTHLY PLATFORM FEE AND PROFESSIONAL EARNINGS CHARTS -->
 
-    <!-- MONTHLY REVENUE TABLE -->
+<section class="section">
+    <h2 class="section-title">Platform Fee & Professional Earnings Analytics</h2>
 
-    <section class="section">
-
-        <h2 class="section-title">
-            Monthly Revenue Report
-        </h2>
-
-
-        <div class="table-card">
-
-            <table>
-
-                <thead>
-
-                    <tr>
-                        <th>Month</th>
-                        <th>Bookings</th>
-                        <th>Revenue</th>
-                        <th>Refunded</th>
-                        <th>Net Revenue</th>
-                    </tr>
-
-                </thead>
-
-
-                <tbody>
-
-                    {% for month in monthly_labels %}
-
-                    <tr>
-
-                        <td>
-                            {{ month }}
-                        </td>
-
-                        <td>
-                            {{ monthly_booking_values[loop.index0] }}
-                        </td>
-
-                        <td class="amount">
-                            ₹{{ "%.2f"|format(
-                                monthly_revenue_values[loop.index0]
-                            ) }}
-                        </td>
-
-                        <td class="amount">
-                            ₹{{ "%.2f"|format(
-                                monthly_refunded_values[loop.index0]
-                            ) }}
-                        </td>
-
-                        <td class="amount">
-                            ₹{{ "%.2f"|format(
-                                monthly_net_values[loop.index0]
-                            ) }}
-                        </td>
-
-                    </tr>
-
-                    {% else %}
-
-                    <tr>
-
-                        <td colspan="5">
-                            No data available for the selected period.
-                        </td>
-
-                    </tr>
-
-                    {% endfor %}
-
-                </tbody>
-
-            </table>
-
+    <div class="charts-grid">
+        <div class="table-card chart-card">
+            <h3>Monthly Platform Fees</h3>
+            <canvas id="monthlyPlatformFeeChart"></canvas>
         </div>
 
-    </section>
+        <div class="table-card chart-card">
+            <h3>Monthly Professional Earnings</h3>
+            <canvas id="monthlyProfessionalEarningsChart"></canvas>
+        </div>
+    </div>
+</section>
+
+
+    
+<section class="report-section">
+    <h2>Platform Fee Breakdown</h2><br>
+
+    <div class="table-responsive">
+        <table class="report-table">
+            <thead>
+                <tr>
+                    <th>Payment ID</th>
+                    <th>Customer</th>
+                    <th>Professional</th>
+                    <th>Customer Payment</th>
+                    <th>Fee %</th>
+                    <th>Platform Fee</th>
+                    <th>Professional Earnings</th>
+                    <th>Payment Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for payment in fee_breakdown %}
+                <tr>
+                    <td>{{ payment.id }}</td>
+                    <td>{{ payment.user.name }}</td>
+                    <td>
+                        {{ payment.professional.user.name
+                           if payment.professional and payment.professional.user
+                           else "N/A" }}
+                    </td>
+                    <td>₹{{ "%.2f"|format(payment.amount|float) }}</td>
+                    <td>{{ "%.2f"|format(payment.platform_fee_percentage|float) }}%</td>
+                    <td>₹{{ "%.2f"|format(payment.platform_fee_amount|float) }}</td>
+                    <td>₹{{ "%.2f"|format(payment.professional_amount|float) }}</td>
+                    <td>
+                        {{ payment.paid_at.strftime("%d %b %Y, %I:%M %p")
+                           if payment.paid_at else "N/A" }}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="8" class="empty-state">
+                        No successful payments found for the selected dates.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+
+
+
+    
+<!-- MONTHLY REVENUE TABLE -->
+
+<section class="section">
+    <h2 class="section-title">
+        Monthly Revenue Report
+    </h2>
+
+    <div class="table-card">
+        <table>
+            <thead>
+                <tr>
+                    <th>Month</th>
+                    <th>Bookings</th>
+                    <th>Revenue</th>
+                    <th>Refunded</th>
+                    <th>Net Revenue</th>
+                    <th>Platform Fees</th>
+                    <th>Professional Earnings</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for month in monthly_labels %}
+                <tr>
+                    <td>{{ month }}</td>
+
+                    <td>
+                        {{ monthly_booking_values[loop.index0] }}
+                    </td>
+
+                    <td class="amount">
+                        ₹{{ "%.2f"|format(
+                            monthly_revenue_values[loop.index0]
+                        ) }}
+                    </td>
+
+                    <td class="amount">
+                        ₹{{ "%.2f"|format(
+                            monthly_refunded_values[loop.index0]
+                        ) }}
+                    </td>
+
+                    <td class="amount">
+                        ₹{{ "%.2f"|format(
+                            monthly_net_values[loop.index0]
+                        ) }}
+                    </td>
+
+                    <td class="amount">
+                        ₹{{ "%.2f"|format(
+                            monthly_platform_fee_values[loop.index0]
+                        ) }}
+                    </td>
+
+                    <td class="amount">
+                        ₹{{ "%.2f"|format(
+                            monthly_professional_earning_values[loop.index0]
+                        ) }}
+                    </td>
+                </tr>
+
+                {% else %}
+                <tr>
+                    <td colspan="7">
+                        No data available for the selected period.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
 
 
 </main>
@@ -1015,7 +1134,86 @@ document.addEventListener(
     }
 );
 
+document.addEventListener("DOMContentLoaded", function () {
+    const monthlyLabels = {{ monthly_labels | tojson }};
+    const platformFeeValues = {{ monthly_platform_fee_values | tojson }};
+    const professionalEarningsValues = {{ monthly_professional_earning_values | tojson }};
+
+    const feeCanvas = document.getElementById("monthlyPlatformFeeChart");
+
+    if (feeCanvas) {
+        new Chart(feeCanvas, {
+            type: "line",
+            data: {
+                labels: monthlyLabels,
+                datasets: [{
+                    label: "Platform Fees (₹)",
+                    data: platformFeeValues,
+                    borderColor: "#2563eb",
+                    backgroundColor: "rgba(37, 99, 235, 0.12)",
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: true }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: value => "₹" + value
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    const earningsCanvas = document.getElementById(
+        "monthlyProfessionalEarningsChart"
+    );
+
+    if (earningsCanvas) {
+        new Chart(earningsCanvas, {
+            type: "line",
+            data: {
+                labels: monthlyLabels,
+                datasets: [{
+                    label: "Professional Earnings (₹)",
+                    data: professionalEarningsValues,
+                    borderColor: "#16a34a",
+                    backgroundColor: "rgba(22, 163, 74, 0.12)",
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: true }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: value => "₹" + value
+                        }
+                    }
+                }
+            }
+        });
+    }
+});
+
 </script>
+
 
 </body>
 

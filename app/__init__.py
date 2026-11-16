@@ -3,6 +3,7 @@ from flask_wtf.csrf import generate_csrf
 
 from .config import Config
 from .extensions import db, migrate, login_manager, mail, csrf, limiter
+from .routes.razorpay_webhooks import razorpay_webhooks
 
 
 def create_app():
@@ -46,8 +47,6 @@ def create_app():
                 request.environ[
                     "HTTP_X_CSRFTOKEN"
                 ] = csrf_cookie
-
-    csrf.init_app(app)
 
     @app.after_request
     def add_csrf_cookie(response):
@@ -142,6 +141,7 @@ def create_app():
 
     from .routes.admin import admin
     app.register_blueprint(admin)
+    app.register_blueprint(razorpay_webhooks)
 
     # Home route
     @app.route("/")
@@ -165,6 +165,36 @@ def create_app():
     def internal_server_error(error):
         db.session.rollback()
         return render_template("errors/500.html"), 500
+
+    @app.before_request
+    def check_maintenance_mode():
+        # Allow static files
+        if request.endpoint == "static":
+            return None
+
+        # Allow the landing page
+        if request.endpoint == "home":
+            return None
+
+        # Allow authentication pages
+        if request.blueprint == "auth":
+            return None
+
+        # Allow admin users
+        from flask_login import current_user
+
+        if current_user.is_authenticated and current_user.role == "admin":
+            return None
+
+        # Check maintenance mode
+        from .utils.admin_settings import get_admin_settings
+
+        settings = get_admin_settings()
+
+        if settings.maintenance_mode:
+            return render_template("errors/maintenance.html")
+
+        return None
 
     
 

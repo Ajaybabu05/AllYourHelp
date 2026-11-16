@@ -82,6 +82,28 @@ class Payment(db.Model):
         default="INR"
     )
 
+        # ---------------------------------------------------------
+    # PLATFORM FEE
+    # ---------------------------------------------------------
+
+    platform_fee_percentage = db.Column(
+        db.Numeric(5, 2),
+        nullable=False,
+        default=0
+    )
+
+    platform_fee_amount = db.Column(
+        db.Numeric(10, 2),
+        nullable=False,
+        default=0
+    )
+
+    professional_amount = db.Column(
+        db.Numeric(10, 2),
+        nullable=False,
+        default=0
+    )
+    
     # ---------------------------------------------------------
     # PAYMENT STATUS
     # ---------------------------------------------------------

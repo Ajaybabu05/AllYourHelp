@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Payments Unavailable - AllYourHelp
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for(
+            'static',
+            filename='css/payment.css'
+        ) }}"
+    >
+
+</head>
+
+<body>
+
+    <header class="dashboard-header">
+
+        <div class="dashboard-header-inner">
+
+            <div class="dashboard-logo">
+                AllYourHelp
+            </div>
+
+            <div class="dashboard-user">
+
+                <span>
+                    {{ current_user.name }}
+                </span>
+
+                <a
+                    href="{{ url_for('auth.logout') }}"
+                    class="logout-button"
+                >
+                    Logout
+                </a>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <main class="payment-status-container">
+
+        <div class="payment-status-card">
+
+            <div class="payment-status-icon">
+                !
+            </div>
+
+            <h1>
+                Payments are currently unavailable
+            </h1>
+
+            <p>
+                We are temporarily unable to process payments.
+                Please try again later.
+            </p>
+
+            <div class="payment-status-actions">
+
+                <a
+                    href="{{ url_for('dashboard.user_dashboard') }}"
+                    class="primary-button"
+                >
+                    Back to Dashboard
+                </a>
+
+                <a
+                    href="{{ url_for('dashboard.my_bookings') }}"
+                    class="secondary-button"
+                >
+                    View My Bookings
+                </a>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</body>
+
+</html>

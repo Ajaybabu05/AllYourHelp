@@ -21,6 +21,7 @@ from app.models.notification import Notification
 from ..models import Review
 from ..models.admin_activity_log import AdminActivityLog
 from ..models.admin_settings import AdminSettings
+from ..models.payment import Payment
 from decimal import Decimal, InvalidOperation
 from app.routes.dashboard import create_notification
 from ..utils.admin_activity import log_admin_activity
@@ -1612,6 +1613,50 @@ def reports():
     # --------------------------------
 
     bookings = query.all()
+    
+    # --------------------------------
+    # PLATFORM FEE REPORTING
+    # --------------------------------
+
+    # Use the same date range as the booking report.
+    payment_query = Payment.query.join(
+        ServiceRequest,
+        Payment.service_request_id == ServiceRequest.id
+    )
+
+    if date_from:
+        payment_query = payment_query.filter(
+            ServiceRequest.preferred_date >= datetime.strptime(
+                date_from, "%Y-%m-%d"
+            ).date()
+        )
+
+    if date_to:
+        payment_query = payment_query.filter(
+            ServiceRequest.preferred_date <= datetime.strptime(
+                date_to, "%Y-%m-%d"
+            ).date()
+        )
+
+    report_payments = payment_query.filter(
+        Payment.status == "paid"
+    ).all()
+
+    total_customer_payments = sum(
+        float(payment.amount or 0)
+        for payment in report_payments
+    )
+
+    total_platform_fees = sum(
+        float(payment.platform_fee_amount or 0)
+        for payment in report_payments
+    )
+
+    total_professional_earnings = sum(
+        float(payment.professional_amount or 0)
+        for payment in report_payments
+    )
+
 
     # --------------------------------
     # SUMMARY STATISTICS
@@ -1650,6 +1695,37 @@ def reports():
     )
 
     net_revenue = total_revenue - total_refunded
+
+
+    
+    # Detailed platform fee breakdown
+    fee_breakdown = (
+        Payment.query
+        .join(
+            ServiceRequest,
+            Payment.service_request_id == ServiceRequest.id
+        )
+        .filter(Payment.status == "paid")
+    )
+
+    if date_from:
+        fee_breakdown = fee_breakdown.filter(
+            ServiceRequest.preferred_date >= datetime.strptime(
+                date_from, "%Y-%m-%d"
+            ).date()
+        )
+
+    if date_to:
+        fee_breakdown = fee_breakdown.filter(
+            ServiceRequest.preferred_date <= datetime.strptime(
+                date_to, "%Y-%m-%d"
+            ).date()
+        )
+
+    fee_breakdown = fee_breakdown.order_by(
+        Payment.paid_at.desc()
+    ).all()
+
 
     # --------------------------------
     # BOOKING STATUS
@@ -1790,9 +1866,13 @@ def reports():
     # MONTHLY ANALYTICS
     # --------------------------------
 
+    
     monthly_bookings = {}
     monthly_revenue = {}
     monthly_refunded = {}
+    monthly_platform_fees = {}
+    monthly_professional_earnings = {}
+
 
     for booking in bookings:
 
@@ -1836,6 +1916,25 @@ def reports():
                     booking.refund_amount or 0
                 )
             )
+        
+        # Platform fee and professional earnings
+        if booking.payment_status == "paid":
+            payment = Payment.query.filter_by(
+                service_request_id=booking.id,
+                status="paid"
+            ).first()
+
+            if payment:
+                monthly_platform_fees[month_key] = (
+                    monthly_platform_fees.get(month_key, 0)
+                    + float(payment.platform_fee_amount or 0)
+                )
+
+                monthly_professional_earnings[month_key] = (
+                    monthly_professional_earnings.get(month_key, 0)
+                    + float(payment.professional_amount or 0)
+                )
+
 
     all_months = sorted(
         set(
@@ -1865,6 +1964,17 @@ def reports():
         - monthly_refunded.get(month, 0)
         for month in all_months
     ]
+    
+    monthly_platform_fee_values = [
+        monthly_platform_fees.get(month, 0)
+        for month in all_months
+    ]
+
+    monthly_professional_earning_values = [
+        monthly_professional_earnings.get(month, 0)
+        for month in all_months
+    ]
+
 
     # --------------------------------
     # RENDER REPORTS PAGE
@@ -1900,8 +2010,15 @@ def reports():
 
         monthly_revenue_values=monthly_revenue_values,
         monthly_refunded_values=monthly_refunded_values,
-        monthly_net_values=monthly_net_values
+        monthly_net_values=monthly_net_values,
+                total_customer_payments=total_customer_payments,
+        total_platform_fees=total_platform_fees,
+        total_professional_earnings=total_professional_earnings,
+        fee_breakdown=fee_breakdown,
+                monthly_platform_fee_values=monthly_platform_fee_values,
+        monthly_professional_earning_values=monthly_professional_earning_values
     )
+
 
 @admin.route("/bookings/<int:request_id>")
 @login_required
@@ -1915,9 +2032,14 @@ def booking_details(request_id):
     if not booking:
         abort(404)
 
+    payment = Payment.query.filter_by(
+        service_request_id=booking.id
+    ).first()
+
     return render_template(
         "admin/booking_details.html",
-        booking=booking
+        booking=booking,
+        payment=payment
     )
 @admin.route("/notifications")
 @login_required

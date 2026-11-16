@@ -4,6 +4,7 @@ from flask_login import login_user, logout_user, login_required
 from ..models.professional_profile import ProfessionalProfile
 from ..models.notification import Notification
 from ..utils.email import send_email
+from ..utils.admin_settings import get_admin_settings
 from flask import current_app
 from ..extensions import db, limiter
 from ..models.user import User
@@ -132,7 +133,12 @@ def register():
                 db.session.add(notification)
 
                 # Send email to admin
-                if admin.email:
+                settings = get_admin_settings()
+
+                if (
+                    settings.email_notifications_enabled
+                    and admin.email
+                ):
 
                     send_email(
                         recipient=admin.email,

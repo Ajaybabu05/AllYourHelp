@@ -134,6 +134,8 @@ def professional_profile(professional_id):
             professional_id=professional.id
         ).first()
 
+    settings = get_admin_settings()
+
     return render_template(
         "services/professional_profile.html",
         professional=professional,
@@ -141,7 +143,8 @@ def professional_profile(professional_id):
         reviews=reviews,
         average_rating=average_rating,
         review_count=review_count,
-        favorite=favorite
+        favorite=favorite,
+        bookings_enabled=settings.bookings_enabled
     )
 
 @services.route(
@@ -332,7 +335,8 @@ def request_service(professional_id):
 
         location=location,
 
-        additional_details=additional_details
+        additional_details=additional_details,
+        bookings_enabled=settings.bookings_enabled
     )
 
 @services.route("/booking/review")

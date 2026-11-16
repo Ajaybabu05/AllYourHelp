@@ -362,7 +362,17 @@
 
                 <div class="refund-box">
 
-                    <h3>Refund Information</h3>
+                    <p>
+                        <strong>Refund Status:</strong>
+
+                        {% if payment.status == "partially_refunded" %}
+                            Partially Refunded
+                        {% elif payment.status == "refunded" %}
+                            Fully Refunded
+                        {% else %}
+                            {{ payment.status|replace("_", " ")|capitalize }}
+                        {% endif %}
+                    </p>
 
                     {% if payment.refund_amount %}
 

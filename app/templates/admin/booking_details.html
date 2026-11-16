@@ -244,45 +244,43 @@
                 </span>
             </div>
 
-            <!-- BOOKING STATUS FILTERS -->
+            <div class="detail-row">
+                <span class="label">Status</span>
+                <span class="value">
 
-            <div class="status-filters">
+                    {% if booking.status == "confirmed" %}
 
-                <a
-                    href="{{ url_for('admin.bookings') }}"
-                    class="filter-btn {% if status_filter == 'all' %}active{% endif %}"
-                >
-                    All
-                </a>
+                        <span class="status status-confirmed">
+                            Confirmed
+                        </span>
 
-                <a
-                    href="{{ url_for('admin.bookings', status='pending') }}"
-                    class="filter-btn {% if status_filter == 'pending' %}active{% endif %}"
-                >
-                    Pending
-                </a>
+                    {% elif booking.status == "completed" %}
 
-                <a
-                    href="{{ url_for('admin.bookings', status='confirmed') }}"
-                    class="filter-btn {% if status_filter == 'confirmed' %}active{% endif %}"
-                >
-                    Confirmed
-                </a>
+                        <span class="status status-completed">
+                            Completed
+                        </span>
 
-                <a
-                    href="{{ url_for('admin.bookings', status='completed') }}"
-                    class="filter-btn {% if status_filter == 'completed' %}active{% endif %}"
-                >
-                    Completed
-                </a>
+                    {% elif booking.status == "pending" %}
 
-                <a
-                    href="{{ url_for('admin.bookings', status='rejected') }}"
-                    class="filter-btn {% if status_filter == 'rejected' %}active{% endif %}"
-                >
-                    Rejected
-                </a>
+                        <span class="status status-pending">
+                            Pending
+                        </span>
 
+                    {% elif booking.status == "rejected" %}
+
+                        <span class="status status-rejected">
+                            Rejected
+                        </span>
+
+                    {% else %}
+
+                        <span class="status status-default">
+                            {{ booking.status }}
+                        </span>
+
+                    {% endif %}
+
+                </span>
             </div>
 
         </div>
@@ -379,56 +377,97 @@
         </div>
 
 
-        <!-- Payment Information -->
+        
+<!-- Payment Information -->
 
-        <div class="card">
+<div class="card">
 
-            <h2>Payment Information</h2>
+    <h2>Payment Information</h2>
 
-            <div class="detail-row">
-                <span class="label">Payment Status</span>
-                <span class="value">
+    <div class="detail-row">
+        <span class="label">Payment Status</span>
+        <span class="value">
 
-                    {% if booking.payment_status == "paid" %}
+            {% if booking.payment_status == "paid" %}
 
-                        <span class="payment-paid">
-                            Paid
-                        </span>
+                <span class="payment-paid">Paid</span>
 
-                    {% elif booking.payment_status == "refunded" %}
+            {% elif booking.payment_status == "refunded" %}
 
-                        <span class="payment-refunded">
-                            Refunded
-                        </span>
+                <span class="payment-refunded">Refunded</span>
 
-                    {% else %}
+            {% else %}
 
-                        {{ booking.payment_status or "Not available" }}
+                {{ booking.payment_status or "Not available" }}
 
-                    {% endif %}
+            {% endif %}
 
-                </span>
-            </div>
+        </span>
+    </div>
 
-            <div class="detail-row">
-                <span class="label">Payment ID</span>
-                <span class="value">
-                    {{ booking.payment_id or "Not available" }}
-                </span>
-            </div>
+    <div class="detail-row">
+        <span class="label">Payment ID</span>
+        <span class="value">
+            {{ booking.payment_id or "Not available" }}
+        </span>
+    </div>
 
-            <div class="detail-row">
-                <span class="label">Amount Paid</span>
-                <span class="value amount">
-                    {% if booking.payment_amount %}
-                        ₹{{ booking.payment_amount }}
-                    {% else %}
-                        Not available
-                    {% endif %}
-                </span>
-            </div>
+    <div class="detail-row">
+        <span class="label">Amount Paid by Customer</span>
+        <span class="value amount">
+            {% if payment %}
+                ₹{{ "%.2f"|format(payment.amount|float) }}
+            {% elif booking.payment_amount is not none %}
+                ₹{{ "%.2f"|format(booking.payment_amount|float) }}
+            {% else %}
+                Not available
+            {% endif %}
+        </span>
+    </div>
 
+    <div class="detail-row">
+        <span class="label">Platform Fee Percentage</span>
+        <span class="value">
+            {% if payment %}
+                {{ "%.2f"|format(payment.platform_fee_percentage|float) }}%
+            {% else %}
+                Not available
+            {% endif %}
+        </span>
+    </div>
+
+    <div class="detail-row">
+        <span class="label">Platform Fee Amount</span>
+        <span class="value">
+            {% if payment %}
+                ₹{{ "%.2f"|format(payment.platform_fee_amount|float) }}
+            {% else %}
+                Not available
+            {% endif %}
+        </span>
+    </div>
+
+    <div class="detail-row">
+        <span class="label">Professional Amount</span>
+        <span class="value amount">
+            {% if payment %}
+                ₹{{ "%.2f"|format(payment.professional_amount|float) }}
+            {% else %}
+                Not available
+            {% endif %}
+        </span>
+    </div>
+
+    {% if payment %}
+        <div class="detail-row">
+            <span class="label">Payment Gateway</span>
+            <span class="value">
+                {{ payment.gateway or "Not available" }}
+            </span>
         </div>
+    {% endif %}
+
+</div>
 
 
         <!-- Refund Information -->

@@ -883,7 +883,13 @@
                                             class="payment-status payment-status-{{ payment.status }}"
                                         >
 
-                                            {{ payment.status|capitalize }}
+                                            {% if payment.status == "partially_refunded" %}
+                                                Partially Refunded
+                                            {% elif payment.status == "refunded" %}
+                                                Fully Refunded
+                                            {% else %}
+                                                {{ payment.status|replace("_", " ")|capitalize }}
+                                            {% endif %}
 
                                         </span>
 

@@ -129,6 +129,14 @@ class ServiceRequest(db.Model):
         db.String(255),
         nullable=True
     )
+
+    
+    # Action to finalize after the refund is confirmed
+    refund_action = db.Column(
+        db.String(30),
+        nullable=True
+    )
+
     
     created_at = db.Column(
         db.DateTime,

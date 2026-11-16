@@ -6,3 +6,6 @@ __pycache__/
 instance/
 .vscode/
 .idea/
+.pytest_cache/
+*.sqlite
+*.db

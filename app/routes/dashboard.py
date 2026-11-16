@@ -22,9 +22,13 @@ from ..models.user import User
 from ..models.professional_service_request import ProfessionalServiceRequest
 from ..models.notification_preference import NotificationPreference
 from ..utils.email import send_email
+from app.utils.payment_refunds import process_full_refund
 from ..models import Favorite
 from ..models.notification import Notification
 from ..models.payment import Payment
+from ..models.payment_refund import PaymentRefund
+
+
 from ..utils.admin_settings import get_admin_settings
 from sqlalchemy import func
 import os
@@ -61,7 +65,13 @@ def create_notification(
 
     user = db.session.get(User, user_id)
 
-    if user and user.email:
+    settings = get_admin_settings()
+
+    if (
+        settings.email_notifications_enabled
+        and user
+        and user.email
+    ):
         send_email(
             recipient=user.email,
             subject=f"AllYourHelp - {title}",
@@ -1791,7 +1801,7 @@ def payment_history():
     refunded_payments = sum(
         1
         for payment in payments
-        if payment.status == "refunded"
+        if payment.status in ("refunded", "partially_refunded")
     )
 
     # --------------------------------------------------------
@@ -1811,7 +1821,7 @@ def payment_history():
     total_refunded_amount = sum(
         float(payment.refund_amount or 0)
         for payment in payments
-        if payment.status == "refunded"
+        if payment.status in ("refunded", "partially_refunded")
     )
 
     unread_notifications = Notification.query.filter_by(
@@ -1822,6 +1832,7 @@ def payment_history():
     # RENDER PAYMENT HISTORY PAGE
     # --------------------------------------------------------
 
+    
     return render_template(
         "dashboard/payment_history.html",
         user=current_user,
@@ -1840,6 +1851,7 @@ def payment_history():
             2
         )
     )
+
 
 # ============================================================
 # CUSTOMER PAYMENT DETAILS
@@ -2100,6 +2112,18 @@ def cancel_booking(request_id):
     if not service_request:
         abort(404)
 
+    if service_request.payment_status == "partially_refunded":
+        flash(
+            "This booking has a partially refunded payment. "
+            "Please contact support before cancelling.",
+            "error"
+        )
+        return redirect(
+            url_for(
+                "dashboard.booking_details",
+                request_id=service_request.id
+            )
+        )
     # Only pending or confirmed bookings can be cancelled
     if service_request.status not in ["pending", "confirmed"]:
 
@@ -2114,37 +2138,181 @@ def cancel_booking(request_id):
                 request_id=service_request.id
             )
         )
-
-    # --------------------------------------------------
-    # RELEASE AVAILABILITY SLOT
-    # --------------------------------------------------
-
-    if service_request.availability_slot:
-        service_request.availability_slot.is_booked = False
-
-    # --------------------------------------------------
-    # CANCEL BOOKING
-    # --------------------------------------------------
-
-    service_request.status = "cancelled"
-
+    
     # --------------------------------------------------
     # PROCESS REFUND
     # --------------------------------------------------
 
+    refund_message = None
+
     if service_request.payment_status == "paid":
 
-        service_request.refund_status = "refunded"
+        payment = Payment.query.filter_by(
+            service_request_id=service_request.id,
+            user_id=current_user.id
+        ).first()
 
-        service_request.refund_amount = (
-            service_request.payment_amount
+        if not payment:
+            current_app.logger.error(
+                "No payment record found for booking %s.",
+                service_request.id
+            )
+            flash(
+                "We could not verify the payment for this booking. "
+                "Please contact support before cancelling.",
+                "error"
+            )
+            return redirect(
+                url_for(
+                    "dashboard.booking_details",
+                    request_id=service_request.id
+                )
+            )
+
+        
+        # Prevent a duplicate refund request while an earlier
+        # refund is awaiting confirmation.
+        # Prevent duplicate refund requests while one is pending.
+    if payment.refund_id and payment.status == "paid":
+        existing_refund = PaymentRefund.query.filter_by(
+            razorpay_refund_id=payment.refund_id,
+            payment_id=payment.id
+        ).first()
+
+        if not existing_refund or existing_refund.status != "failed":
+            flash(
+                "A refund request already exists for this payment. "
+                "Please wait for confirmation before trying again.",
+                "info"
+            )
+            return redirect(
+                url_for(
+                    "dashboard.booking_details",
+                    request_id=service_request.id
+                )
+            )
+
+        # The previous refund failed, so permit a new attempt.
+        payment.refund_id = None
+        service_request.refund_id = None
+        service_request.refund_status = "failed"
+        service_request.refund_action = None
+
+        success, message, refund_id, refund_status = (
+            process_full_refund(payment)
         )
 
-        service_request.refund_id = (
-            f"TEST-REFUND-{service_request.id}"
-        )
 
-        service_request.payment_status = "refunded"
+        if not success:
+            flash(
+                f"Cancellation was not completed: {message}",
+                "error"
+            )
+            return redirect(
+                url_for(
+                    "dashboard.booking_details",
+                    request_id=service_request.id
+                )
+            )
+
+        if refund_status == "pending":
+            payment.refund_id = refund_id
+            payment.refund_amount = payment.amount
+
+            service_request.refund_id = refund_id
+            service_request.refund_amount = payment.amount
+            service_request.refund_status = "pending"
+            service_request.refund_action = "cancel"
+
+            db.session.commit()
+
+            flash(
+                "Your refund request has been submitted and is awaiting confirmation. Your booking has not been cancelled yet.",
+                "info"
+            )
+            return redirect(
+                url_for(
+                    "dashboard.booking_details",
+                    request_id=service_request.id
+                )
+            )
+        # Record a completed refund only when Razorpay reports processed.
+        if refund_status == "processed":
+            refund_record = PaymentRefund.query.filter_by(
+                razorpay_refund_id=refund_id
+            ).first()
+
+            if not refund_record:
+                db.session.rollback()
+                current_app.logger.error(
+                    "Processed Razorpay refund %s has no refund record.",
+                    refund_id
+                )
+                flash(
+                    "The refund is being verified. Your booking has not been cancelled yet.",
+                    "info"
+                )
+                return redirect(
+                    url_for(
+                        "dashboard.booking_details",
+                        request_id=service_request.id
+                    )
+                )
+
+            
+            # Confirm the recorded refund covers the full payment.
+            if round(float(refund_record.amount), 2) != round(
+                float(payment.amount), 2
+            ):
+                db.session.rollback()
+                current_app.logger.error(
+                    "Refund amount mismatch for payment %s, refund %s.",
+                    payment.id,
+                    refund_id
+                )
+                flash(
+                    "The refund amount is being verified. "
+                    "Your booking has not been cancelled.",
+                    "error"
+                )
+                return redirect(
+                    url_for(
+                        "dashboard.booking_details",
+                        request_id=service_request.id
+                    )
+                )
+
+            refund_record.status = "processed"
+            payment.status = "refunded"
+            payment.refund_id = refund_id
+
+            payment.refund_amount = payment.amount
+            payment.refunded_at = datetime.utcnow()
+
+            service_request.refund_status = "refunded"
+            service_request.refund_amount = payment.amount
+            service_request.refund_id = refund_id
+            service_request.payment_status = "refunded"
+        else:
+            db.session.rollback()
+            flash(
+                "The refund has not been confirmed yet. Your booking has not been cancelled.",
+                "info"
+            )
+            return redirect(
+                url_for(
+                    "dashboard.booking_details",
+                    request_id=service_request.id
+                )
+            )
+
+    # Cancel booking only after any required refund is confirmed.
+    service_request.status = "cancelled"
+
+    # Release the availability slot only when cancellation is finalized.
+    if service_request.availability_slot:
+        service_request.availability_slot.is_booked = False
+
 
     # --------------------------------------------------
     # ADMIN NOTIFICATION
@@ -2277,7 +2445,12 @@ def booking_payment():
                 "dashboard.user_dashboard"
             )
         )
+    if not settings.payments_enabled:
+        session.pop("razorpay_order_id", None)
 
+        return render_template(
+            "dashboard/payment_unavailable.html"
+        )
     # --------------------------------
     # GET PENDING BOOKING FROM SESSION
     # --------------------------------
@@ -3047,17 +3220,53 @@ def professional_earnings():
     # EARNINGS CALCULATIONS
     # --------------------------------------------------------
 
+    
+# Get payment records for this professional's bookings
+    booking_ids = [booking.id for booking in bookings]
+
+    payments = Payment.query.filter(
+        Payment.service_request_id.in_(booking_ids),
+        Payment.professional_id == professional.id
+    ).all() if booking_ids else []
+
+    payments_by_booking = {
+        payment.service_request_id: payment
+        for payment in payments
+    }
+
+    # Customer payment totals
     total_earnings = sum(
-        float(booking.payment_amount or 0)
-        for booking in bookings
+        float(payment.amount or 0)
+        for payment in payments
+        if payment.status == "paid"
     )
 
+    # Platform fees on paid payments
+    total_platform_fees = sum(
+        float(payment.platform_fee_amount or 0)
+        for payment in payments
+        if payment.status == "paid"
+    )
+
+    # Actual amount allocated to the professional
+    paid_earnings = sum(
+        float(payment.professional_amount or 0)
+        for payment in payments
+        if payment.status == "paid"
+    )
+
+    # Refund total from bookings
     total_refunded = sum(
         float(booking.refund_amount or 0)
         for booking in bookings
+        if booking.payment_status == "refunded"
     )
 
-    net_earnings = total_earnings - total_refunded
+    net_earnings = max(
+        0,
+        paid_earnings - total_refunded
+    )
+
 
     # Paid bookings
     paid_bookings = [
@@ -3072,6 +3281,8 @@ def professional_earnings():
     )
 
     # Pending payments
+    
+    # Pending payments
     pending_bookings = [
         booking
         for booking in bookings
@@ -3081,7 +3292,8 @@ def professional_earnings():
     pending_earnings = sum(
         float(booking.payment_amount or 0)
         for booking in pending_bookings
-    )
+)
+
 
     # Refunded bookings
     refunded_bookings = [
@@ -3098,48 +3310,40 @@ def professional_earnings():
         if booking.status == "completed"
     ]
 
-    # --------------------------------------------------------
+    
     # MONTHLY EARNINGS
-    # --------------------------------------------------------
 
     monthly_earnings = {}
 
     for booking in bookings:
-
-        if not booking.payment_amount:
+        if not booking.created_at:
             continue
 
-        if not booking.created_at:
+        payment = payments_by_booking.get(booking.id)
+
+        if not payment or payment.status != "paid":
             continue
 
         month_key = booking.created_at.strftime("%Y-%m")
 
         monthly_earnings[month_key] = (
             monthly_earnings.get(month_key, 0)
-            + float(booking.payment_amount)
-            - float(booking.refund_amount or 0)
+            + float(payment.professional_amount or 0)
         )
 
     monthly_labels = []
     monthly_values = []
 
     for month in sorted(monthly_earnings.keys()):
-
         try:
-            month_date = datetime.strptime(
-                month,
-                "%Y-%m"
-            )
-
+            month_date = datetime.strptime(month, "%Y-%m")
             label = month_date.strftime("%b %Y")
-
         except ValueError:
             label = month
 
         monthly_labels.append(label)
-        monthly_values.append(
-            round(monthly_earnings[month], 2)
-        )
+        monthly_values.append(round(monthly_earnings[month], 2))
+
 
     return render_template(
         "dashboard/professional_earnings.html",
@@ -3219,18 +3423,6 @@ def notification_click(notification_id):
     return redirect(url_for("dashboard.notifications"))
 from flask import current_app
 
-
-@dashboard.route("/test-email")
-@login_required
-def test_email():
-
-    send_email(
-        recipient="ajaybabu0509@gmail.com",
-        subject="AllYourHelp Email Test",
-        body="This is a test email from AllYourHelp."
-    )
-
-    return "Test email attempted. Check the Flask terminal."
 @dashboard.route(
     "/favorites/<int:professional_id>/add",
     methods=["POST"]
@@ -3487,11 +3679,27 @@ def verify_payment():
             "message": "Booking information is no longer available."
         }, 400
 
-    amount = service.price or 0
+    # --------------------------------------------------
+# CALCULATE PLATFORM FEE
+# --------------------------------------------------
 
-    expected_amount = int(
-        float(amount) * 100
-    )
+        amount = service.price or 0
+
+        platform_fee_percentage = (
+            settings.platform_fee_percentage or 0
+        )
+
+        platform_fee_amount = (
+            amount * platform_fee_percentage / 100
+        )
+
+        professional_amount = (
+            amount - platform_fee_amount
+        )
+
+        expected_amount = int(
+            float(amount) * 100
+        )
 
     if razorpay_payment.get("amount") != expected_amount:
 
@@ -3571,6 +3779,9 @@ def verify_payment():
         user_id=current_user.id,
         professional_id=professional.id,
         amount=amount,
+        platform_fee_percentage=platform_fee_percentage,
+        platform_fee_amount=platform_fee_amount,
+        professional_amount=professional_amount,
         currency="INR",
         status="paid",
         gateway="razorpay",
@@ -3656,7 +3867,7 @@ def payment_failed():
 
     error_description = request.form.get(
         "error_description"
-    )
+    )  
 
     # Verify that this failure belongs to the
     # Razorpay order created for the current session.
