@@ -19,12 +19,26 @@ class Config:
             "SECRET_KEY is not set. Add a strong SECRET_KEY to your .env file."
         )
 
+    
+    # --------------------------------------------------
+    # Database configuration
+    # --------------------------------------------------
+
+    # Pooled Neon connection for normal application usage
     SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
 
     if not SQLALCHEMY_DATABASE_URI:
         raise RuntimeError(
             "DATABASE_URL is not set. Add your PostgreSQL connection string to .env."
         )
+
+    # Direct Neon connection for database migrations
+    DATABASE_URL_UNPOOLED = os.getenv("DATABASE_URL_UNPOOLED")
+
+    # Check connections before reusing them
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        "pool_pre_ping": True
+    }
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
